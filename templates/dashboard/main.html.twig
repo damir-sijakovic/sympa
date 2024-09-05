@@ -1,0 +1,226 @@
+    <link rel="stylesheet" href="{{rootUrl}}/assets/vendor/bootstrap-5.3.3-dist/font/bootstrap-icons.min.css">
+    <link rel="stylesheet" href="{{rootUrl}}/assets/vendor/bootstrap-5.3.3-dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="{{rootUrl}}/assets/css/main.css">
+
+	<style>
+		html, body{
+			height:100%;
+			background: #f1f1f1;
+		}
+		
+		#ds-dashboard-sidemenu{
+			height:100%;
+		}
+		
+		.ds-dashboard-sidemenu-outter{
+			background: #212529;
+			position:fixed;
+			top:0;
+			bottom:0;
+			overflow-y: auto;
+		}
+		
+		.ds-dashboard-container{
+			/* height:100%; */
+			display:flex;            
+		}
+		
+		#ds-dashboard-content{
+			height:100%;
+			background-color: #f1f1f1;
+			margin-left: 280px;
+		}
+		
+		.ds-content{
+			width: calc(100% - 280px);
+			overflow:auto;
+			padding: 20px;
+		}
+		
+		.ds-nav-submenu{
+			list-style-type: none;
+			background: #333;
+			display: none;
+			padding: 5px;
+		}
+		
+		#ds-dashboard-mobile-button{
+			position: fixed;
+			top:0;
+			left:0px;
+			height: 50px;
+			width: 50px;
+			z-index:10000;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			cursor:pointer;
+		}
+		#ds-dashboard-mobile-declick{
+			display:none;
+		}
+		
+		#ds-dashboard-mobile-button{
+			display:none;
+		}
+		
+	@media only screen and (max-width: 600px) /* mobile */
+	{ 
+		#ds-dashboard-sidemenu{ 
+		   position: fixed ;
+		   z-index: 9999;	
+		   display: none !important;
+		
+		}
+
+		#ds-dashboard-mobile-declick{
+			position: fixed;
+			top:0;
+			bottom:0;
+			left:0;
+			right:0;
+			background: #00000066;
+			z-index: 9998;
+			cursor:pointer;
+		}
+
+		.ds-content{
+			width: 100%;
+			position: fixed;
+			z-index: 9997;		
+		}
+		
+		#ds-dashboard-mobile-button{
+			display:flex;
+		}
+	}
+
+
+	#ds-top-message{
+		position: fixed;
+		left:0;
+		right:0;
+		z-index: 9999;
+	}
+
+	.ds-animate-top{position:relative;animation:animatetop 0.4s}@keyframes animatetop{from{top:-300px;opacity:0} to{top:0;opacity:1}}
+		
+	</style>
+
+	<div id="ds-top-message" class="ds-animate-top"> 
+
+	</div>
+
+
+	<div id="ds-dashboard-mobile-button" class="text-bg-dark" onclick="ds_showSidebar()"> <i class="bi bi-list"></i> </div>
+	<div id="ds-dashboard-mobile-declick" onclick="ds_hideSidebar()"></div>
+
+
+
+	<div class="ds-dashboard-container">
+        
+<div class="ds-dashboard-sidemenu-outter">
+	<div id="ds-dashboard-sidemenu" class="d-flex flex-column flex-shrink-0 p-3 text-bg-dark" style="width: 280px;">
+    <a  target="_blank" href="/" class="d-flex align-items-center mb-3 mb-md-0 me-md-auto text-white text-decoration-none" title="Go to webpage...">
+      <i class="bi bi-box-arrow-in-up-right" style="font-size: 40px; margin-right:10px" title="Open home page..."></i>
+      <span class="fs-4"> Sympa Project </span>      
+    </a>
+    <hr>
+    <ul class="nav nav-pills flex-column mb-auto">
+		        
+      <li>
+        <a id="ds-posts-link-files" href="/dashboard" class="nav-link text-white">
+          <i class="bi bi-folder2"></i>
+          Articles
+        </a>
+      </li>
+  
+      <li>
+        <a id="ds-posts-link-about" href="/dashboard/article-create" class="nav-link text-white">
+          <i class="bi bi-file-earmark-plus"></i>
+          Create article
+        </a>
+      </li>
+    
+      <li>
+        <a id="ds-posts-link-about" href="/dashboard/categories" class="nav-link text-white">
+          <i class="bi bi-ui-checks-grid"></i>
+          Categories
+        </a>
+      </li>
+  
+      <li>
+        <a id="ds-posts-link-about" href="/dashboard/category-create" class="nav-link text-white">
+          <i class="bi bi-ui-checks-grid"></i>
+          Create category
+        </a>
+      </li>
+  
+      <li>
+        <a id="ds-posts-link-about" href="/dashboard/about" class="nav-link text-white">
+          <i class="bi bi-tag"></i>
+          Tags
+        </a>
+      </li>
+  
+    </ul>
+    <hr>
+    <div class="dropdown">
+      <a href="#" class="d-flex align-items-center text-white text-decoration-none dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+        <img src="{{rootUrl}}/assets/img/admin.jpg" alt="" width="32" height="32" class="rounded-circle me-2">
+        <strong>{{userId|default('User')}}</strong>
+      </a>
+      <ul class="dropdown-menu dropdown-menu-dark text-small shadow">
+        <li><a class="dropdown-item" href="/" target="_blank">View website...</a></li>
+        <li><hr class="dropdown-divider"></li>
+        <li><a class="dropdown-item" href="/user/logout">Logout</a></li>
+      </ul>
+    </div>
+  </div>
+	
+</div>
+
+
+	<!-- SCRIPTS -->
+    <script src="{{rootUrl}}/assets/vendor/umd/popper.min.js"></script>
+    <script src="{{rootUrl}}/assets/vendor/bootstrap-5.3.3-dist/js/bootstrap.bundle.min.js"></script>	
+    
+    <script src="{{rootUrl}}/assets/js/main.js"></script>
+    
+	<div id="ds-dashboard-content" class="ds-content" style="">
+	{{body|raw}}
+	</div>
+
+	</div>
+
+
+<script>	
+    
+    
+    /*
+	const activeMenu = "{{activeLink|default(null)}}";	
+	document.getElementById(activeMenu).classList.add("active");
+	if (activeMenu.startsWith("ds-posts")) {
+		document.getElementById("ds-submenu-posts").style.display = "block";
+	} 	
+	
+	// SHOW HIDE
+	
+	function ds_hideSidebar(){
+		document.getElementById("ds-dashboard-mobile-declick").style.display = "none";
+		document.getElementById("ds-dashboard-sidemenu").style.setProperty("display", "none", "important");
+		document.getElementById("ds-dashboard-mobile-declick").style.display = "none";
+		document.getElementById("ds-dashboard-mobile-button").style.display = "flex";
+	}
+	
+	function ds_showSidebar(){
+		document.getElementById("ds-dashboard-sidemenu").style.setProperty("display", "flex", "important");
+		document.getElementById("ds-dashboard-mobile-declick").style.display = "block";
+		document.getElementById("ds-dashboard-mobile-button").style.display = "none";
+	}
+	
+    */
+	
+</script>
+
+

@@ -1,0 +1,173 @@
+<link rel="stylesheet" href="{{rootUrl}}/assets/vendor/trumbowyg/trumbowyg.min.css">
+<link rel="stylesheet" href="{{rootUrl}}/assets/vendor/trumbowyg/plugins/table/trumbowyg.table.min.css">
+<style>
+	#trumbowyg-element{
+		background: #ffffff;
+	}
+
+	.ds-categories-between{
+		display:flex; 
+		justify-content:space-between;
+		align-items: baseline;
+	}
+	
+	h6{
+		font-size: 13px;
+	}
+	
+	.ds-selected-table-item{
+		background: #0d6efd !important;
+		color: white !important;
+	}
+	
+	.ds-error{
+		border: 1px red solid !important;
+	}
+	
+	.trumbowyg-textarea{
+		font-size: 16px;
+		font-family: 'Consolas', 'Courier New', Courier, monospace;
+		line-height: 22px;
+	}
+	
+</style>
+
+
+<h2>Create article</h2>
+
+<hr>
+<br><br>
+
+    <div class="col-8">
+    
+    	<h6>Title:</h6>
+		<input class="form-control" id="ds-article-title" placeholder="" >
+		
+		<br>
+		<h6>Excerpt:</h6>
+		<textarea class="form-control" id="ds-article-excerpt" rows="3" maxlength="255" placeholder=""></textarea>
+		<br />
+		<h6>Content:</h6>
+		<div id="trumbowyg-element"></div>
+		
+		<br />
+       
+        <div class="form-check form-switch">
+            <input class="form-check-input" type="checkbox" role="switch" id="ds-article-active" checked>
+            <label class="form-check-label" for="flexSwitchCheckChecked">Visible</label>
+        </div>
+			
+       <br />
+       <div onclick="ds_publish()" class="btn btn-primary btn-lg" >Save</div>     
+		
+    </div>
+
+
+
+
+
+
+<script src="{{rootUrl}}/assets/vendor/jquery-3.6.0/jquery-3.6.0.min.js"></script>
+<script src="{{rootUrl}}/assets/vendor/trumbowyg/trumbowyg.min.js"></script>
+<script src="{{rootUrl}}/assets/vendor/trumbowyg/plugins/table/trumbowyg.table.min.js"></script>
+<script src="{{rootUrl}}/assets/vendor/slugify/slugify.min.js"></script> 
+<script src="{{rootUrl}}/assets/vendor/slugify/speakingurl.min.js"></script> 
+
+<script>
+
+//EDITOR
+var trumboEditor = $('#trumbowyg-element').trumbowyg({
+    autogrow: true,
+    tagsToRemove: ['script', 'iframe', 'style'],    
+    
+    plugins: {
+        table: {
+            // Allows creating tables up to 10 x 10
+            limitRows: 10,
+            limitCols: 10,
+
+            // Allows creating tables with a maximum of 100 cells
+            limitCells: 100,
+
+            // Allows creating tables with a maximum width of 1000 pixels
+            limitWidth: 1000,
+
+            // Allows creating tables with a maximum height of 500 pixels
+            limitHeight: 500
+        }
+    },
+    
+    /*
+    btns: [
+        ['viewHTML'],
+        ['formatting'],
+        ['strong', 'em', 'del'],
+        ['superscript', 'subscript'],
+        ['link'],
+        ['image'],
+        ['table'],
+        ['tableAddRowAbove', 'tableAddRowBelow', 'tableRemoveRow'],
+        ['tableAddColLeft', 'tableAddColRight', 'tableRemoveCol'],
+        ['tableMergeCells', 'tableSplitCells'],
+        ['horizontalRule'],
+        ['fullscreen']
+    ],
+    */
+});
+trumboEditor.trumbowyg('html', 'hellllo');
+
+
+
+//ARTICLE
+
+
+function ds_getArticleData()
+{    
+    let articleTitle = document.getElementById("ds-article-title").value;
+    let articleExcerpt = document.getElementById("ds-article-excerpt").value;
+    let content = trumboEditor.html();
+    let active = document.getElementById("ds-article-active").checked;
+
+    let data = {};
+    data.title = articleTitle;
+	data.content = content;
+	data.excerpt = articleExcerpt;
+	data.active = active;
+    
+    return data;
+}
+
+
+async function ds_publish()
+{
+	let data = ds_getArticleData();
+	
+	let postData = new FormData();  
+	postData.append('title', data.title);
+	postData.append('excerpt', data.excerpt);
+	postData.append('content', data.content);
+	postData.append('active', data.active);
+
+	const response = await fetch('/article-create', {
+		method: 'POST', 
+		body: postData,
+	});
+	
+	const jsonData = await response.json();
+	
+	if (jsonData.error) {
+		ds_message(jsonData.message, 'warning');
+	}
+	else {
+		ds_message('Article created!', 'success');
+		setTimeout(function () {
+		//	window.location.reload();
+		}, 2000);
+	}
+}
+
+
+
+
+
+</script>

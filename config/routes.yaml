@@ -1,0 +1,96 @@
+controllers:
+    resource:
+        path: ../src/Controller/
+        namespace: App\Controller
+    type: attribute
+
+page_home:
+    path: /
+    controller: App\Controller\PageController::home
+    methods: ['GET']
+
+page_about:
+    path: /about
+    controller: App\Controller\PageController::about
+    methods: ['GET']
+
+user_login_get:
+    path: /user/login
+    controller: App\Controller\UserController::loginGet
+    methods: ['GET']
+    
+user_login_post:
+    path: /user/login
+    controller: App\Controller\UserController::loginpost
+    methods: ['POST']
+    
+user_register_get:
+    path: /user/register
+    controller: App\Controller\UserController::registerGet
+    methods: ['GET']
+        
+user_register_post:
+    path: /user/register
+    controller: App\Controller\UserController::registerPost
+    methods: ['POST']
+    
+user_logout_get:
+    path: /user/logout
+    controller: App\Controller\UserController::logoutGet
+    methods: ['GET']
+
+article_post_id:
+    path: /article-get-by-id/{id}
+    controller: App\Controller\ArticleController::getByIdPost 
+    methods: ['POST']
+
+article_post_get_all: 
+    path: /article-get-all
+    controller: App\Controller\ArticleController::getArticlesPost 
+    methods: ['GET']
+    # queryparams: page, per_page, sort: id-asc, id-desc, asc, desc
+
+article_create: 
+    path: /article-create
+    controller: App\Controller\ArticleController::createPost 
+    methods: ['POST']
+
+article_edit: 
+    path: /article-edit
+    controller: App\Controller\ArticleController::editPost 
+    methods: ['POST']
+
+article_delete:
+    path: /article-delete
+    controller: App\Controller\ArticleController::deleteArticleByIdPost
+    methods: ['POST']
+    
+dashboard:
+    path: /dashboard
+    controller: App\Controller\DashboardController::index
+    methods: ['GET']
+
+dashboard_article_create: 
+    path: /dashboard/article-create
+    controller: App\Controller\DashboardController::createArticle 
+    methods: ['GET']
+
+dashboard_article_edit: 
+    path: /dashboard/article-edit/{id}
+    controller: App\Controller\DashboardController::editArticle 
+    methods: ['GET']
+
+
+dashboard_categories: 
+    path: /dashboard/categories
+    controller: App\Controller\DashboardController::categories 
+    methods: ['GET']
+
+dashboard_category_create: 
+    path: /dashboard/category-create
+    controller: App\Controller\DashboardController::createCategory 
+    methods: ['GET']
+
+
+
+

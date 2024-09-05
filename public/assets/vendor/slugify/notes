@@ -1,0 +1,19 @@
+
+<script src="jquery.js"></script>
+<script src="speakingurl.min.js"></script>
+<script src="slugify.min.js"></script>
+
+<input type ="text" value="" id="slug-source" /> <!-- The text to be slugged -->
+<input type ="text" value="" id="slug-target" /> <!-- The processed text as slug -->
+
+<script>
+jQuery(function($) {
+  $.slugify("Ätschi Bätschi"); // "aetschi-baetschi"
+  $('#slug-target').slugify('#slug-source'); // Type as you slug
+
+  $("#slug-target").slugify("#slug-source", {
+  	separator: '_' // If you want to change separator from hyphen (-) to underscore (_).
+  });
+});
+</script>
+
