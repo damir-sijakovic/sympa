@@ -47,4 +47,6 @@ class ArticleTag
         $this->article = $article;
         return $this;
     }
+    
+    
 }

@@ -19,9 +19,24 @@ class Article
     #[ORM\Column(type: "text", nullable: true, unique: true)]
     private ?string $slug = null;
 
+    #[ORM\Column(type:"string", length:36, unique:true, nullable: true)]
+    private string $uuid;
+
+    #[ORM\Column(type:"string", length:36, unique:true, nullable: true)]
+    private ?string $groupUuid = null;
+
     #[ORM\Column(length: 32)]
     private ?string $type = null;
 
+    #[ORM\Column(type: "text", nullable: true)]
+    private ?string $sku = null;
+
+    #[ORM\Column(type: "float", nullable: true)]
+    private ?float $price = null;
+    
+    #[ORM\Column(type: "integer", nullable: true)]
+    private ?int $quantity = null;
+    
     #[ORM\Column(type: "text", nullable: true)]
     private ?string $content = null;
 
@@ -34,7 +49,7 @@ class Article
     #[ORM\Column(length: 255)]
     private ?string $author = null;
 
-    #[ORM\Column(length: 255)]
+    #[ORM\Column(type: "text", nullable: true)]
     private ?string $image = null;
 
     #[ORM\Column]
@@ -244,4 +259,63 @@ class Article
 
         return $this;
     }
-}
+
+
+    public function getUuid(): string
+    {
+        return $this->uuid;
+    }
+
+    public function setUuid(string $uuid): self
+    {
+        $this->uuid = $uuid;
+        return $this;
+    }
+
+    public function getGroupUuid(): ?string
+    {
+        return $this->groupUuid;
+    }
+
+    public function setGroupUuid(?string $groupUuid): self
+    {
+        $this->groupUuid = $groupUuid;
+        return $this;
+    }
+
+
+    public function getSku(): ?string
+    {
+        return $this->sku;
+    }
+
+    public function setSku(?string $sku): self
+    {
+        $this->sku = $sku;
+        return $this;
+    }
+
+    public function getPrice(): ?float
+    {
+        return $this->price;
+    }
+
+    public function setPrice(?float $price): self
+    {
+        $this->price = $price;
+        return $this;
+    }
+
+    public function getQuantity(): ?int
+    {
+        return $this->quantity;
+    }
+
+    public function setQuantity(?int $quantity): self
+    {
+        $this->quantity = $quantity;
+        return $this;
+    }
+
+
+};

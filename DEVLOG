@@ -1,0 +1,22 @@
+
+0.1.9.1725683908
+=====
+Improved dashboard Article list view (bulk actions). 
+Added product columns to "article" entity.
+Added types to Category and Tags
+
+0.1.8 
+=====
+Login/Logout controllers and twig templates.
+Added "sort=id-asc, sort=id-desc" to ArticlesController::getArticlesPost method.
+
+
+0.1.5 
+=====
+Added dashboard.<br/>Added "home" page.
+Added "about".
+
+0.1.0 
+=====
+Basic project shape. 
+

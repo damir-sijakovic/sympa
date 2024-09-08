@@ -47,4 +47,6 @@ class ArticleCategory
 
         return $this;
     }
+    
+    
 }

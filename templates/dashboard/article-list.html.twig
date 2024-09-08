@@ -1,3 +1,22 @@
+<style>
+.sympa-bulk-actions, .sympa-list-options{
+    display:flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column; 
+    flex-direction: row;
+    white-space: nowrap;
+}
+
+#symp-list-titlebar{
+    font-size: 14px !important;
+     font-weight: 500;
+}
+
+</style>
+
+
+
 <h2>Articles</h2>
 
 <hr>
@@ -6,11 +25,11 @@
 
 <br><br>
 
-<div id="ds-no-article-list" class="alert alert-primary" role="alert" style="display:none">
+<div id="sympa-no-article-list" class="alert alert-primary" role="alert" style="display:none">
   There is no articles!
 </div>
 
-<ul id="ds-article-list" class="list-group mb-3">
+<ul id="sympa-article-list" class="list-group mb-3">
           
           <!--
         <li class=
@@ -37,7 +56,7 @@
           <li class=
           "list-group-item d-flex justify-content-between">
             <span>Total:</span>
-            <strong id="ds-total-articles"></strong>
+            <strong id="sympa-total-articles"></strong>
           </li>
           
           -->   
@@ -47,7 +66,7 @@
         </li> 
  </ul>
 
-<nav aria-label="Page navigation example" id="ds-pagination">
+<nav aria-label="Page navigation example" id="sympa-pagination">
 <!--
   <ul class="pagination">
     <li class="page-item">
@@ -69,23 +88,23 @@
 
 <!-- MODALS -->
 
-<div class="modal ds-modal" id="ds-delete-single-modal" style="display:none;">
+<div class="modal sympa-modal" id="sympa-delete-single-modal" style="display:none;">
   <div class="modal-dialog">
-    <div class="modal-content ds-huge-shadow ds-animate-opacity">
+    <div class="modal-content sympa-huge-shadow sympa-animate-opacity">
       <div class="modal-header">
         <h5 class="modal-title">Warning!</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" onclick="document.getElementById('ds-delete-single-modal').style.display='none'"></button>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" onclick="document.getElementById('sympa-delete-single-modal').style.display='none'"></button>
       </div>
       <div class="modal-body">
         <p>Do you want to delete post?</p>
       </div>
       <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" onclick="document.getElementById('ds-delete-single-modal').style.display='none'">Cancel</button>
-        <button type="button" class="btn btn-danger" onclick="ds_deleteArticleModalAction()">Delete</button>
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" onclick="document.getElementById('sympa-delete-single-modal').style.display='none'">Cancel</button>
+        <button type="button" class="btn btn-danger" onclick="sympa_deleteArticleModalAction()">Delete</button>
       </div>
 
 	<div class="alert alert-warning alert-dismissible fade show" role="alert" style="display:none; margin-bottom: 0;">
-	   <span id="ds-bulk-delete-modal-message"> Hello</span> 
+	   <span id="sympa-bulk-delete-modal-message"> Hello</span> 
 	  <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close" ></button>
 	</div>
 
@@ -97,16 +116,40 @@
 
 <script>
 
-function ds_deleteArticleModal(id){
-    let targetElement = document.getElementById("ds-delete-single-modal");
+
+function sympa_tableCheck(checked){
+    if (checked){
+        const elements = document.querySelectorAll('.sympa-bulk-checkbox');
+        elements.forEach(function(element) {
+            console.log(element);
+            element.checked = true;
+        });
+    }
+    else{
+        const elements = document.querySelectorAll('.sympa-bulk-checkbox');
+        elements.forEach(function(element) {
+            console.log(element);
+            element.checked = false;
+        });
+    }    
+}
+
+
+function sympa_applyBulk(){
+    console.log("BULČK");
+}
+
+
+function sympa_deleteArticleModal(id){
+    let targetElement = document.getElementById("sympa-delete-single-modal");
     targetElement.style.display = "block";
     targetElement.setAttribute("data-id", id);
 }
 
 
-async function ds_deleteArticleModalAction()
+async function sympa_deleteArticleModalAction()
 {   
-    let targetElement = document.getElementById("ds-delete-single-modal");
+    let targetElement = document.getElementById("sympa-delete-single-modal");
     const id = targetElement.getAttribute("data-id"); 
     
     let postData = new FormData();  
@@ -132,7 +175,7 @@ async function ds_deleteArticleModalAction()
     
     
     /*
-    let targetElement = document.getElementById("ds-delete-single-modal");
+    let targetElement = document.getElementById("sympa-delete-single-modal");
     const id = targetElement.getAttribute("data-id");
 
     const response = await fetch('/article-delete/'+ id); 
@@ -160,31 +203,37 @@ async function ds_deleteArticleModalAction()
     }
     
     // console.log( jsonData );    
-    // ds-no-categories-found
+    // sympa-no-categories-found
     
     return jsonData;
     */
 }
 
 
-function ds_drawList(data)
+function sympa_drawList(data)
 {      
     let _createItem = function(x){
        
         let id = x.id;
         let title = x.title;
         let excerpt = x.excerpt;
+        let createdAt = x.created_at;
+        let modifiedAt = x.modified_at;
         
         return `
-        <li class="list-group-item d-flex justify-content-between bg-body-tertiary" title="ID: ${id}">
-            <div class="">
-              <div style="display: flex;"> <span style="font-size: smaller; margin-right: 5px;">(${id})</span> <h6 class="my-0">${title}</h6></div>
-              <small>${excerpt}</small>
+        <li class="list-group-item d-flex justify-content-between bg-body-tertiary" title="ID: ${id} \nCreated: ${createdAt}" data-id="${id}">
+            <div class="d-flex gap-1">                
+                <input class="form-check-input sympa-bulk-checkbox" type="checkbox">
+                <div>
+                    <div style="display: flex;"> <span style="font-size: smaller; margin-right: 5px;">(${id})</span> <h6 class="my-0">${title}</h6></div>
+                    <small>${excerpt}</small>
+                </div>
             </div>            
             <span class="text-success">
                 <div class="btn-group" role="group" aria-label="Basic outlined example">
+                  <a href="/dashboard/article-edit/${id}" class="btn btn-primary btn-sm " target="_blank">View</a>
                   <a href="/dashboard/article-edit/${id}" class="btn btn-primary btn-sm" target="_blank">Edit</a>
-                  <div onclick="ds_deleteArticleModal(${id})" class="btn btn-outline-primary btn-sm">Delete</div>
+                  <div onclick="sympa_deleteArticleModal(${id})" class="btn btn-outline-primary btn-sm">Delete</div>
                 </div>            
             </span>
           </li>
@@ -192,11 +241,32 @@ function ds_drawList(data)
     }
     
     let htmlData = `
-        <li class="list-group-item d-flex justify-content-between"> 
+        <li id="symp-list-titlebar" class="list-group-item d-flex justify-content-between">             
+			<div class="sympa-bulk-actions">
+                <input class="form-check-input" type="checkbox" onclick="sympa_tableCheck(this.checked)">
+				<small style="margin:0 5px">Bulk Actions:</small> 
+				<select class="form-select small" aria-label="Default select example">
+				  <option class="small" selected>Select...</option>
+				  <option class="small" value="1">Delete items</option>
+				</select>
+                <div onclick="sympa_applyBulk()" class="btn btn-primary btn-sm">Apply</div>
+			</div>
+			<div>
+            	<div class="sympa-list-options">
+                    <small style="margin:0 5px">Per page:</small> 
+                    <select class="form-select small" aria-label="Default select example">
+                      <option class="small" selected>Select...</option>
+                      <option class="small" value="10">10 items</option>
+                      <option class="small" value="25">25 items</option>
+                      <option class="small" value="50">50 items</option>
+                    </select>
+                    <button type="button" class="btn btn-primary btn-sm">Go</button>
+                </div>
+            </div>
         </li>   
     `;
     
-    let listElement = document.getElementById("ds-article-list");     
+    let listElement = document.getElementById("sympa-article-list");     
     
     for (const key in data.articles) {
         htmlData += _createItem(data.articles[key]);
@@ -205,20 +275,20 @@ function ds_drawList(data)
     htmlData += `
         <li class="list-group-item d-flex justify-content-between">
             <span>Total:</span>
-            <strong id="ds-total-articles"></strong>
+            <span id="sympa-total-articles"></span>
         </li>   
     `;
     
     listElement.innerHTML = htmlData;
     
-    let totalArticlesElement = document.getElementById("ds-total-articles");
-    totalArticlesElement.innerHTML = data.total;
+    let totalArticlesElement = document.getElementById("sympa-total-articles");
+    totalArticlesElement.innerHTML = data.total + ' article(s)';
     
    
 }
 
 
-function ds_paginate(data){    
+function sympa_paginate(data){    
     const {
 		currentPage,
 		firstPage,
@@ -254,7 +324,7 @@ function ds_paginate(data){
 		let prevPage = currentPage-1;
 		htmlData += `
             <li class="page-item">
-            <a class="page-link" onclick="ds_repaginate(${prevPage}, ${perPage})" aria-label="Previous">
+            <a class="page-link" onclick="sympa_repaginate(${prevPage}, ${perPage})" aria-label="Previous">
                 <span aria-hidden="true">&laquo;</span>
             </a>
             </li> 
@@ -266,18 +336,18 @@ function ds_paginate(data){
 		let targetPage = i;
 		
 		if (i === currentPage){	
-			htmlData += `<li class="page-item active"><a class="page-link" onclick="ds_repaginate(${i}, ${perPage})" >${i}</a></li>`;
+			htmlData += `<li class="page-item active"><a class="page-link" onclick="sympa_repaginate(${i}, ${perPage})" >${i}</a></li>`;
 		}
 		else
 		{
-			htmlData += `<li class="page-item"><a class="page-link" onclick="ds_repaginate(${i}, ${perPage})" >${i}</a></li>`;
+			htmlData += `<li class="page-item"><a class="page-link" onclick="sympa_repaginate(${i}, ${perPage})" >${i}</a></li>`;
 		}
 		
 	}     
          
     if (visibleEndPage > currentPage){
 		let nextPage = currentPage+1;
-		htmlData += `<li class="page-item"><div class="page-link" onclick="ds_repaginate(${nextPage}, ${perPage})" aria-label=""><span aria-hidden="true">&raquo;</span></div></li>`;
+		htmlData += `<li class="page-item"><div class="page-link" onclick="sympa_repaginate(${nextPage}, ${perPage})" aria-label=""><span aria-hidden="true">&raquo;</span></div></li>`;
 	}
 	else{
 		htmlData += `<li class="page-item disabled"><div class="page-link" onclick="" aria-label=""><span aria-hidden="true">&raquo;</span></div></li>`;
@@ -289,12 +359,12 @@ function ds_paginate(data){
         </ul>    
     `;
     
-    document.getElementById("ds-pagination").innerHTML = htmlData;
+    document.getElementById("sympa-pagination").innerHTML = htmlData;
     
 }
 
 
-async function ds_getArticles(page=1, perPage=3, sort='desc')
+async function sympa_getArticles(page=1, perPage=3, sort='desc')
 {      
     const response = await fetch('/article-get-all?page=' + page + '&per_page=' + perPage + '&sort=' + sort); // /article-get-all
 	const jsonData = await response.json();
@@ -308,35 +378,35 @@ async function ds_getArticles(page=1, perPage=3, sort='desc')
     }
     
     // console.log( jsonData );    
-    // ds-no-categories-found
+    // sympa-no-categories-found
     
     return jsonData;
 }
 
 
-async function ds_repaginate(page=1, perPage=3, sort='desc')
+async function sympa_repaginate(page=1, perPage=3, sort='desc')
 {      
-   	const data = await ds_getArticles(page, perPage, sort);
+   	const data = await sympa_getArticles(page, perPage, sort);
     
     if (data.total === 0){
-        document.getElementById("ds-article-list").style.display = 'none';  
-        document.getElementById("ds-no-article-list").style.display = 'block'; 
+        document.getElementById("sympa-article-list").style.display = 'none';  
+        document.getElementById("sympa-no-article-list").style.display = 'block'; 
         return;         
     }
             
-	ds_drawList(data);	
-    ds_paginate(data.paginateData);
+	sympa_drawList(data);	
+    sympa_paginate(data.paginateData);
 }
 
 
-async function ds_initList()
+async function sympa_initList()
 {      
-    await ds_repaginate(1, 10);
+    await sympa_repaginate(1, 10);
 }
 
 //MAIN
 window.addEventListener("load", async function() {
-    await ds_initList();
+    await sympa_initList();
 });
 
 </script>

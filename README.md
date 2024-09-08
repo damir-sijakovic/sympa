@@ -12,13 +12,9 @@ Sympa is my project built with **Symfony PHP 6.4** and **Bootstrap 5.3**, featur
 4. Run **reset.sh** to re-populate database.
 5. (Optional) add **fake_data.sql** to **article** table.
 
-## Version history
+## What's new?
 
-| Version | About |
-|---------|-------|
-| 0.1.8 | Login/Logout controllers and twig templates.<br/>Added "sort=id-asc, sort=id-desc" to ArticlesController::getArticlesPost method.<br/> |
-| 0.1.5 | Added dashboard.<br/>Added "home" page.<br/>Added "about".<br/> |
-| 0.1.0 | Basic project shape. |
+See DEVLOG file.
 
 ## Note
 The project is in the early stages of development but is still functional and usable.

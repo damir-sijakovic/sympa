@@ -21,6 +21,9 @@ class Category
     #[ORM\Column(type: "text", nullable: true)]
 	private ?string $slug = null;
 
+    #[ORM\Column(length: 32)]
+    private ?string $type = null;
+
     #[ORM\Column]
     private ?int $parent = null;
 
@@ -156,6 +159,18 @@ class Category
     public function getVisible(): bool
     {
         return $this->visible;
+    }
+    
+    public function getType(): ?string
+    {
+        return $this->type;
+    }
+
+    public function setType(string $type): static
+    {
+        $this->type = $type;
+
+        return $this;
     }
     
 }

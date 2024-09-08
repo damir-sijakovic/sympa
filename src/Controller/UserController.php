@@ -78,6 +78,7 @@ class UserController extends AbstractController
 
 		$user = new User();
 		$user->setEmail($email)
+			 ->setRole('user')
 			 ->setPassword($hashedPassword)
 			 ->setCreatedAt(new \DateTimeImmutable())
 			 ->setModifiedAt(new \DateTimeImmutable())
