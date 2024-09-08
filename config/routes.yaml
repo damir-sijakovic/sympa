@@ -8,6 +8,11 @@ page_home:
     path: /
     controller: App\Controller\PageController::home
     methods: ['GET']
+    
+page_view_article:
+    path: /article/{id}
+    controller: App\Controller\PageController::viewArticle
+    methods: ['GET']
 
 page_about:
     path: /about
@@ -64,7 +69,8 @@ article_delete:
     path: /article-delete
     controller: App\Controller\ArticleController::deleteArticleByIdPost
     methods: ['POST']
-    
+  
+ 
 dashboard:
     path: /dashboard
     controller: App\Controller\DashboardController::index

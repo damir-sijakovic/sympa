@@ -40,9 +40,23 @@ class PageController extends AbstractController
         ]);
     }
     
+    public function viewArticle(Request $request, $id): Response
+    {
+        $htmlTemplate = $this->renderView('/pages/article.html.twig', [
+            'rootUrl' => $this->utilityHelper->getRootUrl(),
+            'id' => $id
+        ]);
+       
+        return $this->render('/pages/main.html.twig', [
+            'rootUrl' => $this->utilityHelper->getRootUrl(),
+            'body' => $htmlTemplate,
+        ]);
+    }
+
+
     public function about(Request $request): Response
     {
-        $htmlTemplate = $this->renderView('/pages/about.html.twig', [
+        $htmlTemplate = $this->renderView('/pages/artcle.html.twig', [
             'rootUrl' => $this->utilityHelper->getRootUrl(),
         ]);
        
@@ -50,8 +64,8 @@ class PageController extends AbstractController
             'rootUrl' => $this->utilityHelper->getRootUrl(),
             'body' => $htmlTemplate,
         ]);
-
     }
+
 
 /*
     public function home(Request $request): Response

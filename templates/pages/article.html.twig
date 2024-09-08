@@ -1,0 +1,51 @@
+<style>
+</style>
+
+
+<div id="sympa-loader" class="container d-flex justify-content-center align-items-center" style="height: 500px; display:none !important;">
+    <div class="spinner-border" style="width: 3rem; height: 3rem;" role="status">
+      <span class="visually-hidden">Loading...</span>
+    </div>
+</div>
+
+
+<div id="sympa-article" class="container">
+
+    <br>
+    <h1 id="sympa-title"></h1>
+    <br><br>
+    <p id="sympa-excerpt"></p>
+    <p id="sympa-content"></p>
+</div>
+
+
+<script>
+
+
+async function sympa_initArticle(){
+    const response = await fetch('/article-get-by-id/'+{{id}},{
+        method: 'POST'
+    });
+    
+	const jsonData = await response.json();
+	if (response.status != 200) {
+		console.log("Server error!");
+	}
+    else{
+        console.log(jsonData.title);
+        
+        document.getElementById("sympa-title").innerHTML = jsonData.title;
+        document.getElementById("sympa-excerpt").innerHTML = jsonData.excerpt;
+        document.getElementById("sympa-content").innerHTML = jsonData.content;
+    }
+    
+    return jsonData; 
+}
+
+//MAIN
+window.addEventListener("load", async function() {
+    await sympa_initArticle();
+});
+
+
+</script>

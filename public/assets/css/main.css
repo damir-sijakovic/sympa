@@ -1,3 +1,7 @@
+html{
+    height: 100%;
+}
+
 .ds-huge-shadow{
     box-shadow: rgba(0, 0, 0, 0.25) 0px 54px 55px, rgba(0, 0, 0, 0.12) 0px -12px 30px, rgba(0, 0, 0, 0.12) 0px 4px 6px, rgba(0, 0, 0, 0.17) 0px 12px 13px, rgba(0, 0, 0, 0.09) 0px -3px 5px;
 }
@@ -13,6 +17,10 @@
 
 
 .body-page{
-background: rgb(165,159,255) !important; 
-background: linear-gradient(0deg, rgba(165,159,255,1) 0%, rgba(92,194,254,1) 35%, rgba(255,255,255,1) 100%) !important;
+    background: rgb(165,159,255) !important; 
+    background: linear-gradient(0deg, rgba(165,159,255,1) 0%, rgba(92,194,254,1) 35%, rgba(255,255,255,1) 100%) !important;
+    background-attachment: fixed !important; 
+    background-size: cover; 
+    background-repeat: no-repeat; 
+    height: 100%;
 }

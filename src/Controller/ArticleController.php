@@ -320,6 +320,20 @@ class ArticleController extends AbstractController
 	}
     
     
+    public function viewById(Request $request, $id): Response
+	{          
+		$htmlTemplate = $this->renderView('/pages/home.html.twig', [
+            'rootUrl' => $this->utilityHelper->getRootUrl(),
+            'controller_name' => 'DashboardController',
+        ]);
+        
+        return $this->render('/pages/main.html.twig', [
+            'rootUrl' => $this->utilityHelper->getRootUrl(),
+            'body' => $htmlTemplate,
+        ]);
+	}
+    
+    
     
     
     
