@@ -1,0 +1,494 @@
+<style>
+.sympa-bulk-actions, .sympa-list-options{
+    display:flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column; 
+    flex-direction: row;
+    white-space: nowrap;
+}
+
+#sympa-list-titlebar, #sympa-list-bottom-bar{
+    font-size: 12px !important;
+     font-weight: 500;
+     background: #eeeeee;
+}
+
+
+.sympa-toolbar-font{
+    font-size: 12px !important;
+}
+
+.sympa-list-font{
+    font-size: 12px !important;
+    font-weight: 500;
+}
+
+#sympa-delete-single-modal{
+    background: #3e3e3ed1;
+}
+
+
+</style>
+
+
+
+<h2>Articles</h2>
+
+<hr>
+
+<div class="btn-group" role="group" aria-label="Basic example">
+  <button type="button" class="btn btn-primary btn-sm"><i class="bi bi-plus-circle mx-1"></i>Create</button>
+  <button type="button" class="btn btn-outline-primary btn-sm"><i class="bi bi-search"></i> Search</button>
+</div>
+
+<br><br>
+
+<div id="sympa-no-article-list" class="alert alert-primary" role="alert" style="display:none">
+  There is no articles!
+</div>
+
+<ul id="sympa-article-list" class="list-group mb-3">
+          
+          <!--
+        <li class=
+          "list-group-item d-flex justify-content-between">
+            <div href="button" class="btn btn-primary btn-sm">Small button</div>
+            <strong>20</strong>
+          </li>
+  
+          
+          <li class="list-group-item d-flex justify-content-between bg-body-tertiary">
+            <div class="">
+              <h6 class="my-0">Promo code</h6>
+              <small>EXAMPLECODE</small>
+            </div>            
+            <span class="text-success">
+                <div class="btn-group" role="group" aria-label="Basic outlined example">
+                  <button type="button" class="btn btn-primary btn-sm">Edit</button>
+                  <button type="button" class="btn btn-outline-primary btn-sm">Delete</button>
+                </div>            
+            </span>
+          </li>
+          
+                    
+          <li class=
+          "list-group-item d-flex justify-content-between">
+            <span>Total:</span>
+            <strong id="sympa-total-articles"></strong>
+          </li>
+          
+          -->   
+          
+         <li class="list-group-item d-flex justify-content-between">
+            
+        </li> 
+ </ul>
+
+<nav aria-label="Page navigation example" id="sympa-pagination">
+<!--
+  <ul class="pagination">
+    <li class="page-item">
+      <a class="page-link" href="#" aria-label="Previous">
+        <span aria-hidden="true">&laquo;</span>
+      </a>
+    </li>
+    <li class="page-item"><a class="page-link active" href="#">1</a></li>
+    <li class="page-item"><a class="page-link" href="#">2</a></li>
+    <li class="page-item"><a class="page-link" href="#">3</a></li>
+    <li class="page-item">
+      <a class="page-link" href="#" aria-label="Next">
+        <span aria-hidden="true">&raquo;</span>
+      </a>
+    </li>
+  </ul>
+-->
+</nav>
+
+<!-- MODALS -->
+
+<div class="modal sympa-modal" id="sympa-delete-single-modal" style="display:none;">
+  <div class="modal-dialog">
+    <div class="modal-content sympa-huge-shadow sympa-animate-opacity">
+      <div class="modal-header">
+        <h5 class="modal-title">Warning!</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" onclick="document.getElementById('sympa-delete-single-modal').style.display='none'"></button>
+      </div>
+      <div class="modal-body">
+        <p>Do you want to delete post?</p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" onclick="document.getElementById('sympa-delete-single-modal').style.display='none'">Cancel</button>
+        <button type="button" class="btn btn-danger" onclick="sympa_deleteArticleModalAction()">Delete</button>
+      </div>
+
+	<div class="alert alert-warning alert-dismissible fade show" role="alert" style="display:none; margin-bottom: 0;">
+	   <span id="sympa-bulk-delete-modal-message"> Hello</span> 
+	  <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close" ></button>
+	</div>
+
+    </div>
+  </div>
+</div>
+
+
+
+<script>
+
+
+
+
+function sympa_tableCheck(checked){
+    if (checked){
+        const elements = document.querySelectorAll('.sympa-bulk-checkbox');
+        elements.forEach(function(element) {
+            console.log(element);
+            element.checked = true;
+        });
+    }
+    else{
+        const elements = document.querySelectorAll('.sympa-bulk-checkbox');
+        elements.forEach(function(element) {
+            console.log(element);
+            element.checked = false;
+        });
+    }    
+}
+
+
+function sympa_applyBulk(){
+    console.log("BULČK");
+}
+
+
+function sympa_deleteArticleModal(id){
+    let targetElement = document.getElementById("sympa-delete-single-modal");
+    targetElement.style.display = "block";
+    targetElement.setAttribute("data-id", id);
+}
+
+
+async function sympa_deleteArticleModalAction()
+{   
+    let targetElement = document.getElementById("sympa-delete-single-modal");
+    const id = targetElement.getAttribute("data-id"); 
+    
+    let postData = new FormData();  
+    postData.append('id', id);
+
+    const response = await fetch('/article-delete', {
+        method: 'POST', 
+        body: postData,
+    });
+
+    const jsonData = await response.json();
+	if (response.status != 200) {		
+		return null;
+	}
+    else{
+        ds_message("Article deleted!", "success");
+        setTimeout(function () {
+            window.location.reload();
+		}, 2000);
+    }
+           
+    return;
+}
+
+
+function sympa_drawList(data)
+{      
+    let _createItem = function(x){
+       
+        let id = x.id;
+        let title = x.title;
+        let excerpt = x.excerpt;
+        let createdAt = x.created_at;
+        let modifiedAt = x.modified_at;
+        
+        return `
+        <li class="list-group-item d-flex justify-content-between bg-body-tertiary" title="ID: ${id} \nCreated: ${createdAt}" data-id="${id}">
+            <div class="d-flex gap-3">                
+                <input class="form-check-input sympa-bulk-checkbox" type="checkbox">
+                <div>
+                    <div style="display: flex;"> <span style="font-size: smaller; margin-right: 5px;">(${id})</span> <h6 class="my-0">${title}</h6></div>
+                    <small>${excerpt}</small>
+                </div>
+            </div>            
+            <span class="text-success">
+                <div class="btn-group" role="group" aria-label="Basic outlined example">
+                  <a href="/article/${id}" class="btn btn-primary btn-sm sympa-list-font" target="_blank">View</a>
+                  <a href="/dashboard/article-edit/${id}" class="btn btn-primary btn-sm sympa-list-font" target="_blank">Edit</a>
+                  <div onclick="sympa_deleteArticleModal(${id})" class="btn btn-outline-primary btn-sm sympa-list-font">Delete</div>
+                </div>            
+            </span>
+          </li>
+        `;        
+    }
+    
+    let htmlData = `
+        <li id="sympa-list-titlebar" class="list-group-item d-flex justify-content-between">             
+			<div>
+                <div class="sympa-bulk-actions">
+                    <div>
+                    <input style="margin-right: 1rem;" class="form-check-input" type="checkbox" onclick="sympa_tableCheck(this.checked)">
+                    </div>     
+                    <select class="form-select sympa-toolbar-font" aria-label="Default select example">
+                      <option selected>Bulk actions...</option>
+                      <option value="1">Delete items</option>
+                    </select>
+                    <div onclick="sympa_applyBulk()" class="btn btn-light btn-sm sympa-toolbar-font">Apply</div>
+                </div>                
+                
+            </div>
+			<div class="d-flex">
+            
+                <div class="sympa-list-options mx-2">                    
+                    <select class="form-select sympa-toolbar-font" aria-label="Default select example">
+                      <option selected>Sort by...</option>
+                      <option value="newest">Newest</option>
+                      <option value="oldest">Oldest</option>
+                      <option value="id-descending">ID ascending</option>
+                      <option value="id-descending">ID descending</option>
+                    </select>
+                    <button type="button" class="btn btn-light btn-sm sympa-toolbar-font">Sort</button>
+                </div>
+            
+            	<div class="sympa-list-options">
+                    <select class="form-select sympa-toolbar-font" aria-label="Default select example">
+                      <option selected>Per page...</option>
+                      <option value="10">10 items</option>
+                      <option value="25">25 items</option>
+                      <option value="50">50 items</option>
+                    </select>
+                    <button type="button" class="btn btn-light btn-sm sympa-toolbar-font">Go</button>
+                </div>  
+                              
+            </div>
+        </li>   
+    `;
+    
+    let listElement = document.getElementById("sympa-article-list");     
+    
+    for (const key in data.articles) {
+        htmlData += _createItem(data.articles[key]);
+    }
+    
+    htmlData += `
+        <li class="list-group-item d-flex justify-content-between" id="sympa-list-bottom-bar">
+            <div>Total: <span id="sympa-total-articles"></span> </div>
+            <div id="sympa-bottom-right-message">Category: books</div>
+        </li> 
+        <!--li class="list-group-item d-flex justify-content-between" id="sympa-list-bottom-bar">
+            <span>Total:</span>
+            <div></div> <span id="sympa-total-articles"></span>
+        </li-->   
+    `;
+    
+    listElement.innerHTML = htmlData;
+    
+    let totalArticlesElement = document.getElementById("sympa-total-articles");
+    totalArticlesElement.innerHTML = data.total + ' article(s)';   
+}
+
+
+function sympa_paginate(data){    
+    const {
+		currentPage,
+		firstPage,
+		indexOffset,
+		indexRowCount,
+		itemNumber,
+		lastPage,
+		nextPage,
+		numberOfPages,
+		perPage,
+		prevPage,
+		visibleEndPage,
+		visibleStartPage
+	} = data;
+    
+    console.log("debug data: ", data);
+    
+    let htmlData = `
+        <ul class="pagination">    
+    `;         
+        
+	if (currentPage === 1){
+		htmlData += `
+            <li class="page-item disabled">
+            <a class="page-link" href="#" aria-label="Previous">
+                <span aria-hidden="true">&laquo;</span>
+            </a>
+            </li> 
+        `;
+	}
+	else{
+		let prevPage = currentPage-1;
+		htmlData += `
+            <li class="page-item">
+            <a class="page-link" onclick="sympa_repaginate(${prevPage}, ${perPage})" aria-label="Previous">
+                <span aria-hidden="true">&laquo;</span>
+            </a>
+            </li> 
+        `; 
+	}
+	               
+         
+   for (let i=visibleStartPage; i<visibleEndPage+1; i++){
+		let targetPage = i;
+		
+		if (i === currentPage){	
+			htmlData += `<li class="page-item active"><a class="page-link" onclick="sympa_repaginate(${i}, ${perPage})" >${i}</a></li>`;
+		}
+		else
+		{
+			htmlData += `<li class="page-item"><a class="page-link" onclick="sympa_repaginate(${i}, ${perPage})" >${i}</a></li>`;
+		}
+		
+	}     
+         
+    if (visibleEndPage > currentPage){
+		let nextPage = currentPage+1;
+		htmlData += `<li class="page-item"><div class="page-link" onclick="sympa_repaginate(${nextPage}, ${perPage})" aria-label=""><span aria-hidden="true">&raquo;</span></div></li>`;
+	}
+	else{
+		htmlData += `<li class="page-item disabled"><div class="page-link" onclick="" aria-label=""><span aria-hidden="true">&raquo;</span></div></li>`;
+	}
+   
+
+         
+    htmlData += `
+        </ul>    
+    `;
+    
+    document.getElementById("sympa-pagination").innerHTML = htmlData;
+    
+}
+
+
+async function sympa_getArticles(page=1, perPage=3, sort='desc')
+{      
+    const response = await fetch('/article-get-all?page=' + page + '&per_page=' + perPage + '&sort=' + sort); // /article-get-all
+	const jsonData = await response.json();
+	if (response.status != 200) {
+		console.log('ERROR!');
+		return null;
+	}
+    
+    if (!jsonData.articles){
+        throw new Error("Missing 'articles' object. Bad json format!");
+    }
+    
+    // console.log( jsonData );    
+    // sympa-no-categories-found
+    
+    return jsonData;
+}
+
+
+
+async function sympa_repaginate(page=1, perPage=3, sort='desc'){      
+   	const data = await sympa_getArticles(page, perPage, sort);
+    
+    if (data.total === 0){
+        document.getElementById("sympa-article-list").style.display = 'none';  
+        document.getElementById("sympa-no-article-list").style.display = 'block'; 
+        return;         
+    }
+            
+	sympa_drawList(data);	
+    sympa_paginate(data.paginateData);
+}
+
+
+async function sympa_getArticlesNew()
+{      
+    const sympaViewMode    = localStorage.getItem("sympa-view-mode"); 
+    const sympaPerPage     = localStorage.getItem("sympa-per-page"); 
+    const sympaCurrentPage = localStorage.getItem("sympa-current-page");        
+    const sympaBulkMode    = localStorage.getItem("sympa-bulk-mode"); 
+    const sympaListMessage = localStorage.getItem("sympa-list-message"); 
+    const sympaSearch      = localStorage.getItem("sympa-search"); 
+    const sympaSearchTerm  = localStorage.getItem("sympa-search-term"); 
+    
+    let url ="";    
+    
+    const response = await fetch(url); 
+	const jsonData = await response.json();
+	if (response.status != 200){
+		console.log('ERROR!');
+		return null;
+	}
+    
+    if (!jsonData.articles){
+        throw new Error("Missing 'articles' object. Bad json format!");
+    }
+    
+    // console.log( jsonData );    
+    // sympa-no-categories-found
+    
+    return jsonData;
+}
+
+
+
+function sympa_initStorageSettings(){
+    if (localStorage.getItem('sympa-per-page')){        
+    } 
+    else{
+        localStorage.setItem('sympa-per-page', '10');
+    }
+    
+    if (localStorage.getItem('sympa-current-page')){        
+    } 
+    else{
+        localStorage.setItem('sympa-current-page', '1');
+    }  
+     
+    if (localStorage.getItem('sympa-view-mode')){        
+    } 
+    else{
+        localStorage.setItem('sympa-view-mode', 'normal');
+    } 
+          
+    if (localStorage.getItem('sympa-bulk-mode')){        
+    } 
+    else{
+        localStorage.setItem('sympa-bulk-mode', 'none');
+    } 
+      
+    if (localStorage.getItem('sympa-list-message')){        
+    } 
+    else{
+        localStorage.setItem('sympa-list-message', '');
+    }   
+    
+    if (localStorage.getItem('sympa-search')){        
+    } 
+    else{
+        localStorage.setItem('sympa-search-term', '');
+    }   
+}
+
+
+async function sympa_initList(){      
+    await sympa_repaginate(1, 10);
+}
+
+
+function sympa_setBottomRightMessage(message){
+    document.getElementById("sympa-bottom-right-message").innerHTML = message;
+}
+
+//MAIN
+window.addEventListener("load", async function(){
+    sympa_initStorageSettings();
+    await sympa_initList();
+});
+
+</script>
+
+
+
+

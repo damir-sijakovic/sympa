@@ -24,6 +24,10 @@
     font-weight: 500;
 }
 
+.sympa-modal{
+    background: #3e3e3ed1;
+}
+
 
 </style>
 
@@ -105,7 +109,7 @@
 
 <div class="modal sympa-modal" id="sympa-delete-single-modal" style="display:none;">
   <div class="modal-dialog">
-    <div class="modal-content sympa-huge-shadow sympa-animate-opacity">
+    <div class="modal-content">
       <div class="modal-header">
         <h5 class="modal-title">Warning!</h5>
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" onclick="document.getElementById('sympa-delete-single-modal').style.display='none'"></button>
@@ -116,6 +120,35 @@
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" onclick="document.getElementById('sympa-delete-single-modal').style.display='none'">Cancel</button>
         <button type="button" class="btn btn-danger" onclick="sympa_deleteArticleModalAction()">Delete</button>
+      </div>
+
+	<div class="alert alert-warning alert-dismissible fade show" role="alert" style="display:none; margin-bottom: 0;">
+	   <span id="sympa-bulk-delete-modal-message"> Hello</span> 
+	  <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close" ></button>
+	</div>
+
+    </div>
+  </div>
+</div>
+
+<div class="modal sympa-modal" id="sympa-list-value-modal" style="display:none;">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Enter value</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" onclick="document.getElementById('sympa-list-value-modal').style.display='none'"></button>
+      </div>
+      <div class="modal-body">
+        
+      <div class="mb-3">
+        <p>Enter search term or category id:</p>
+        <input type="text" class="form-control" id="sympa-list-value-modal-input" aria-describedby="">
+      </div>
+
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" onclick="document.getElementById('sympa-list-value-modal').style.display='none'">Cancel</button>
+        <button type="button" class="btn btn-primary" onclick="sympa_setListValueAction()">Accept</button>
       </div>
 
 	<div class="alert alert-warning alert-dismissible fade show" role="alert" style="display:none; margin-bottom: 0;">
@@ -187,41 +220,6 @@ async function sympa_deleteArticleModalAction()
     }
            
     return;
-    
-    
-    /*
-    let targetElement = document.getElementById("sympa-delete-single-modal");
-    const id = targetElement.getAttribute("data-id");
-
-    const response = await fetch('/article-delete/'+ id); 
-	const jsonData = await response.json();
-	if (response.status != 200) {		
-		return null;
-	}
-    else{
-        ds_message("Failed to delete article!");
-    }
-           
-    return;
-    */
-    
-    /*
-    const response = await fetch('/article-get-all?page=' + page + '&per_page=' + perPage + '&sort=' + sort); // /article-get-all
-	const jsonData = await response.json();
-	if (response.status != 200) {
-		console.log('ERROR!');
-		return null;
-	}
-    
-    if (!jsonData.articles){
-        throw new Error("Missing 'articles' object. Bad json format!");
-    }
-    
-    // console.log( jsonData );    
-    // sympa-no-categories-found
-    
-    return jsonData;
-    */
 }
 
 
@@ -272,25 +270,32 @@ function sympa_drawList(data)
             </div>
 			<div class="d-flex">
             
-                <div class="sympa-list-options mx-2">                    
-                    <select class="form-select sympa-toolbar-font" aria-label="Default select example">
-                      <option selected>Sort by...</option>
-                      <option value="newest">Newest</option>
-                      <option value="oldest">Oldest</option>
-                      <option value="id-descending">ID ascending</option>
-                      <option value="id-descending">ID descending</option>
+                <button data="" style="display:none" onclick="sympa_openSetListValueModal()" id="sympa-list-value-button" type="button" class="btn btn-light btn-sm sympa-toolbar-font">Enter value...</button>
+            
+                <div class="sympa-list-options">                    
+                    <select id="sympa-select-right-mode" class="form-select sympa-toolbar-font" aria-label="Default select example">
+                      <option value="normal" selected onclick="sympa_changeListMode(this)">Normal Mode</option>
+                      <option value="search" onclick="sympa_changeListMode(this)">Search Mode</option>
+                      <option value="category" onclick="sympa_changeListMode(this)">Category Mode</option>        
                     </select>
-                    <button type="button" class="btn btn-light btn-sm sympa-toolbar-font">Sort</button>
+                </div>
+                
+                <div class="sympa-list-options mx-1">                    
+                    <select id="sympa-select-right-sort" class="form-select sympa-toolbar-font" aria-label="Default select example">
+                      <option selected onclick="sympa_changeListSort(this)" value="newest">Newest</option>
+                      <option onclick="sympa_changeListSort(this)" value="oldest">Oldest</option>
+                      <option onclick="sympa_changeListSort(this)" value="id-ascending">ID ascending</option>
+                      <option onclick="sympa_changeListSort(this)" value="id-descending">ID descending</option>
+                    </select>
                 </div>
             
             	<div class="sympa-list-options">
-                    <select class="form-select sympa-toolbar-font" aria-label="Default select example">
-                      <option selected>Per page...</option>
-                      <option value="10">10 items</option>
-                      <option value="25">25 items</option>
-                      <option value="50">50 items</option>
+                    <select id="sympa-select-right-per-page" class="form-select sympa-toolbar-font" aria-label="Default select example">
+                      <option onclick="sympa_changeListPerPage(this)" selected value="10">10 items</option>
+                      <option onclick="sympa_changeListPerPage(this)" value="25">25 items</option>
+                      <option onclick="sympa_changeListPerPage(this)" value="50">50 items</option>
                     </select>
-                    <button type="button" class="btn btn-light btn-sm sympa-toolbar-font">Go</button>
+                    <button onclick="sympa_goAction()" type="button" class="btn btn-light btn-sm sympa-toolbar-font">Go</button>
                 </div>  
                               
             </div>
@@ -317,9 +322,7 @@ function sympa_drawList(data)
     listElement.innerHTML = htmlData;
     
     let totalArticlesElement = document.getElementById("sympa-total-articles");
-    totalArticlesElement.innerHTML = data.total + ' article(s)';
-    
-   
+    totalArticlesElement.innerHTML = data.total + ' article(s)';   
 }
 
 
@@ -339,12 +342,11 @@ function sympa_paginate(data){
 		visibleStartPage
 	} = data;
     
-    console.log("yyy", data)
+    console.log("debug data: ", data);
     
     let htmlData = `
         <ul class="pagination">    
-    `;
-         
+    `;         
         
 	if (currentPage === 1){
 		htmlData += `
@@ -419,7 +421,22 @@ async function sympa_getArticles(page=1, perPage=3, sort='desc')
 }
 
 
-async function sympa_repaginate(page=1, perPage=3, sort='desc'){      
+
+async function sympa_repaginate(page, perPage){       
+    localStorage.setItem('sympa-article-list-per-page', perPage);
+    localStorage.setItem('sympa-article-list-current-page', page);
+     
+    const data = await sympa_getArticlesNew();
+    if (data.total === 0){
+        document.getElementById("sympa-article-list").style.display = 'none';  
+        document.getElementById("sympa-no-article-list").style.display = 'block'; 
+        return;         
+    }
+    
+    sympa_drawList(data);	
+    sympa_paginate(data.paginateData);
+    
+    /*
    	const data = await sympa_getArticles(page, perPage, sort);
     
     if (data.total === 0){
@@ -430,11 +447,226 @@ async function sympa_repaginate(page=1, perPage=3, sort='desc'){
             
 	sympa_drawList(data);	
     sympa_paginate(data.paginateData);
+    */
 }
 
 
+async function sympa_repaginateOld(page=1, perPage=10){       
+    localStorage.setItem('sympa-article-list-per-page', perPage);
+    localStorage.setItem('sympa-article-list-current-page', page);
+     
+    const data = await sympa_getArticlesNew();
+    if (data.total === 0){
+        document.getElementById("sympa-article-list").style.display = 'none';  
+        document.getElementById("sympa-no-article-list").style.display = 'block'; 
+        return;         
+    }
+    
+    sympa_drawList(data);	
+    sympa_paginate(data.paginateData);
+    
+    /*
+   	const data = await sympa_getArticles(page, perPage, sort);
+    
+    if (data.total === 0){
+        document.getElementById("sympa-article-list").style.display = 'none';  
+        document.getElementById("sympa-no-article-list").style.display = 'block'; 
+        return;         
+    }
+            
+	sympa_drawList(data);	
+    sympa_paginate(data.paginateData);
+    */
+}
+
+
+
+
+async function sympa_getArticlesNew()
+{      
+    const sympaViewMode    = localStorage.getItem("sympa-article-list-view-mode"); 
+    const sympaPerPage     = localStorage.getItem("sympa-article-list-per-page"); 
+    const sympaCurrentPage = localStorage.getItem("sympa-article-list-current-page");        
+    const sympaBulkMode    = localStorage.getItem("sympa-article-list-bulk-mode"); 
+    const sympaListMessage = localStorage.getItem("sympa-article-list-message"); 
+    const sympaSearch      = localStorage.getItem("sympa-article-list-search"); 
+    const sympaCategory  = localStorage.getItem("sympa-article-list-category"); 
+    const sympaValue = localStorage.getItem("sympa-article-list-value"); 
+    
+    let url = '/article-get-all?';  
+    
+    if (sympaViewMode === 'normal'){
+        url += 'page=' + sympaCurrentPage + '&per_page=' + sympaPerPage;         
+    }      
+    else if (sympaViewMode === 'search'){
+        url += 'page=' + sympaCurrentPage + '&per_page=' + sympaPerPage + '&search=' + sympaValue; 
+    }    
+    else if (sympaViewMode === 'category'){
+        url += 'page=' + sympaCurrentPage + '&per_page=' + sympaPerPage + '&category=' + sympaValue; 
+    }
+    
+    const response = await fetch(url); 
+	const jsonData = await response.json();
+	if (response.status != 200){
+		console.log('ERROR!');
+		return null;
+	}
+    
+    if (!jsonData.articles){
+        throw new Error("Missing 'articles' object. Bad json format!");
+    }
+    
+    // console.log( jsonData );    
+    // sympa-no-categories-found
+    
+    return jsonData;
+}
+
+
+async function sympa_getArticlesByUrl(url)
+{          
+    const response = await fetch('/article-get-all?'+url); 
+	const jsonData = await response.json();
+	if (response.status != 200){
+		console.log('ERROR!');
+		return null;
+	}
+    
+    if (!jsonData.articles){
+        throw new Error("Missing 'articles' object. Bad json format!");
+    }
+    
+    return jsonData;
+}
+
+
+function sympa_initStorageSettings(){    
+    
+    let value = localStorage.getItem('sympa-article-list-per-page');
+    if (value) {   
+    } else {
+        localStorage.setItem('sympa-article-list-per-page', '10');
+    }
+
+    value = localStorage.getItem('sympa-article-list-current-page');
+    if (!value) {        
+        localStorage.setItem('sympa-article-list-current-page', '1');
+    }
+
+    value = localStorage.getItem('sympa-article-list-view-mode');
+    if (!value) {        
+        localStorage.setItem('sympa-article-list-view-mode', 'normal');
+    }
+
+    value = localStorage.getItem('sympa-article-list-bulk-mode');
+    if (!value) {        
+        localStorage.setItem('sympa-article-list-bulk-mode', 'none');
+    }
+
+    value = localStorage.getItem('sympa-article-list-message');
+    if (!value) {        
+        localStorage.setItem('sympa-article-list-message', '');
+    }
+
+    value = localStorage.getItem('sympa-article-list-search');
+    if (!value) {        
+        localStorage.setItem('sympa-article-list-search', '');
+    }
+
+    value = localStorage.getItem('sympa-article-list-category');
+    if (!value) {        
+        localStorage.setItem('sympa-article-list-category', '');
+    }
+
+    value = localStorage.getItem('sympa-article-list-sort');
+    if (!value) {        
+        localStorage.setItem('sympa-article-list-sort', 'newest');
+    }
+
+    value = localStorage.getItem('sympa-article-list-value');
+    if (!value) {        
+        localStorage.setItem('sympa-article-list-value', '');
+    }
+    
+}
+
+
+function sympa_postUiRedraw(){
+    
+    /*
+    sympa-select-right-mode                 
+    sympa-select-right-sort
+    sympa-select-right-per-page    
+    */    
+        
+//    document.getElementById('sympa-select-right-per-page').value = parseInt();
+    
+    let value = localStorage.getItem('sympa-article-list-per-page');
+    if (value) { 
+        document.getElementById('sympa-select-right-per-page').value = parseInt(value);
+    } 
+
+    
+/*
+    value = localStorage.getItem('sympa-article-list-current-page');
+    if (!value) {        
+        localStorage.setItem('sympa-article-list-current-page', '1');
+    }
+
+    value = localStorage.getItem('sympa-article-list-view-mode');
+    if (!value) {        
+        localStorage.setItem('sympa-article-list-view-mode', 'normal');
+    }
+
+    value = localStorage.getItem('sympa-article-list-bulk-mode');
+    if (!value) {        
+        localStorage.setItem('sympa-article-list-bulk-mode', 'none');
+    }
+
+    value = localStorage.getItem('sympa-article-list-message');
+    if (!value) {        
+        localStorage.setItem('sympa-article-list-message', '');
+    }
+
+    value = localStorage.getItem('sympa-article-list-search');
+    if (!value) {        
+        localStorage.setItem('sympa-article-list-search', '');
+    }
+
+    value = localStorage.getItem('sympa-article-list-category');
+    if (!value) {        
+        localStorage.setItem('sympa-article-list-category', '');
+    }
+
+    value = localStorage.getItem('sympa-article-list-sort');
+    if (!value) {        
+        localStorage.setItem('sympa-article-list-sort', 'newest');
+    }
+
+    value = localStorage.getItem('sympa-article-list-value');
+    if (!value) {        
+        localStorage.setItem('sympa-article-list-value', '');
+    }
+*/ 
+    
+}
+
+
+
+
+
 async function sympa_initList(){      
-    await sympa_repaginate(1, 10);
+    //await sympa_repaginate(1, 10);
+
+    const data = await sympa_getArticlesNew();
+    if (data.total === 0){
+        document.getElementById("sympa-article-list").style.display = 'none';  
+        document.getElementById("sympa-no-article-list").style.display = 'block'; 
+        return;         
+    }
+    
+    sympa_drawList(data);	
+    sympa_paginate(data.paginateData);
 }
 
 
@@ -442,9 +674,97 @@ function sympa_setBottomRightMessage(message){
     document.getElementById("sympa-bottom-right-message").innerHTML = message;
 }
 
+
+function sympa_setListValueAction(){
+    const value = document.getElementById("sympa-list-value-modal-input").value;
+    document.getElementById("sympa-list-value-button").innerHTML = value;
+    document.getElementById("sympa-list-value-button").setAttribute('data', value);
+    document.getElementById("sympa-list-value-modal").style.display = "none";
+    localStorage.setItem('sympa-article-list-value', value);
+}
+
+function sympa_openSetListValueModal(){
+    document.getElementById("sympa-list-value-modal").style.display = "block";
+}
+
+
+function sympa_changeListMode(that){
+    console.log(that);
+    if (that.value === 'normal'){
+        document.getElementById("sympa-list-value-button").style.display = "none";
+        document.getElementById("sympa-list-value-button").innerHTML = "Enter value...";
+        localStorage.setItem('sympa-article-list-view-mode', 'normal');
+    }
+    if (that.value === 'category'){
+         document.getElementById("sympa-list-value-button").style.display = "block";
+         localStorage.setItem('sympa-article-list-view-mode', 'category');
+    }
+    if (that.value === 'search'){
+        document.getElementById("sympa-list-value-button").style.display = "block";
+        localStorage.setItem('sympa-article-list-view-mode', 'search');        
+    }
+}
+
+
+function sympa_changeListSort(that){
+    if (that.value === 'newest'){
+        localStorage.setItem('sympa-article-list-sort', 'newest');
+    }
+    
+    if (that.value === 'oldest'){
+        localStorage.setItem('sympa-article-list-sort', 'oldest');
+    }
+    
+    if (that.value === 'id-ascending'){
+        localStorage.setItem('sympa-article-list-sort', 'id-ascending');
+    }
+    
+    if (that.value === 'id-descending'){
+        localStorage.setItem('sympa-article-list-sort', 'id-descending');
+    }  
+
+}
+
+
+function sympa_changeListPerPage(that){
+    if (that.value === '10'){
+        localStorage.setItem('sympa-article-list-per-page', '10');
+    }
+    
+    if (that.value === '25'){
+        localStorage.setItem('sympa-article-list-per-page', '25');
+    }
+    
+    if (that.value === '50'){
+        localStorage.setItem('sympa-article-list-per-page', '50');
+    }    
+}
+
+
+async function sympa_goAction(){
+    console.log("GO ACTION");
+    let perPage = localStorage.getItem('sympa-article-list-per-page');
+    let currentPage = localStorage.getItem('sympa-article-list-current-page');
+    sympa_repaginate(1, perPage);
+    
+    /*
+    const data = await sympa_getArticlesNew();
+    sympa_drawList(data);	
+    sympa_paginate(data.paginateData);
+    //sympa_getArticlesNew();
+    */
+}
+
+
 //MAIN
-window.addEventListener("load", async function() {
+window.addEventListener("load", async function(){
+    sympa_initStorageSettings();
+    // await sympa_getArticlesNew();
+    // await sympa_getArticlesByUrl("page=1&perPage=10&category=1");
     await sympa_initList();
+    sympa_postUiRedraw();
+    
+    
 });
 
 </script>

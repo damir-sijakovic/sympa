@@ -68,7 +68,246 @@ class ArticleController extends AbstractController
     }
     
     
+    
     public function getArticlesPost(Request $request): Response
+    {
+        try {
+            $perPage = $request->query->getInt('per_page', 10);
+            $page = $request->query->getInt('page', 1);
+            $sort = $request->query->get('sort', 'desc'); // Default sort order is descending
+            $active = $request->query->get('active'); // Get the active parameter
+            $search = $request->query->get('search'); // Get the search parameter
+            $category = $request->query->get('category'); // Get the category parameter
+            $offset = ($page - 1) * $perPage;
+
+            // Determine the sorting order based on the "sort" parameter
+            if ($sort === 'id-asc') {
+                $order = ['id' => 'ASC'];
+            } elseif ($sort === 'id-desc') {
+                $order = ['id' => 'DESC'];
+            } else {
+                // Default to sorting by createdAt
+                $order = ($sort === 'asc') ? ['createdAt' => 'ASC'] : ['createdAt' => 'DESC'];
+            }
+
+            $articleRepository = $this->entityManager->getRepository(Article::class);
+
+            // Create criteria for the query, including active filter and type "article"
+            $criteria = ['type' => 'article'];
+            if ($active === '1') {
+                $criteria['active'] = true;
+            } elseif ($active === '0') {
+                $criteria['active'] = false;
+            }
+
+            // Build the query with optional category filter
+            $queryBuilder = $articleRepository->createQueryBuilder('a')
+                ->where('a.type = :type')
+                ->setParameter('type', 'article');
+
+            if ($active === '1') {
+                $queryBuilder->andWhere('a.active = :active')->setParameter('active', true);
+            } elseif ($active === '0') {
+                $queryBuilder->andWhere('a.active = :active')->setParameter('active', false);
+            }
+
+            if (!empty($search)) {
+                $queryBuilder->andWhere('a.title LIKE :search OR a.excerpt LIKE :search')
+                             ->setParameter('search', '%' . $search . '%');
+            }
+
+            if (!empty($category)) {
+                // Join with ArticleCategory entity to filter by category
+                $queryBuilder->join('App\Entity\ArticleCategory', 'ac', 'WITH', 'ac.article = a')
+                             ->andWhere('ac.category = :category')
+                             ->setParameter('category', $category);
+            }
+
+            // First count all results that match the criteria
+            $totalQuery = clone $queryBuilder;
+            $totalArticles = count($totalQuery->getQuery()->getResult());
+
+            // Apply pagination and sorting
+            $queryBuilder->orderBy('a.' . key($order), current($order))
+                         ->setFirstResult($offset)
+                         ->setMaxResults($perPage);
+
+            $articles = $queryBuilder->getQuery()->getResult();
+
+            $articleData = [];
+            foreach ($articles as $article) {
+                $articleData[] = [
+                    'id' => $article->getId(),
+                    'title' => $article->getTitle(),
+                    'excerpt' => $article->getExcerpt(),
+                    'content' => $article->getContent(),
+                    'slug' => $article->getSlug(),
+                    'image' => $article->getImage(),
+                    'created_at' => $article->getCreatedAt()->format('Y-m-d H:i:s'),
+                    'modified_at' => $article->getModifiedAt() ? $article->getModifiedAt()->format('Y-m-d H:i:s') : null,
+                    'active' => $article->isActive(),
+                ];
+            }
+
+            $paginateData = $this->utilityHelper->paginate($totalArticles, $perPage, $page, 3); // 3 = visible pages
+
+            return $this->json(['total' => $totalArticles, 'articles' => $articleData, 'paginateData' => $paginateData]);
+        } catch (\Exception $e) {
+            return $this->json(['error' => $e->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }
+
+
+
+
+
+
+
+    
+
+
+
+    
+    /*
+    
+        public function getArticlesPost6(Request $request): Response
+    {
+        try {
+            $perPage = $request->query->getInt('per_page', 10);
+            $page = $request->query->getInt('page', 1);
+            $sort = $request->query->get('sort', 'desc'); // Default sort order is descending
+            $active = $request->query->get('active'); // Get the active parameter
+            $search = $request->query->get('search'); // Get the search parameter
+            $offset = ($page - 1) * $perPage;
+
+            // Determine the sorting order based on the "sort" parameter
+            if ($sort === 'id-asc') {
+                $order = ['id' => 'ASC'];
+            } elseif ($sort === 'id-desc') {
+                $order = ['id' => 'DESC'];
+            } else {
+                // Default to sorting by createdAt
+                $order = ($sort === 'asc') ? ['createdAt' => 'ASC'] : ['createdAt' => 'DESC'];
+            }
+
+            $articleRepository = $this->entityManager->getRepository(Article::class);
+
+            // Create criteria for the query, including active filter and type "article"
+            $criteria = ['type' => 'article'];
+            if ($active === '1') {
+                $criteria['active'] = true;
+            } elseif ($active === '0') {
+                $criteria['active'] = false;
+            }
+
+            // If search query param is present, add conditions for searching in title and excerpt
+            $queryBuilder = $articleRepository->createQueryBuilder('a')
+                ->where('a.type = :type')
+                ->setParameter('type', 'article');
+
+            if ($active === '1') {
+                $queryBuilder->andWhere('a.active = :active')->setParameter('active', true);
+            } elseif ($active === '0') {
+                $queryBuilder->andWhere('a.active = :active')->setParameter('active', false);
+            }
+
+            if (!empty($search)) {
+                $queryBuilder->andWhere('a.title LIKE :search OR a.excerpt LIKE :search')
+                             ->setParameter('search', '%' . $search . '%');
+            }
+
+            // First count all results that match the criteria
+            $totalQuery = clone $queryBuilder;
+            $totalArticles = count($totalQuery->getQuery()->getResult());
+
+            // Apply pagination and sorting
+            $queryBuilder->orderBy('a.' . key($order), current($order))
+                         ->setFirstResult($offset)
+                         ->setMaxResults($perPage);
+
+            $articles = $queryBuilder->getQuery()->getResult();
+
+            $articleData = [];
+            foreach ($articles as $article) {
+                $articleData[] = [
+                    'id' => $article->getId(),
+                    'title' => $article->getTitle(),
+                    'excerpt' => $article->getExcerpt(),
+                    'content' => $article->getContent(),
+                    'slug' => $article->getSlug(),
+                    'image' => $article->getImage(),
+                    'created_at' => $article->getCreatedAt()->format('Y-m-d H:i:s'),
+                    'modified_at' => $article->getModifiedAt() ? $article->getModifiedAt()->format('Y-m-d H:i:s') : null,
+                    'active' => $article->isActive(),
+                ];
+            }
+
+            $paginateData = $this->utilityHelper->paginate($totalArticles, $perPage, $page, 3); // 3 = visible pages
+
+            return $this->json(['total' => $totalArticles, 'articles' => $articleData, 'paginateData' => $paginateData]);
+        } catch (\Exception $e) {
+            return $this->json(['error' => $e->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }
+    
+    
+    public function getArticlesPost5(Request $request): Response
+    {
+        try {
+            $perPage = $request->query->getInt('per_page', 10);
+            $page = $request->query->getInt('page', 1);
+            $sort = $request->query->get('sort', 'desc'); // Default sort order is descending
+            $active = $request->query->get('active'); // Get the active parameter
+            $offset = ($page - 1) * $perPage;
+
+            // Determine the sorting order based on the "sort" parameter
+            if ($sort === 'id-asc') {
+                $order = ['id' => 'ASC'];
+            } elseif ($sort === 'id-desc') {
+                $order = ['id' => 'DESC'];
+            } else {
+                // Default to sorting by createdAt
+                $order = ($sort === 'asc') ? ['createdAt' => 'ASC'] : ['createdAt' => 'DESC'];
+            }
+
+            $articleRepository = $this->entityManager->getRepository(Article::class);
+
+            // Create criteria for the query, including active filter and type "article"
+            $criteria = ['type' => 'article'];
+            if ($active === '1') {
+                $criteria['active'] = true;
+            } elseif ($active === '0') {
+                $criteria['active'] = false;
+            }
+
+            $totalArticles = $articleRepository->count($criteria);
+            $articles = $articleRepository->findBy($criteria, $order, $perPage, $offset);
+
+            $articleData = [];
+            foreach ($articles as $article) {
+                $articleData[] = [
+                    'id' => $article->getId(),
+                    'title' => $article->getTitle(),
+                    'excerpt' => $article->getExcerpt(),
+                    'content' => $article->getContent(),
+                    'slug' => $article->getSlug(),
+                    'image' => $article->getImage(),
+                    'created_at' => $article->getCreatedAt()->format('Y-m-d H:i:s'),
+                    'modified_at' => $article->getModifiedAt() ? $article->getModifiedAt()->format('Y-m-d H:i:s') : null,
+                    'active' => $article->isActive(),
+                ];
+            }
+
+            $paginateData = $this->utilityHelper->paginate($totalArticles, $perPage, $page, 3); // 3 = visible pages
+
+            return $this->json(['total' => $totalArticles, 'articles' => $articleData, 'paginateData' => $paginateData]);
+        } catch (\Exception $e) {
+            return $this->json(['error' => $e->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }
+    
+    
+        public function getArticlesPost4(Request $request): Response
     {
         try {
             $perPage = $request->query->getInt('per_page', 10);
@@ -123,10 +362,17 @@ class ArticleController extends AbstractController
         }
     }
 
-
-
     
-    /*
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
     
     
     public function getArticlesPost3(Request $request): Response

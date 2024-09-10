@@ -1,3 +1,9 @@
+0.1.9.1726000684
+=====
+Reworked dashboard Article list view. 
+Added search and category into "Article list view".
+Restructured model entities.
+
 0.1.9.1725790502
 =====
 Improved dashboard Article list view. 

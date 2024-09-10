@@ -1,3 +1,16 @@
+<style>
+
+#sympa-article-list{
+    box-shadow: rgba(0, 0, 0, 0.25) 0px 54px 55px, rgba(0, 0, 0, 0.12) 0px -12px 30px, rgba(0, 0, 0, 0.12) 0px 4px 6px, rgba(0, 0, 0, 0.17) 0px 12px 13px, rgba(0, 0, 0, 0.09) 0px -3px 5px;
+}
+
+.list-group-item{
+    box-shadow: rgba(50, 50, 93, 0.25) 0px 30px 60px -12px inset, rgba(0, 0, 0, 0.3) 0px 18px 36px -18px inset;
+}
+
+</style>
+
+
 <div class="container my-5">
   <div class="p-5 text-center rounded-3">
     
@@ -24,9 +37,10 @@
 <h2 class="display-6 text-center mb-4">Latest posts</h2>
 
 
-<div class="d-flex flex-column flex-md-row p-4 gap-4 py-md-5 align-items-center justify-content-center">
-  <div class="list-group">
+<div class="d-flex flex-column flex-md-row p-4 gap-4  align-items-center justify-content-center">
+  <div id="sympa-article-list" class="list-group">
   
+  <!--
     <a href="#" class="list-group-item list-group-item-action d-flex gap-3 py-3" aria-current="true">
       <i class="bi bi-sticky" style="font-size:32px"></i>
       <div class="d-flex gap-2 w-100 justify-content-between">
@@ -37,62 +51,77 @@
         <small class="opacity-50 text-nowrap">now</small>
       </div>
     </a>
-    
-    <a href="#" class="list-group-item list-group-item-action d-flex gap-3 py-3" aria-current="true">
-      <i class="bi bi-sticky" style="font-size:32px"></i>
-      <div class="d-flex gap-2 w-100 justify-content-between">
-        <div>
-          <h6 class="mb-0">Another title here</h6>
-          <p class="mb-0 opacity-75">Some placeholder content in a paragraph that goes a little longer so it wraps to a new line.</p>
-        </div>
-        <small class="opacity-50 text-nowrap">3d</small>
-      </div>
-    </a>
-    
-    <a href="#" class="list-group-item list-group-item-action d-flex gap-3 py-3" aria-current="true">
-      <i class="bi bi-sticky" style="font-size:32px"></i>
-      <div class="d-flex gap-2 w-100 justify-content-between">
-        <div>
-          <h6 class="mb-0">Third heading</h6>
-          <p class="mb-0 opacity-75">Some placeholder content in a paragraph.</p>
-        </div>
-        <small class="opacity-50 text-nowrap">1w</small>
-      </div>
-    </a>
-    
-    <a href="#" class="list-group-item list-group-item-action d-flex gap-3 py-3" aria-current="true">
-      <i class="bi bi-sticky" style="font-size:32px"></i>
-      <div class="d-flex gap-2 w-100 justify-content-between">
-        <div>
-          <h6 class="mb-0">Third heading</h6>
-          <p class="mb-0 opacity-75">Some placeholder content in a paragraph.</p>
-        </div>
-        <small class="opacity-50 text-nowrap">1w</small>
-      </div>
-    </a>
-    
-    <a href="#" class="list-group-item list-group-item-action d-flex gap-3 py-3" aria-current="true">
-      <i class="bi bi-sticky" style="font-size:32px"></i>
-      <div class="d-flex gap-2 w-100 justify-content-between">
-        <div>
-          <h6 class="mb-0">Third heading</h6>
-          <p class="mb-0 opacity-75">Some placeholder content in a paragraph.</p>
-        </div>
-        <small class="opacity-50 text-nowrap">1w</small>
-      </div>
-    </a>
-    
-    
+   -->
     
   </div>
 </div>
 
 
-
-
-
-
-
 </div>
 
 
+
+<script>
+
+function sympa_drawArticles(data){
+    
+    let _createItem = function(x){
+        const id = x.id;
+        const title = x.title;
+        const excerpt = x.excerpt;
+        const content = x.content;
+        
+        const createdAt = x.created_at;
+        const date = new Date(createdAt);
+        const shortenedDateString = date.toISOString().split("T")[0]; // "2023-09-21"
+        
+        return `
+            <a href="/article/${id}" class="list-group-item list-group-item-action d-flex gap-3 py-3" aria-current="true">
+              <i class="bi bi-sticky" style="font-size:32px"></i>
+              <div class="d-flex gap-2 w-100 justify-content-between">
+                <div>
+                  <h6 class="mb-0">${title}</h6>
+                  <p class="mb-0 opacity-75">${excerpt}</p>
+                </div>
+                <small class="opacity-50 text-nowrap">${shortenedDateString}</small>
+              </div>
+            </a>
+        `;
+    }
+    
+    const articleList = document.getElementById("sympa-article-list");    
+    for (const key in data.articles) {
+        //htmlData += _createItem(data.articles[key]);
+        articleList.innerHTML += _createItem(data.articles[key]);
+    }
+    
+}
+
+async function sympa_getArticles(page=1, perPage=10, sort='desc'){      
+    const response = await fetch('/article-get-all?page=' + page + '&per_page=' + perPage + '&sort=' + sort); // /article-get-all
+	const jsonData = await response.json();
+	if (response.status != 200) {
+		console.log('ERROR!');
+		return null;
+	}
+    
+    if (!jsonData.articles){
+        throw new Error("Missing 'articles' object. Bad json format!");
+    }
+        
+    return jsonData;
+}
+
+async function sympa_initArticleList(){
+    const data = await sympa_getArticles();
+    sympa_drawArticles(data);
+    console.log(data);
+}
+
+//MAIN
+window.addEventListener("load", async function() {
+    await sympa_initArticleList();
+});
+
+
+</script>

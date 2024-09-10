@@ -16,6 +16,9 @@ class ArticleCategory
     #[ORM\ManyToOne(inversedBy: 'Article')]
     private ?Category $category = null;
 
+    #[ORM\Column(length: 32)]
+    private ?string $type = null;
+
     #[ORM\ManyToOne]
     private ?Article $article = null;
 
@@ -47,6 +50,18 @@ class ArticleCategory
 
         return $this;
     }
+    
+    public function getType(): ?string
+    {
+        return $this->type;
+    }
+
+    public function setType(string $type): static
+    {
+        $this->type = $type;
+        return $this;
+    }
+    
     
     
 }

@@ -97,6 +97,9 @@ dashboard_category_create:
     controller: App\Controller\DashboardController::createCategory 
     methods: ['GET']
 
-
+category_create:
+    path: /category/create
+    controller: App\Controller\CategoryController::create
+    methods: ['POST']
 
 

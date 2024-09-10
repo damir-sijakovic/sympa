@@ -56,7 +56,7 @@ class PageController extends AbstractController
 
     public function about(Request $request): Response
     {
-        $htmlTemplate = $this->renderView('/pages/artcle.html.twig', [
+        $htmlTemplate = $this->renderView('/pages/about.html.twig', [
             'rootUrl' => $this->utilityHelper->getRootUrl(),
         ]);
        

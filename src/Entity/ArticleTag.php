@@ -21,6 +21,9 @@ class ArticleTag
     #[ORM\ManyToOne(cascade: ['remove'])]
     private ?Article $article = null;
 
+    #[ORM\Column(length: 32)]
+    private ?string $type = null;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -48,5 +51,16 @@ class ArticleTag
         return $this;
     }
     
+    public function getType(): ?string
+    {
+        return $this->type;
+    }
+
+    public function setType(string $type): static
+    {
+        $this->type = $type;
+        return $this;
+    }
+       
     
 }
