@@ -42,27 +42,27 @@ INSERT INTO `article` (`title`, `slug`, `type`, `content`, `excerpt`, `author`, 
 ('The Impact of Typography in Graphic Design', 'the-impact-of-typography-in-graphic-design', 'article', 'Typography is a vital element of graphic design, affecting readability, aesthetics, and overall design effectiveness...', 'Explore the impact of typography in graphic design.', 'David Lee', 'graphic_design_typography_1.jpg', '2023-09-21 06:00:00', '2023-09-21 06:00:00', 1, 'An article discussing the importance of typography in design.', 'Typography in Graphic Design', 'Understand the impact of typography in graphic design.', 'https://example.com/the-impact-of-typography-in-graphic-design');
 
 
-INSERT INTO `category` (`name`, `slug`, `type`, `parent`, `description`, `image`, `visible`) VALUES
-('Technology', 'technology', 'article', -1, 'All about the latest in technology', 'tech.jpg', 1),
-('Health', 'health', 'article', -1, 'Health tips and articles', 'health.jpg', 1),
-('Travel', 'travel', 'article', -1, 'Travel guides and tips', 'travel.jpg', 1),
-('Lifestyle', 'lifestyle', 'article', -1, 'Lifestyle tips and inspiration', 'lifestyle.jpg', 1),
-('Food', 'food', 'article', -1, 'Recipes and food-related articles', 'food.jpg', 1),
-('Fitness', 'fitness', 'article', -1, 'Fitness guides and workout routines', 'fitness.jpg', 1),
-('Business', 'business', 'article', -1, 'Business strategies and news', 'business.jpg', 1),
-('Education', 'education', 'article', -1, 'Education tips and learning guides', 'education.jpg', 1),
-('Finance', 'finance', 'article', -1, 'Finance and money management', 'finance.jpg', 1),
-('Entertainment', 'entertainment', 'article', -1, 'Movies, music, and entertainment news', 'entertainment.jpg', 1),
-('Parenting', 'parenting', 'article', -1, 'Parenting tips and guides', 'parenting.jpg', 1),
-('Fashion', 'fashion', 'article', -1, 'Latest fashion trends and style tips', 'fashion.jpg', 1),
-('Beauty', 'beauty', 'article', -1, 'Beauty tips and product reviews', 'beauty.jpg', 1),
-('Photography', 'photography', 'article', -1, 'Photography tips and techniques', 'photography.jpg', 1),
-('DIY', 'diy', 'article', -1, 'Do-it-yourself projects and crafts', 'diy.jpg', 1),
-('Pets', 'pets', 'article', -1, 'Articles about pets and pet care', 'pets.jpg', 1),
-('Gaming', 'gaming', 'article', -1, 'Gaming news and reviews', 'gaming.jpg', 1),
-('Environment', 'environment', 'article', -1, 'Environmental news and tips', 'environment.jpg', 1),
-('Science', 'science', 'article', -1, 'Latest scientific discoveries and news', 'science.jpg', 1),
-('History', 'history', 'article', -1, 'Articles on historical events and figures', 'history.jpg', 1);
+INSERT INTO `category` (`name`, `slug`, `type`, `parent`, `description`, `image`, `visible`, `created_at`) VALUES
+('Technology', 'technology', 'article', -1, 'All about the latest in technology', 'tech.jpg', 1, '2023-09-21 06:00:00'),
+('Health', 'health', 'article', -1, 'Health tips and articles', 'health.jpg', 1, '2023-09-21 06:00:00'),
+('Travel', 'travel', 'article', -1, 'Travel guides and tips', 'travel.jpg', 1, '2023-09-21 06:00:00'),
+('Lifestyle', 'lifestyle', 'article', -1, 'Lifestyle tips and inspiration', 'lifestyle.jpg', 1, '2023-09-21 06:00:00'),
+('Food', 'food', 'article', -1, 'Recipes and food-related articles', 'food.jpg', 1, '2023-09-21 06:00:00'),
+('Fitness', 'fitness', 'article', -1, 'Fitness guides and workout routines', 'fitness.jpg', 1, '2023-09-21 06:00:00'),
+('Business', 'business', 'article', -1, 'Business strategies and news', 'business.jpg', 1, '2023-09-21 06:00:00'),
+('Education', 'education', 'article', -1, 'Education tips and learning guides', 'education.jpg', 1, '2023-09-21 06:00:00'),
+('Finance', 'finance', 'article', -1, 'Finance and money management', 'finance.jpg', 1, '2023-09-21 06:00:00'),
+('Entertainment', 'entertainment', 'article', -1, 'Movies, music, and entertainment news', 'entertainment.jpg', 1, '2023-09-21 06:00:00'),
+('Parenting', 'parenting', 'article', -1, 'Parenting tips and guides', 'parenting.jpg', 1, '2023-09-21 06:00:00'),
+('Fashion', 'fashion', 'article', -1, 'Latest fashion trends and style tips', 'fashion.jpg', 1, '2023-09-21 06:00:00'),
+('Beauty', 'beauty', 'article', -1, 'Beauty tips and product reviews', 'beauty.jpg', 1, '2023-09-21 06:00:00'),
+('Photography', 'photography', 'article', -1, 'Photography tips and techniques', 'photography.jpg', 1, '2023-09-21 06:00:00'),
+('DIY', 'diy', 'article', -1, 'Do-it-yourself projects and crafts', 'diy.jpg', 1, '2023-09-21 06:00:00'),
+('Pets', 'pets', 'article', -1, 'Articles about pets and pet care', 'pets.jpg', 1, '2023-09-21 06:00:00'),
+('Gaming', 'gaming', 'article', -1, 'Gaming news and reviews', 'gaming.jpg', 1, '2023-09-21 06:00:00'),
+('Environment', 'environment', 'article', -1, 'Environmental news and tips', 'environment.jpg', 1, '2023-09-21 06:00:00'),
+('Science', 'science', 'article', -1, 'Latest scientific discoveries and news', 'science.jpg', 1, '2023-09-21 06:00:00'),
+('History', 'history', 'article', -1, 'Articles on historical events and figures', 'history.jpg', 1, '2023-09-21 06:00:00');
 
 
 

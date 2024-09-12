@@ -102,4 +102,14 @@ category_create:
     controller: App\Controller\CategoryController::create
     methods: ['POST']
 
-
+   
+category_get_all: 
+    path: /category-get-all
+    controller: App\Controller\CategoryController::get 
+    methods: ['GET']
+    # queryparams: page, per_page, sort: id-asc, id-desc, asc, desc
+    
+dashboard_category_edit: 
+    path: /dashboard/category-edit/{id}
+    controller: App\Controller\DashboardController::editCategory 
+    methods: ['GET']

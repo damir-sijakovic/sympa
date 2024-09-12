@@ -72,7 +72,7 @@ class ArticleController extends AbstractController
     public function getArticlesPost(Request $request): Response
     {
         try {
-            $perPage = $request->query->getInt('per_page', 10);
+            $perPage = $request->query->getInt('per-page', 10);
             $page = $request->query->getInt('page', 1);
             $sort = $request->query->get('sort', 'desc'); // Default sort order is descending
             $active = $request->query->get('active'); // Get the active parameter
@@ -173,7 +173,7 @@ class ArticleController extends AbstractController
         public function getArticlesPost6(Request $request): Response
     {
         try {
-            $perPage = $request->query->getInt('per_page', 10);
+            $perPage = $request->query->getInt('per-page', 10);
             $page = $request->query->getInt('page', 1);
             $sort = $request->query->get('sort', 'desc'); // Default sort order is descending
             $active = $request->query->get('active'); // Get the active parameter
@@ -254,7 +254,7 @@ class ArticleController extends AbstractController
     public function getArticlesPost5(Request $request): Response
     {
         try {
-            $perPage = $request->query->getInt('per_page', 10);
+            $perPage = $request->query->getInt('per-page', 10);
             $page = $request->query->getInt('page', 1);
             $sort = $request->query->get('sort', 'desc'); // Default sort order is descending
             $active = $request->query->get('active'); // Get the active parameter
@@ -310,7 +310,7 @@ class ArticleController extends AbstractController
         public function getArticlesPost4(Request $request): Response
     {
         try {
-            $perPage = $request->query->getInt('per_page', 10);
+            $perPage = $request->query->getInt('per-page', 10);
             $page = $request->query->getInt('page', 1);
             $sort = $request->query->get('sort', 'desc'); // Default sort order is descending
             $active = $request->query->get('active'); // Get the active parameter
@@ -378,7 +378,7 @@ class ArticleController extends AbstractController
     public function getArticlesPost3(Request $request): Response
 {
     try {
-        $perPage = $request->query->getInt('per_page', 10);
+        $perPage = $request->query->getInt('per-page', 10);
         $page = $request->query->getInt('page', 1);
         $sort = $request->query->get('sort', 'desc'); // Default sort order is descending
         $active = $request->query->get('active'); // Get the active parameter
@@ -435,7 +435,7 @@ class ArticleController extends AbstractController
     public function getArticlesPost1(Request $request): Response
     {
         try {
-            $perPage = $request->query->getInt('per_page', 10);
+            $perPage = $request->query->getInt('per-page', 10);
             $page = $request->query->getInt('page', 1);
             $sort = $request->query->get('sort', 'desc'); // Default sort order is descending
             $offset = ($page - 1) * $perPage;
@@ -482,7 +482,7 @@ class ArticleController extends AbstractController
     public function getArticlesPost0(Request $request): Response
 	{
 		try {
-			$perPage = $request->query->getInt('per_page', 10);
+			$perPage = $request->query->getInt('per-page', 10);
 			$page = $request->query->getInt('page', 1);
 			$sort = $request->query->get('sort', 'desc'); // Default sort order is descending
 			$offset = ($page - 1) * $perPage;

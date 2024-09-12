@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Entity\Article;
+use App\Entity\Category;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -98,7 +99,7 @@ class DashboardController extends AbstractController
   
     public function categories(): Response
     {
-		$articles = $this->renderView('dashboard/article-categories.html.twig', [
+		$articles = $this->renderView('dashboard/category-list.html.twig', [
 			'rootUrl' => $this->utilityHelper->getRootUrl(),
             'controller_name' => 'DashboardController',
         ]);
@@ -126,7 +127,39 @@ class DashboardController extends AbstractController
   
     
 
+    public function editCategory(Request $request, $id): Response
+    {
+        $session = $request->getSession();	
+        $categoryRepository = $this->entityManager->getRepository(Category::class);
+        $category = $categoryRepository->findOneBy(['id' => $id]);
+
+        if (!$category) {
+            throw new NotFoundHttpException('The category was not found.');
+        }
+
+        $categories = $this->renderView('dashboard/category-edit.html.twig', [
+            'rootUrl' => $this->utilityHelper->getRootUrl(),    
+        /*
+            'rootUrl' => $this->utilityHelper->getRootUrl(),    
+            'title' => $category->getTitle(),
+            'slug' => $category->getSlug(),
+            'excerpt' => $category->getExcerpt(),
+            'content' => $category->getContent(),
+            'image' => $category->getImage(),
+            'type' => $category->getType(),
+            'active' => $category->isActive() ? 'yes' : 'no',
+            'id' => $id
+            */
+        ]);
+
+        return $this->render('dashboard/main.html.twig', [ 
+            'userId' => $session->get('userId'),           
+            'rootUrl' => $this->utilityHelper->getRootUrl(),
+            'body' => $categories,
+        ]);
+    }
   
+
     
     
     

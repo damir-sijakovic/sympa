@@ -36,6 +36,11 @@ class Category
 	#[ORM\Column]
     private ?bool $visible = null;
 	
+    #[ORM\Column]
+    private ?\DateTimeImmutable $createdAt = null;
+
+    #[ORM\Column(nullable: true)]
+    private ?\DateTimeImmutable $modifiedAt = null;
 
     /**
      * @var Collection<int, ArticleCategory>
@@ -169,6 +174,30 @@ class Category
     public function setType(string $type): static
     {
         $this->type = $type;
+
+        return $this;
+    }
+    
+        public function getCreatedAt(): ?\DateTimeImmutable
+    {
+        return $this->createdAt;
+    }
+
+    public function setCreatedAt(\DateTimeImmutable $createdAt): static
+    {
+        $this->createdAt = $createdAt;
+
+        return $this;
+    }
+
+    public function getModifiedAt(): ?\DateTimeImmutable
+    {
+        return $this->modifiedAt;
+    }
+
+    public function setModifiedAt(\DateTimeImmutable $modifiedAt): static
+    {
+        $this->modifiedAt = $modifiedAt;
 
         return $this;
     }

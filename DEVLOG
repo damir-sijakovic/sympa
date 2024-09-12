@@ -1,3 +1,10 @@
+0.1.9.1726176526
+=====
+Added search to "Article list".
+Added list by category ID to "Article list". 
+Started shaping categories.
+Craeted "Create category" view.
+
 0.1.9.1726000684
 =====
 Reworked dashboard Article list view. 

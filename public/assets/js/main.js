@@ -1,5 +1,5 @@
 
-function ds_message(message, type="warning"){
+function sympa_message(message, type="warning"){
 	
 	let element = document.getElementById("ds-top-message");
 	
@@ -13,3 +13,13 @@ function ds_message(message, type="warning"){
 	`;		
 }
 
+
+function sympa_isIntegerString(str) {
+    if (str !== "" && !isNaN(str) && Number.isInteger(parseFloat(str))) {
+        //console.log(`${str} is an integer.`);
+        return true;
+    } else {
+        //console.log(`${str} is not an integer.`);
+        return false;
+    }
+}

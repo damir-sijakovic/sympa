@@ -30,43 +30,53 @@
 		line-height: 22px;
 	}
 	
+    
+    .sympa-modal{
+        background: #3e3e3ed1;
+    }
+    
+    
 </style>
 
 
-<h2>Create Category</h2>
+<h2>Create category</h2>
 
 <hr>
 <br><br>
 
+
+<div class="d-flex">
+
     <div class="col-8">
     
-    	<h6>Title:</h6>
-		<input class="form-control" id="ds-post-title-input" placeholder="" onchange="ds_titleChangeAction()" >
+    	<h6>Name:</h6>
+		<input class="form-control" id="ds-article-title" placeholder="" >
 		
 		<br>
-		<h6>Excerpt:</h6>
-		<textarea class="form-control" id="ds-post-excerpt" rows="3" maxlength="255" placeholder=""></textarea>
+		<h6>Description:</h6>
+		<textarea class="form-control" id="ds-article-excerpt" rows="3" maxlength="255" placeholder=""></textarea>
 		<br />
-		<h6>Content:</h6>
-		<div id="trumbowyg-element"></div>
+
+    	<h6>Image:</h6>
+        <div class="mb-3">
+           <input class="form-control" type="file" id="sympa-category-image-input" accept=".gif, .png, .jpg, .jpeg, .webp">
+        </div>
+
+    	<h6>Parent category:</h6>        
+        <div class="input-group mb-3">
+          <span class="input-group-text" onclick="sympa_openParentCategoryModal()" style="cursor:pointer">Select...</span>
+          <input id="sympa-parent-category-input" type="text" class="form-control" placeholder="">
+        </div>
 		
 		<br />
-		<h6>Categories:</h6>
-		<div style="display:flex">		
-			<button style="margin-right:6px" onclick="ds_selectCategoriesModal()" type="button" class="btn btn-sm btn-light" data-bs-toggle="modal" data-bs-target="#ds-select-categories-modal"> Add <span class="badge bg-success">+</span></button>
-			<div id="ds-selected-categories-list"></div>	
-		</div>
-		
-		<br />
-		<h6>Tags:</h6>
-		<div style="display:flex">		
-			<button style="margin-right:6px" onclick="ds_selectTagsModal()" type="button" class="btn btn-sm btn-light" data-bs-toggle="modal" data-bs-target="#ds-select-tags-modal"> Add <span class="badge bg-success">+</span></button>
-			<div id="ds-selected-tags-list"></div>	
-		</div>
-		
+       
+        <div class="form-check form-switch">
+            <input class="form-check-input" type="checkbox" role="switch" id="ds-article-active" checked>
+            <label class="form-check-label" for="flexSwitchCheckChecked">Visible</label>
+        </div>
 			
        <br />
-       <div href="" class="btn btn-primary btn-lg">Save</div>     
+       <div onclick="ds_publish()" class="btn btn-primary btn-lg" >Save</div>     
 		
     </div>
 
@@ -75,57 +85,274 @@
 
 
 
+
+<div class="col-4">
+<div class="accordion mx-2 mt-4" id="accordionExample">
+  <div class="accordion-item">
+    <h2 class="accordion-header">
+      <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+        Publish
+      </button>
+    </h2>
+    <div id="collapseOne" class="accordion-collapse collapse show" data-bs-parent="#accordionExample">
+      <div class="accordion-body">      
+          <div class="d-flex justify-content-between">  
+            <button type="button" class="btn btn-primary btn-lg">Create</button>
+            <button type="button" class="btn btn-primary btn-lg">Create</button>
+          </div>
+      </div>
+    </div>
+  </div>
+  <div class="accordion-item">
+    <h2 class="accordion-header">
+      <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
+        Categories
+      </button>
+    </h2>
+    <div id="collapseTwo" class="accordion-collapse collapse" data-bs-parent="#accordionExample">
+      <div class="accordion-body">
+        <strong>This is the second item's accordion body.</strong> It is hidden by default, until the collapse plugin adds the appropriate classes that we use to style each element. These classes control the overall appearance, as well as the showing and hiding via CSS transitions. You can modify any of this with custom CSS or overriding our default variables. It's also worth noting that just about any HTML can go within the <code>.accordion-body</code>, though the transition does limit overflow.
+      </div>
+    </div>
+  </div>
+  <div class="accordion-item">
+    <h2 class="accordion-header">
+      <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
+        Images
+      </button>
+    </h2>
+    <div id="collapseThree" class="accordion-collapse collapse" data-bs-parent="#accordionExample">
+      <div class="accordion-body">
+        <strong>This is the third item's accordion body.</strong> It is hidden by default, until the collapse plugin adds the appropriate classes that we use to style each element. These classes control the overall appearance, as well as the showing and hiding via CSS transitions. You can modify any of this with custom CSS or overriding our default variables. It's also worth noting that just about any HTML can go within the <code>.accordion-body</code>, though the transition does limit overflow.
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+
+
+
+
+
+</div>
+
+
+
+
+
+
+
+
+
+
+<div class="modal sympa-modal" id="sympa-parent-category-modal" style="display:none;">
+  <div class="modal-dialog" >
+    <div class="modal-content" >
+      <div class="modal-header">
+        <h5 class="modal-title">Select category</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" onclick="document.getElementById('sympa-parent-category-modal').style.display='none'"></button>
+      </div>
+      <div class="modal-body" style="height: calc(100vh - 200px) !important; overflow:scroll;">
+        
+        <div id="sympa-parent-category-loading-modal" class="d-flex justify-content-center align-items-center h-100">
+            <div class="spinner-border" role="status">
+              <span class="visually-hidden">Loading...</span>
+            </div>
+       </div>
+      
+        <ul id="sympa-parent-category-ul-modal" class="list-group" style="display:none;">
+          <li onclick="sympa_toggleSelectedCategory(this)" class="sympa-category-select-list list-group-item">An active item</li>
+          <li onclick="sympa_toggleSelectedCategory(this)" class="sympa-category-select-list list-group-item">A second item</li>
+          <li onclick="sympa_toggleSelectedCategory(this)" class="sympa-category-select-list list-group-item">A third item</li>
+          <li onclick="sympa_toggleSelectedCategory(this)" class="sympa-category-select-list list-group-item">A fourth item</li>
+          <li onclick="sympa_toggleSelectedCategory(this)" class="sympa-category-select-list list-group-item">And a fifth one</li>
+          <li onclick="sympa_toggleSelectedCategory(this)" class="sympa-category-select-list list-group-item">A second item</li>
+          <li onclick="sympa_toggleSelectedCategory(this)" class="sympa-category-select-list list-group-item">A third item</li>
+          <li onclick="sympa_toggleSelectedCategory(this)" class="sympa-category-select-list list-group-item">A fourth item</li>
+          <li onclick="sympa_toggleSelectedCategory(this)" class="sympa-category-select-list list-group-item">And a fifth one</li>
+          <li onclick="sympa_toggleSelectedCategory(this)" class="sympa-category-select-list list-group-item">A second item</li>
+          <li onclick="sympa_toggleSelectedCategory(this)" class="sympa-category-select-list list-group-item">A third item</li>
+          <li onclick="sympa_toggleSelectedCategory(this)" class="sympa-category-select-list list-group-item">A fourth item</li>
+          <li onclick="sympa_toggleSelectedCategory(this)" class="sympa-category-select-list list-group-item">And a fifth one</li>
+          <li onclick="sympa_toggleSelectedCategory(this)" class="sympa-category-select-list list-group-item">A second item</li>
+          <li onclick="sympa_toggleSelectedCategory(this)" class="sympa-category-select-list list-group-item">A third item</li>
+          <li onclick="sympa_toggleSelectedCategory(this)" class="sympa-category-select-list list-group-item">A fourth item</li>
+          <li onclick="sympa_toggleSelectedCategory(this)" class="sympa-category-select-list list-group-item">And a fifth one</li>
+          <li onclick="sympa_toggleSelectedCategory(this)" class="sympa-category-select-list list-group-item">A fourth item</li>
+          <li onclick="sympa_toggleSelectedCategory(this)" class="sympa-category-select-list list-group-item">And a fifth one</li>
+          <li onclick="sympa_toggleSelectedCategory(this)" class="sympa-category-select-list list-group-item">A second item</li>
+          <li onclick="sympa_toggleSelectedCategory(this)" class="sympa-category-select-list list-group-item">A third item</li>
+          <li onclick="sympa_toggleSelectedCategory(this)" class="sympa-category-select-list list-group-item">A fourth item</li>
+          <li onclick="sympa_toggleSelectedCategory(this)" class="sympa-category-select-list list-group-item">And a fifth one</li>
+          <li onclick="sympa_toggleSelectedCategory(this)" class="sympa-category-select-list list-group-item">A second item</li>
+          <li onclick="sympa_toggleSelectedCategory(this)" class="sympa-category-select-list list-group-item">A third item</li>
+          <li onclick="sympa_toggleSelectedCategory(this)" class="sympa-category-select-list list-group-item">A fourth item</li>
+          <li onclick="sympa_toggleSelectedCategory(this)" class="sympa-category-select-list list-group-item">And a fifth one</li>
+          <li onclick="sympa_toggleSelectedCategory(this)" class="sympa-category-select-list list-group-item">A fourth item</li>
+          <li onclick="sympa_toggleSelectedCategory(this)" class="sympa-category-select-list list-group-item">And a fifth one</li>
+          <li onclick="sympa_toggleSelectedCategory(this)" class="sympa-category-select-list list-group-item">A second item</li>
+          <li onclick="sympa_toggleSelectedCategory(this)" class="sympa-category-select-list list-group-item">A third item</li>
+          <li onclick="sympa_toggleSelectedCategory(this)" class="sympa-category-select-list list-group-item">A fourth item</li>
+          <li onclick="sympa_toggleSelectedCategory(this)" class="sympa-category-select-list list-group-item">And a fifth one</li>
+          <li onclick="sympa_toggleSelectedCategory(this)" class="sympa-category-select-list list-group-item">A second item</li>
+          <li onclick="sympa_toggleSelectedCategory(this)" class="sympa-category-select-list list-group-item">A third item</li>
+          <li onclick="sympa_toggleSelectedCategory(this)" class="sympa-category-select-list list-group-item">A fourth item</li>
+          <li onclick="sympa_toggleSelectedCategory(this)" class="sympa-category-select-list list-group-item">And a fifth one</li>
+        </ul>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" onclick="document.getElementById('sympa-parent-category-modal').style.display='none'">Cancel</button>
+        <button type="button" class="btn btn-primary" onclick="sympa_selectParentCategoryItemAction()">Select</button>
+      </div>
+
+	<div class="alert alert-warning alert-dismissible fade show" role="alert" style="display:none; margin-bottom: 0;">
+	   <span id="sympa-bulk-delete-modal-message"> Hello</span> 
+	  <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close" ></button>
+	</div>
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
 <script src="{{rootUrl}}/assets/vendor/jquery-3.6.0/jquery-3.6.0.min.js"></script>
-<script src="{{rootUrl}}/assets/vendor/trumbowyg/trumbowyg.min.js"></script>
-<script src="{{rootUrl}}/assets/vendor/trumbowyg/plugins/table/trumbowyg.table.min.js"></script>
 <script src="{{rootUrl}}/assets/vendor/slugify/slugify.min.js"></script> 
 <script src="{{rootUrl}}/assets/vendor/slugify/speakingurl.min.js"></script> 
 
 <script>
 
-// name slug parent description image visible 	
 
 
-//EDITOR
-var trumboEditor = $('#trumbowyg-element').trumbowyg({
-    autogrow: true,
-    tagsToRemove: ['script', 'iframe', 'style'],    
+
+//ARTICLE
+
+
+function ds_getArticleData()
+{    
+    let articleTitle = document.getElementById("ds-article-title").value;
+    let articleExcerpt = document.getElementById("ds-article-excerpt").value;
+    let content = trumboEditor.html();
+    let active = document.getElementById("ds-article-active").checked;
+
+    let data = {};
+    data.title = articleTitle;
+	data.content = content;
+	data.excerpt = articleExcerpt;
+	data.active = active;
     
-    plugins: {
-        table: {
-            // Allows creating tables up to 10 x 10
-            limitRows: 10,
-            limitCols: 10,
+    return data;
+}
 
-            // Allows creating tables with a maximum of 100 cells
-            limitCells: 100,
 
-            // Allows creating tables with a maximum width of 1000 pixels
-            limitWidth: 1000,
+async function ds_publish()
+{
+	let data = ds_getArticleData();
+	
+	let postData = new FormData();  
+	postData.append('title', data.title);
+	postData.append('excerpt', data.excerpt);
+	postData.append('content', data.content);
+	postData.append('active', data.active);
 
-            // Allows creating tables with a maximum height of 500 pixels
-            limitHeight: 500
+	const response = await fetch('/article-create', {
+		method: 'POST', 
+		body: postData,
+	});
+	
+	const jsonData = await response.json();
+	
+	if (jsonData.error) {
+		ds_message(jsonData.message, 'warning');
+	}
+	else {
+		ds_message('Article created!', 'success');
+		setTimeout(function () {
+		//	window.location.reload();
+		}, 2000);
+	}
+}
+
+
+function sympa_selectParentCategoryItemAction(){
+    console.log("sympa_selectParentCategoryItemAction");
+    const name = localStorage.getItem("sympa-category-parent-selected-item-name");
+    const id = localStorage.getItem("sympa-category-parent-selected-item-id");
+    
+    document.getElementById("sympa-parent-category-input").value = name;   
+    document.getElementById("sympa-parent-category-input").title = "ID: "+ id;   
+    document.getElementById("sympa-parent-category-modal").style.display = "none";  
+}
+
+async function sympa_openParentCategoryModal(){
+    
+    const _createItem = function(item){
+        const name = item.name;
+        const id = item.id;
+        const description = item.description;
+        console.log(item);
+        return `<li onclick="sympa_toggleSelectedCategory(this)" 
+            class="sympa-category-select-list list-group-item" 
+            title="ID: ${id}\nDescription: ${description}"
+            data-id="${id}" data-name="${name}"
+            >${name}</li>`;
+    }
+    
+    document.getElementById("sympa-parent-category-modal").style.display = "block";   
+    // category-get-all
+    // sympa-parent-category-loading-modal
+    // sympa-parent-category-ul-modal
+    
+    const response = await fetch('/category-get-all?per-page=1000&page=1');
+    const jsonData = await response.json();
+	
+	if (jsonData.error) {
+		sympa_message(jsonData.message, 'warning');
+	}
+    
+    if (jsonData.total > 0){        
+        document.getElementById("sympa-parent-category-loading-modal").classList.add("d-none");
+        document.getElementById("sympa-parent-category-ul-modal").style.display = "block";
+        let htmlData = "";
+        for (const key in jsonData.categories) {
+            htmlData += _createItem(jsonData.categories[key]);
         }
-    },
+        document.getElementById("sympa-parent-category-ul-modal").innerHTML = htmlData;
+    }
+    
     
     /*
-    btns: [
-        ['viewHTML'],
-        ['formatting'],
-        ['strong', 'em', 'del'],
-        ['superscript', 'subscript'],
-        ['link'],
-        ['image'],
-        ['table'],
-        ['tableAddRowAbove', 'tableAddRowBelow', 'tableRemoveRow'],
-        ['tableAddColLeft', 'tableAddColRight', 'tableRemoveCol'],
-        ['tableMergeCells', 'tableSplitCells'],
-        ['horizontalRule'],
-        ['fullscreen']
-    ],
+	else {
+		//sympa_message('Article created!', 'success');
+		setTimeout(function () {
+		//	window.location.reload();
+		}, 2000);
+	}
     */
-});
-trumboEditor.trumbowyg('html', 'hellllo');
+    
+}
+
+
+function sympa_toggleSelectedCategory(that){
+    document.querySelectorAll('.sympa-category-select-list').forEach(element => element.classList.remove('active'));
+    that.classList.toggle("active");
+    console.log(that);
+    const id = that.getAttribute("data-id");
+    const name = that.getAttribute("data-name");
+    
+    localStorage.setItem("sympa-category-parent-selected-item-name", name);
+    localStorage.setItem("sympa-category-parent-selected-item-id", id);
+}
+
 
 
 </script>
