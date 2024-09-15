@@ -52,8 +52,22 @@
 		<textarea class="form-control" id="ds-post-excerpt-textarea" rows="3" maxlength="255" placeholder="" value="{{excerpt|raw}}"></textarea>
 		<br />
 		<h6>Content:</h6>
-		<div id="trumbowyg-element"></div>
-				
+		<div id="trumbowyg-element"></div>			
+            
+		<br />
+		<h6>Categories:</h6>
+		<div style="display:flex">		
+			<button style="margin-right:6px" onclick="ds_selectCategoriesModal()" type="button" class="btn btn-sm btn-light" data-bs-toggle="modal" data-bs-target="#ds-select-categories-modal"> Add <span class="badge bg-primary">+</span></button>
+			<div id="ds-selected-categories-list"></div>	
+		</div>
+		
+		<br />
+		<h6>Tags:</h6>
+		<div style="display:flex">		
+			<button style="margin-right:6px" onclick="ds_selectTagsModal()" type="button" class="btn btn-sm btn-light" data-bs-toggle="modal" data-bs-target="#ds-select-tags-modal"> Add <span class="badge bg-primary">+</span></button>
+			<div id="ds-selected-tags-list"></div>	
+		</div>
+        
         
         <br />
         <div onclick="ds_publish()" class="btn btn-primary btn-lg" >Save</div>   

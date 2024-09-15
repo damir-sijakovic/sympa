@@ -4,6 +4,8 @@ controllers:
         namespace: App\Controller
     type: attribute
 
+# ROUTES:
+
 page_home:
     path: /
     controller: App\Controller\PageController::home
@@ -70,10 +72,14 @@ article_delete:
     controller: App\Controller\ArticleController::deleteArticleByIdPost
     methods: ['POST']
   
- 
-dashboard:
+dashboard_home:
     path: /dashboard
     controller: App\Controller\DashboardController::index
+    methods: ['GET']
+    
+dashboard_articles:
+    path: /dashboard/articles
+    controller: App\Controller\DashboardController::articles
     methods: ['GET']
 
 dashboard_article_create: 
@@ -92,14 +98,49 @@ dashboard_categories:
     controller: App\Controller\DashboardController::categories 
     methods: ['GET']
 
+dashboard_tags: 
+    path: /dashboard/tags
+    controller: App\Controller\DashboardController::tags 
+    methods: ['GET']
+    
+dashboard_tag_create: 
+    path: /dashboard/tag-create
+    controller: App\Controller\DashboardController::createTag
+    methods: ['GET']
+
+dashboard_tag_edit: 
+    path: /dashboard/tag-edit/{id}
+    controller: App\Controller\DashboardController::editTag 
+    methods: ['GET']
+
+dashboard_files: 
+    path: /dashboard/files
+    controller: App\Controller\DashboardController::files 
+    methods: ['GET']
+    
+dashboard_images: 
+    path: /dashboard/images
+    controller: App\Controller\DashboardController::images 
+    methods: ['GET']
+    
+dashboard_category_edit: 
+    path: /dashboard/category-edit/{id}
+    controller: App\Controller\DashboardController::editCategory 
+    methods: ['GET']
+
 dashboard_category_create: 
     path: /dashboard/category-create
     controller: App\Controller\DashboardController::createCategory 
     methods: ['GET']
 
 category_create:
-    path: /category/create
+    path: /category-create
     controller: App\Controller\CategoryController::create
+    methods: ['POST']
+
+category_edit: 
+    path: /category-edit
+    controller: App\Controller\CategoryController::edit 
     methods: ['POST']
 
    
@@ -108,8 +149,19 @@ category_get_all:
     controller: App\Controller\CategoryController::get 
     methods: ['GET']
     # queryparams: page, per_page, sort: id-asc, id-desc, asc, desc
-    
-dashboard_category_edit: 
-    path: /dashboard/category-edit/{id}
-    controller: App\Controller\DashboardController::editCategory 
+          
+tag_get_all: 
+    path: /tag-get-all
+    controller: App\Controller\TagController::get 
     methods: ['GET']
+    
+tag_edit: 
+    path: /tag-edit
+    controller: App\Controller\TagController::edit 
+    methods: ['POST']
+    
+tag_create: 
+    path: /tag-create
+    controller: App\Controller\TagController::create 
+    methods: ['POST']
+    

@@ -35,6 +35,11 @@
 		
 		#ds-dashboard-sidemenu{
 			height:100%;
+           /* background: linear-gradient(90deg, rgba(33,37,41,1) 0%, rgba(13,110,253,1) 100%);*/
+           /* background: rgb(13, 110, 253) !important; */
+            background: rgb(33,37,41);
+            background: linear-gradient(0deg, rgba(33,37,41,1) 0%, rgba(13,110,253,1) 14%, rgba(13,110,253,1) 100%); 
+            
 		}
 		
 		.ds-dashboard-sidemenu-outter{
@@ -43,11 +48,13 @@
 			top:0;
 			bottom:0;
 			overflow-y: auto;
+            box-shadow: rgba(0, 0, 0, 0.25) 0px 54px 55px, rgba(0, 0, 0, 0.12) 0px -12px 30px, rgba(0, 0, 0, 0.12) 0px 4px 6px, rgba(0, 0, 0, 0.17) 0px 12px 13px, rgba(0, 0, 0, 0.09) 0px -3px 5px;
 		}
 		
 		.ds-dashboard-container{
 			/* height:100%; */
-			display:flex;            
+			display:flex;       
+                 
 		}
 		
 		#ds-dashboard-content{
@@ -147,25 +154,33 @@
 <div class="ds-dashboard-sidemenu-outter">
 	<div id="ds-dashboard-sidemenu" class="d-flex flex-column flex-shrink-0 p-3 text-bg-dark" style="width: 280px;">
     <a  target="_blank" href="/" class="d-flex align-items-center mb-3 mb-md-0 me-md-auto text-white text-decoration-none" title="Go to webpage...">
-      <i class="bi bi-box-arrow-in-up-right" style="font-size: 40px; margin-right:10px" title="Open home page..."></i>
-      <span class="fs-4"> Sympa Project </span>      
+
+      <img src="{{rootUrl}}/assets/img/sympa.png" style="height:60px; border-radius: 50%; background: antiquewhite;" />
+      <span class="fs-4 mx-1"> Sympa <i class="bi bi-box-arrow-in-up-right"></i>  </span>     
     </a>
     <hr>
     <ul class="nav nav-pills flex-column mb-auto">
-		        
-      <li>
+
+    <li>
         <a id="ds-posts-link-files" href="/dashboard" class="nav-link text-white">
+            <i class="bi bi-house"></i>
+            Home
+        </a>
+    </li>
+              
+      <li>
+        <a id="ds-posts-link-files" href="/dashboard/articles" class="nav-link text-white">
           <i class="bi bi-folder2"></i>
           Articles
         </a>
       </li>
-  
-      <li>
+    
+      <!--li>
         <a id="ds-posts-link-about" href="/dashboard/article-create" class="nav-link text-white">
           <i class="bi bi-file-earmark-plus"></i>
           Create article
         </a>
-      </li>
+      </li-->
     
       <li>
         <a id="ds-posts-link-about" href="/dashboard/categories" class="nav-link text-white">
@@ -174,22 +189,36 @@
         </a>
       </li>
   
-      <li>
+      <!--li>
         <a id="ds-posts-link-about" href="/dashboard/category-create" class="nav-link text-white">
           <i class="bi bi-ui-checks-grid"></i>
           Create category
         </a>
-      </li>
+      </li-->
   
       <li>
-        <a id="ds-posts-link-about" href="/dashboard/about" class="nav-link text-white">
+        <a id="ds-posts-link-about" href="/dashboard/tags" class="nav-link text-white">
           <i class="bi bi-tag"></i>
           Tags
         </a>
       </li>
   
+        <!--li>
+        <a id="ds-posts-link-about" href="/dashboard/tag-create" class="nav-link text-white">
+          <i class="bi bi-tag"></i>
+          Create tag
+        </a>
+      </li-->
+  
       <li>
-        <a id="ds-posts-link-about" href="/dashboard/about" class="nav-link text-white">
+        <a id="ds-posts-link-about" href="/dashboard/images" class="nav-link text-white">
+          <i class="bi bi-images"></i>
+          Images
+        </a>
+      </li>
+  
+      <li>
+        <a id="ds-posts-link-about" href="/dashboard/files" class="nav-link text-white">
           <i class="bi bi-stickies"></i>
           Files
         </a>

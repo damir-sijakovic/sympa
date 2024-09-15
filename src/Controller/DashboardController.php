@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Entity\Tag;
 use App\Entity\Article;
 use App\Entity\Category;
 use Doctrine\ORM\EntityManagerInterface;
@@ -31,6 +32,21 @@ class DashboardController extends AbstractController
 	
     
     public function index(Request $request): Response
+    {
+        $session = $request->getSession();	
+		$articles = $this->renderView('dashboard/home.html.twig', [
+			'rootUrl' => $this->utilityHelper->getRootUrl(),
+            'controller_name' => 'DashboardController',
+        ]);
+		
+        return $this->render('dashboard/main.html.twig', [
+            'userId' => $session->get('userId'),
+			'rootUrl' => $this->utilityHelper->getRootUrl(),
+            'body' => $articles,
+        ]);
+    }
+       
+    public function articles(Request $request): Response
     {
         $session = $request->getSession();	
 		$articles = $this->renderView('dashboard/article-list.html.twig', [
@@ -97,9 +113,71 @@ class DashboardController extends AbstractController
   
     
   
-    public function categories(): Response
+    public function categories(Request $request): Response
     {
+        $session = $request->getSession();	
 		$articles = $this->renderView('dashboard/category-list.html.twig', [
+			'rootUrl' => $this->utilityHelper->getRootUrl(),
+            'controller_name' => 'DashboardController',
+        ]);
+		
+        return $this->render('dashboard/main.html.twig', [
+            'userId' => $session->get('userId'), 
+			'rootUrl' => $this->utilityHelper->getRootUrl(),
+            'body' => $articles,
+        ]);
+    }
+  
+  
+    public function tags(Request $request): Response
+    {
+        $session = $request->getSession();	
+		$articles = $this->renderView('dashboard/tag-list.html.twig', [
+			'rootUrl' => $this->utilityHelper->getRootUrl(),
+            'controller_name' => 'DashboardController',
+        ]);
+		
+        return $this->render('dashboard/main.html.twig', [
+            'userId' => $session->get('userId'), 
+			'rootUrl' => $this->utilityHelper->getRootUrl(),
+            'body' => $articles,
+        ]);
+    }
+  
+    public function images(Request $request): Response
+    {
+        $session = $request->getSession();	
+		$articles = $this->renderView('dashboard/images.html.twig', [
+			'rootUrl' => $this->utilityHelper->getRootUrl(),
+            'controller_name' => 'DashboardController',
+        ]);
+		
+        return $this->render('dashboard/main.html.twig', [
+            'userId' => $session->get('userId'), 
+			'rootUrl' => $this->utilityHelper->getRootUrl(),
+            'body' => $articles,
+        ]);
+    }
+  
+    public function files(Request $request): Response
+    {
+        $session = $request->getSession();	
+		$articles = $this->renderView('dashboard/files.html.twig', [
+			'rootUrl' => $this->utilityHelper->getRootUrl(),
+            'controller_name' => 'DashboardController',
+        ]);
+		
+        return $this->render('dashboard/main.html.twig', [
+            'userId' => $session->get('userId'), 
+			'rootUrl' => $this->utilityHelper->getRootUrl(),
+            'body' => $articles,
+        ]);
+    }
+  
+  
+    public function createCategory(Request $request): Response
+    {
+		$articles = $this->renderView('dashboard/category-create.html.twig', [
 			'rootUrl' => $this->utilityHelper->getRootUrl(),
             'controller_name' => 'DashboardController',
         ]);
@@ -111,15 +189,18 @@ class DashboardController extends AbstractController
     }
   
   
-    public function createCategory(): Response
+    public function createTag(Request $request): Response
     {
-		$articles = $this->renderView('dashboard/category-create.html.twig', [
+        $session = $request->getSession();	
+        
+		$articles = $this->renderView('dashboard/tag-create.html.twig', [
 			'rootUrl' => $this->utilityHelper->getRootUrl(),
             'controller_name' => 'DashboardController',
         ]);
 		
         return $this->render('dashboard/main.html.twig', [
 			'rootUrl' => $this->utilityHelper->getRootUrl(),
+            'userId' => $session->get('userId'),  
             'body' => $articles,
         ]);
     }
@@ -156,6 +237,43 @@ class DashboardController extends AbstractController
             'userId' => $session->get('userId'),           
             'rootUrl' => $this->utilityHelper->getRootUrl(),
             'body' => $categories,
+        ]);
+    }
+  
+
+    
+    public function editTag(Request $request, $id): Response
+    {
+        $session = $request->getSession();	
+        $tagRepository = $this->entityManager->getRepository(Tag::class);
+        $tag = $tagRepository->findOneBy(['id' => $id]);
+
+        if (!$tag) {
+            throw new NotFoundHttpException('The tag was not found.');
+        }
+
+        $tags = $this->renderView('dashboard/tag-edit.html.twig', [
+            'rootUrl' => $this->utilityHelper->getRootUrl(), 
+            'name' => $tag->getName(),   
+            'slug' => $tag->getSlug(), 
+            'id' => $id,
+        /*
+            'rootUrl' => $this->utilityHelper->getRootUrl(),    
+            'title' => $category->getTitle(),
+            'slug' => $category->getSlug(),
+            'excerpt' => $category->getExcerpt(),
+            'content' => $category->getContent(),
+            'image' => $category->getImage(),
+            'type' => $category->getType(),
+            'active' => $category->isActive() ? 'yes' : 'no',
+            'id' => $id
+            */
+        ]);
+
+        return $this->render('dashboard/main.html.twig', [ 
+            'userId' => $session->get('userId'),           
+            'rootUrl' => $this->utilityHelper->getRootUrl(),
+            'body' => $tags,
         ]);
     }
   

@@ -33,12 +33,12 @@
 
 
 
-<h2>Categories</h2>
+<h2>Tags</h2>
 
 <hr>
 
 <div class="btn-group" role="group" aria-label="Basic example">
-  <a target="_blank" href="/dashboard/category-create" class="btn btn-primary btn-sm"><i class="bi bi-plus-circle mx-1"></i>Create</a>
+  <a target="_blank" href="/dashboard/tag-create" class="btn btn-primary btn-sm"><i class="bi bi-plus-circle mx-1"></i>Create</a>
   <button type="button" class="btn btn-outline-primary btn-sm" onclick="sympa_reset()"> Reset query</button>
 </div>
 
@@ -48,7 +48,7 @@
   There is no categories!
 </div>
 
-<ul id="sympa-category-list" class="list-group mb-3">
+<ul id="sympa-tag-list" class="list-group mb-3">
           
           <!--
         <li class=
@@ -229,12 +229,10 @@ function sympa_drawList(data)
        
         let id = x.id;
         let name = x.name;
-        let description = x.description;
-        let createdAt = x.created_at;
-        let modifiedAt = x.modified_at;
+        let slug = x.slug;
         
         return `
-        <li class="list-group-item d-flex justify-content-between bg-body-tertiary" title="ID: ${id} \nCreated: ${createdAt}\nModified: ${modifiedAt}" data-id="${id}">
+        <li class="list-group-item d-flex justify-content-between bg-body-tertiary" title="ID: ${id}" data-id="${id}">
             <div class="d-flex gap-3">                
                 <input class="form-check-input sympa-bulk-checkbox" type="checkbox">
                 <div>
@@ -242,13 +240,13 @@ function sympa_drawList(data)
                     <div style="display: flex;"> <span style="font-size: smaller; margin-right: 5px;">(${id})</span> <h6 class="my-0">${name}</h6></div>
                     -->
                     <div style="display: flex;"> <span class="badge text-bg-secondary mx-1" style="font-size:10px">${id}</span> <h6 class="my-0">${name}</h6></div>   
-                    <small>${description}</small>
+                    <small>${slug}</small>
                 </div>
             </div>            
             <span class="text-success">
                 <div class="btn-group" role="group" aria-label="Basic outlined example">
                   <div onclick="sympa_viewCategory(${id})" class="btn btn-primary btn-sm sympa-list-font" target="_blank">View</div>
-                  <a href="/dashboard/category-edit/${id}" class="btn btn-primary btn-sm sympa-list-font" target="_blank">Edit</a>
+                  <a href="/dashboard/tag-edit/${id}" class="btn btn-primary btn-sm sympa-list-font" target="_blank">Edit</a>
                   <div onclick="sympa_deleteArticleModal(${id})" class="btn btn-outline-primary btn-sm sympa-list-font">Delete</div>
                 </div>            
             </span>
@@ -304,10 +302,10 @@ function sympa_drawList(data)
         </li>   
     `;
     
-    let listElement = document.getElementById("sympa-category-list");     
+    let listElement = document.getElementById("sympa-tag-list");     
     
-    for (const key in data.categories) {
-        htmlData += _createItem(data.categories[key]);
+    for (const key in data.tags) {
+        htmlData += _createItem(data.tags[key]);
     }
     
     htmlData += `
@@ -315,10 +313,6 @@ function sympa_drawList(data)
             <div>Total: <span id="sympa-total-articles"></span> </div>
             <div id="sympa-bottom-right-message">::</div>
         </li> 
-        <!--li class="list-group-item d-flex justify-content-between" id="sympa-list-bottom-bar">
-            <span>Total:</span>
-            <div></div> <span id="sympa-total-articles"></span>
-        </li-->   
     `;
     
     listElement.innerHTML = htmlData;
@@ -393,6 +387,7 @@ function sympa_paginate(data){
 	}
    
 
+         
     htmlData += `
         </ul>    
     `;
@@ -424,12 +419,12 @@ async function sympa_getArticles(page=1, perPage=3, sort='desc')
 
 
 async function sympa_repaginate(page, perPage){       
-    localStorage.setItem('sympa-category-list-per-page', perPage);
-    localStorage.setItem('sympa-category-list-current-page', page);
+    localStorage.setItem('sympa-tag-list-per-page', perPage);
+    localStorage.setItem('sympa-tag-list-current-page', page);
      
     const data = await sympa_getCategoriesNew();
     if (data.total === 0){
-        document.getElementById("sympa-category-list").style.display = 'none';  
+        document.getElementById("sympa-tag-list").style.display = 'none';  
         document.getElementById("sympa-no-category-list").style.display = 'block'; 
         return;         
     }
@@ -441,7 +436,7 @@ async function sympa_repaginate(page, perPage){
    	const data = await sympa_getArticles(page, perPage, sort);
     
     if (data.total === 0){
-        document.getElementById("sympa-category-list").style.display = 'none';  
+        document.getElementById("sympa-tag-list").style.display = 'none';  
         document.getElementById("sympa-no-category-list").style.display = 'block'; 
         return;         
     }
@@ -453,12 +448,12 @@ async function sympa_repaginate(page, perPage){
 
 
 async function sympa_repaginateOld(page=1, perPage=10){       
-    localStorage.setItem('sympa-category-list-per-page', perPage);
-    localStorage.setItem('sympa-category-list-current-page', page);
+    localStorage.setItem('sympa-tag-list-per-page', perPage);
+    localStorage.setItem('sympa-tag-list-current-page', page);
      
     const data = await sympa_getCategoriesNew();
     if (data.total === 0){
-        document.getElementById("sympa-category-list").style.display = 'none';  
+        document.getElementById("sympa-tag-list").style.display = 'none';  
         document.getElementById("sympa-no-category-list").style.display = 'block'; 
         return;         
     }
@@ -470,7 +465,7 @@ async function sympa_repaginateOld(page=1, perPage=10){
    	const data = await sympa_getArticles(page, perPage, sort);
     
     if (data.total === 0){
-        document.getElementById("sympa-category-list").style.display = 'none';  
+        document.getElementById("sympa-tag-list").style.display = 'none';  
         document.getElementById("sympa-no-category-list").style.display = 'block'; 
         return;         
     }
@@ -485,20 +480,20 @@ async function sympa_repaginateOld(page=1, perPage=10){
 
 async function sympa_getCategoriesNew()
 {      
-    const sympaPerPage     = localStorage.getItem("sympa-category-list-per-page"); 
-    const sympaCurrentPage = localStorage.getItem("sympa-category-list-current-page");   
-    const sympaValue = localStorage.getItem("sympa-category-list-value"); 
-    const sympaSort = localStorage.getItem("sympa-category-list-sort");     
-    const sympaViewMode    = localStorage.getItem("sympa-category-list-view-mode");    
-    const sympaSearch      = localStorage.getItem("sympa-category-list-search");  
+    const sympaPerPage     = localStorage.getItem("sympa-tag-list-per-page"); 
+    const sympaCurrentPage = localStorage.getItem("sympa-tag-list-current-page");   
+    const sympaValue = localStorage.getItem("sympa-tag-list-value"); 
+    const sympaSort = localStorage.getItem("sympa-tag-list-sort");     
+    const sympaViewMode    = localStorage.getItem("sympa-tag-list-view-mode");    
+    const sympaSearch      = localStorage.getItem("sympa-tag-list-search");  
     
     /* 
-    const sympaBulkMode    = localStorage.getItem("sympa-category-list-bulk-mode"); 
-    const sympaListMessage = localStorage.getItem("sympa-category-list-message"); 
-    const sympaCategory  = localStorage.getItem("sympa-category-list-category"); 
+    const sympaBulkMode    = localStorage.getItem("sympa-tag-list-bulk-mode"); 
+    const sympaListMessage = localStorage.getItem("sympa-tag-list-message"); 
+    const sympaCategory  = localStorage.getItem("sympa-tag-list-category"); 
     */
     
-    let url = '/category-get-all?';  
+    let url = '/tag-get-all?';  
     
     if (sympaViewMode === 'normal'){
         url += 'page=' + sympaCurrentPage + '&per-page=' + sympaPerPage;         
@@ -524,14 +519,14 @@ async function sympa_getCategoriesNew()
 		return null;
 	}
     
-    if (!jsonData.categories){
-        throw new Error("Missing 'categories' object. Bad json format!");
+    if (!jsonData.tags){
+        throw new Error("Missing 'tags' object. Bad json format!");
     }
     
     // console.log( jsonData );    
     // sympa-no-categories-found
     
-    if (jsonData.total === 0) localStorage.setItem('sympa-category-empty', 'yes');
+    if (jsonData.total === 0) localStorage.setItem('sympa-tag-empty', 'yes');
     
     return jsonData;
 }
@@ -564,7 +559,7 @@ function sympa_setListValueAction(){
     document.getElementById("sympa-list-value-button").innerHTML = value;
     document.getElementById("sympa-list-value-button").setAttribute('data', value);
     document.getElementById("sympa-list-value-modal").style.display = "none";
-    localStorage.setItem('sympa-category-list-value', value);
+    localStorage.setItem('sympa-tag-list-value', value);
 }
 
 function sympa_openSetListValueModal(){
@@ -577,45 +572,45 @@ function sympa_changeListMode(that){
     if (that.value === 'normal'){
         document.getElementById("sympa-list-value-button").style.display = "none";
         document.getElementById("sympa-list-value-button").innerHTML = "Enter value...";
-        localStorage.setItem('sympa-category-list-view-mode', 'normal');
+        localStorage.setItem('sympa-tag-list-view-mode', 'normal');
     }
     if (that.value === 'search'){
         document.getElementById("sympa-list-value-button").style.display = "block";
-        localStorage.setItem('sympa-category-list-view-mode', 'search');        
+        localStorage.setItem('sympa-tag-list-view-mode', 'search');        
     }
 }
 
 
 function sympa_changeListSort(that){
     if (that.value === 'newest'){
-        localStorage.setItem('sympa-category-list-sort', 'newest');
+        localStorage.setItem('sympa-tag-list-sort', 'newest');
     }
     
     if (that.value === 'oldest'){
-        localStorage.setItem('sympa-category-list-sort', 'oldest');
+        localStorage.setItem('sympa-tag-list-sort', 'oldest');
     }
     
     if (that.value === 'id-ascending'){
-        localStorage.setItem('sympa-category-list-sort', 'id-ascending');
+        localStorage.setItem('sympa-tag-list-sort', 'id-ascending');
     }
     
     if (that.value === 'id-descending'){
-        localStorage.setItem('sympa-category-list-sort', 'id-descending');
+        localStorage.setItem('sympa-tag-list-sort', 'id-descending');
     } 
 }
 
 
 function sympa_changeListPerPage(that){
     if (that.value === '10'){
-        localStorage.setItem('sympa-category-list-per-page', '10');
+        localStorage.setItem('sympa-tag-list-per-page', '10');
     }
     
     if (that.value === '25'){
-        localStorage.setItem('sympa-category-list-per-page', '25');
+        localStorage.setItem('sympa-tag-list-per-page', '25');
     }
     
     if (that.value === '50'){
-        localStorage.setItem('sympa-category-list-per-page', '50');
+        localStorage.setItem('sympa-tag-list-per-page', '50');
     }    
 }
 
@@ -632,8 +627,8 @@ function sympa_reset(){ //removes all localStorage data starting with 'sympa-'
 
 
 async function sympa_goAction(){
-    let perPage = localStorage.getItem('sympa-category-list-per-page');
-    let currentPage = localStorage.getItem('sympa-category-list-current-page');
+    let perPage = localStorage.getItem('sympa-tag-list-per-page');
+    let currentPage = localStorage.getItem('sympa-tag-list-current-page');
     await sympa_repaginate(1, perPage);
     sympa_postUiRedraw();
 
@@ -653,63 +648,95 @@ function sympa_postUiRedraw(){
     
     if (localStorage.getItem('sympa-article-empty') !== null) return; 
 
-    let value = localStorage.getItem('sympa-category-list-per-page');
+    let value = localStorage.getItem('sympa-tag-list-per-page');
     if (value) { 
         document.getElementById('sympa-select-right-per-page').value = parseInt(value);
     } 
 
-    value = localStorage.getItem('sympa-category-list-view-mode');
+    value = localStorage.getItem('sympa-tag-list-view-mode');
     if (value) { 
         document.getElementById('sympa-select-right-mode').value = value;
         
         const button = document.getElementById("sympa-list-value-button");
         if (value == 'category' || value == 'search') button.style.display = "block";
-        const categorySearchValue = localStorage.getItem('sympa-category-list-value');
+        const categorySearchValue = localStorage.getItem('sympa-tag-list-value');
         
         if (categorySearchValue){
             button.setAttribute('data', categorySearchValue);
             button.innerHTML = categorySearchValue;
         }       
     }     
-    
-   
-    
-    
-    
 }
 
 
 function sympa_initStorageSettings(){  
     
-    let value = localStorage.getItem('sympa-category-list-per-page');
+    let value = localStorage.getItem('sympa-tag-list-per-page');
     if (value) {   
     } else {
-        localStorage.setItem('sympa-category-list-per-page', '10');
+        localStorage.setItem('sympa-tag-list-per-page', '10');
     }
 
-    value = localStorage.getItem('sympa-category-list-current-page');
+    value = localStorage.getItem('sympa-tag-list-current-page');
     if (!value) {        
-        localStorage.setItem('sympa-category-list-current-page', '1');
+        localStorage.setItem('sympa-tag-list-current-page', '1');
     }
 
-    value = localStorage.getItem('sympa-category-list-view-mode');
+    value = localStorage.getItem('sympa-tag-list-view-mode');
     if (!value) {        
-        localStorage.setItem('sympa-category-list-view-mode', 'normal');
+        localStorage.setItem('sympa-tag-list-view-mode', 'normal');
     }
     
-    value = localStorage.getItem('sympa-category-list-value');
+    value = localStorage.getItem('sympa-tag-list-value');
     if (!value) {        
-        localStorage.setItem('sympa-category-list-value', '');
+        localStorage.setItem('sympa-tag-list-value', '');
     }
 
- 
+/*
+
+    value = localStorage.getItem('sympa-tag-list-bulk-mode');
+    if (!value) {        
+        localStorage.setItem('sympa-tag-list-bulk-mode', 'none');
+    }
+
+    value = localStorage.getItem('sympa-tag-list-message');
+    if (!value) {        
+        localStorage.setItem('sympa-tag-list-message', '');
+    }
+
+    value = localStorage.getItem('sympa-tag-list-search');
+    if (!value) {        
+        localStorage.setItem('sympa-tag-list-search', '');
+    }
+
+    value = localStorage.getItem('sympa-tag-list-category');
+    if (!value) {        
+        localStorage.setItem('sympa-tag-list-category', '');
+    }
+
+    value = localStorage.getItem('sympa-tag-list-sort');
+    if (!value) {        
+        localStorage.setItem('sympa-tag-list-sort', 'newest');
+    }
+
+    value = localStorage.getItem('sympa-tag-list-value');
+    if (!value) {        
+        localStorage.setItem('sympa-tag-list-value', '');
+    }
+        
+    value = localStorage.getItem('sympa-tag-empty');
+    if (value) {        
+        localStorage.removeItem('sympa-tag-empty');
+    } 
+    
+    */   
 }
 
 
 async function sympa_initList(){      
     const data = await sympa_getCategoriesNew();
     if (data.total === 0){
-        document.getElementById("sympa-category-list").style.display = 'none';  
+        document.getElementById("sympa-tag-list").style.display = 'none';  
         document.getElementById("sympa-no-category-list").style.display = 'block';         
         return;         
     }

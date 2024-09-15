@@ -14,7 +14,7 @@ Sympa is my project built with **Symfony PHP 6.4** and **Bootstrap 5.3**, featur
 
 ## What's new?
 
-See DEVLOG file.
+See /development/DEVLOG file.
 
 ## Note
 The project is in the early stages of development but is still functional and usable.

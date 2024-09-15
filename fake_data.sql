@@ -109,3 +109,101 @@ INSERT INTO `article_category` (`id`, `type`, `category_id`, `article_id`) VALUE
 (40, 'article', 8, 40);
 
 
+
+INSERT INTO tag (name, slug, type) VALUES 
+('Tag 1', 'tag-1', 'article'),
+('Tag 2', 'tag-2', 'article'),
+('Tag 3', 'tag-3', 'article'),
+('Tag 4', 'tag-4', 'article'),
+('Tag 5', 'tag-5', 'article'),
+('Tag 6', 'tag-6', 'article'),
+('Tag 7', 'tag-7', 'article'),
+('Tag 8', 'tag-8', 'article'),
+('Tag 9', 'tag-9', 'article'),
+('Tag 10', 'tag-10', 'article'),
+('Tag 11', 'tag-11', 'article'),
+('Tag 12', 'tag-12', 'article'),
+('Tag 13', 'tag-13', 'article'),
+('Tag 14', 'tag-14', 'article'),
+('Tag 15', 'tag-15', 'article'),
+('Tag 16', 'tag-16', 'article'),
+('Tag 17', 'tag-17', 'article'),
+('Tag 18', 'tag-18', 'article'),
+('Tag 19', 'tag-19', 'article'),
+('Tag 20', 'tag-20', 'article'),
+('Tag 21', 'tag-21', 'article'),
+('Tag 22', 'tag-22', 'article'),
+('Tag 23', 'tag-23', 'article'),
+('Tag 24', 'tag-24', 'article'),
+('Tag 25', 'tag-25', 'article'),
+('Tag 26', 'tag-26', 'article'),
+('Tag 27', 'tag-27', 'article'),
+('Tag 28', 'tag-28', 'article'),
+('Tag 29', 'tag-29', 'article'),
+('Tag 30', 'tag-30', 'article'),
+('Tag 31', 'tag-31', 'article'),
+('Tag 32', 'tag-32', 'article'),
+('Tag 33', 'tag-33', 'article'),
+('Tag 34', 'tag-34', 'article'),
+('Tag 35', 'tag-35', 'article'),
+('Tag 36', 'tag-36', 'article'),
+('Tag 37', 'tag-37', 'article'),
+('Tag 38', 'tag-38', 'article'),
+('Tag 39', 'tag-39', 'article'),
+('Tag 40', 'tag-40', 'article');
+
+
+
+
+INSERT INTO `article_tag` (`id`, `type`, `tag_id`, `article_id`) VALUES
+(1, 'article', 8, 1),
+(2, 'article', 7, 2),
+(3, 'article', 6, 3),
+(4, 'article', 5, 4),
+(5, 'article', 4, 5),
+(6, 'article', 3, 6),
+(7, 'article', 2, 7),
+(8, 'article', 1, 8),
+(9, 'article', 8, 9),
+(10, 'article', 7, 10),
+(11, 'article', 6, 11),
+(12, 'article', 5, 12),
+(13, 'article', 4, 13),
+(14, 'article', 3, 14),
+(15, 'article', 2, 15),
+(16, 'article', 1, 16),
+(17, 'article', 8, 17),
+(18, 'article', 7, 18),
+(19, 'article', 6, 19),
+(20, 'article', 5, 20),
+(21, 'article', 4, 21),
+(22, 'article', 3, 22),
+(23, 'article', 2, 23),
+(24, 'article', 1, 24),
+(25, 'article', 8, 25),
+(26, 'article', 7, 26),
+(27, 'article', 6, 27),
+(28, 'article', 5, 28),
+(29, 'article', 4, 29),
+(30, 'article', 3, 30),
+(31, 'article', 2, 31),
+(32, 'article', 1, 32),
+(33, 'article', 8, 33),
+(34, 'article', 7, 34),
+(35, 'article', 6, 35),
+(36, 'article', 5, 36),
+(37, 'article', 4, 37),
+(38, 'article', 3, 38),
+(39, 'article', 2, 39),
+(40, 'article', 1, 40);
+
+
+
+/** admin@mail.com 12345678 **/
+INSERT INTO `user` (`id`, `nickname`, `role`, `email`, `created_at`, `modified_at`, `password`, `active`) VALUES
+(1, NULL, 'user', 'admin@mail.com', '2024-09-14 15:05:51', '2024-09-14 15:05:51', '$2y$13$FK9BETDmhvPhfcnpF8M14OBNNABICzg02aGCesxPnsfPhpHFX.SBK', 1);
+
+
+
+
+

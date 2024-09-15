@@ -38,7 +38,7 @@
 <hr>
 
 <div class="btn-group" role="group" aria-label="Basic example">
-  <button type="button" class="btn btn-primary btn-sm"><i class="bi bi-plus-circle mx-1"></i>Create</button>
+  <a target="_blank" href="/dashboard/article-create" class="btn btn-primary btn-sm"><i class="bi bi-plus-circle mx-1"></i>Create</a>
   <button type="button" class="btn btn-outline-primary btn-sm" onclick="sympa_reset()"> Reset query</button>
 </div>
 
@@ -166,6 +166,18 @@
 
 <script>
 
+function sympa_getSelectedItemIds(){
+    const elements = document.querySelectorAll('.sympa-bulk-checkbox');
+    let selectedIds = [];
+    elements.forEach(function(element) {
+        if (element.checked){
+            const dataId = element.parentElement.parentElement.getAttribute('data-id');
+            selectedIds.push(parseInt(dataId)); 
+        }
+    });
+    
+    return selectedIds;
+}
 
 function sympa_tableCheck(checked){
     if (checked){
@@ -186,7 +198,27 @@ function sympa_tableCheck(checked){
 
 
 function sympa_applyBulk(){
-    console.log("BULK");
+    const bulkMode = localStorage.getItem('sympa-article-list-bulk-mode');
+    const selectedIds = sympa_getSelectedItemIds();
+
+  
+}
+
+function sympa_changeBulkMode(that){
+    console.log(that);
+    if (that.value === 'none'){
+        localStorage.setItem('sympa-article-list-bulk-mode', 'none');
+    }
+    if (that.value === 'delete-items'){
+        localStorage.setItem('sympa-article-list-bulk-mode', 'delete-items');
+    }
+    if (that.value === 'strip-categories'){
+        localStorage.setItem('sympa-article-list-bulk-mode', 'strip-categories');  
+    }
+    if (that.value === 'add-to-category'){
+        localStorage.setItem('sympa-article-list-bulk-mode', 'add-to-category'); 
+    }
+
 }
 
 
@@ -267,11 +299,11 @@ function sympa_drawList(data)
                     <div>
                     <input style="margin-right: 1rem;" class="form-check-input" type="checkbox" onclick="sympa_tableCheck(this.checked)">
                     </div>     
-                    <select class="form-select sympa-toolbar-font" aria-label="Default select example">
-                      <option value="-1" selected>Bulk actions...</option>
-                      <option value="1">Delete items</option>
-                      <option value="2">Strip categories</option>
-                      <option value="3">Add to categories</option>
+                    <select id="sympa-select-bulk-mode" class="form-select sympa-toolbar-font" aria-label="Default select example">
+                      <option onclick="sympa_changeBulkMode(this)" value="none" selected>Bulk actions...</option>
+                      <option onclick="sympa_changeBulkMode(this)" value="delete-items">Delete items</option>
+                      <option onclick="sympa_changeBulkMode(this)" value="strip-categories">Strip categories</option>
+                      <option onclick="sympa_changeBulkMode(this)" value="add-to-category">Add to category</option>
                     </select>
                     <div onclick="sympa_applyBulk()" class="btn btn-light btn-sm sympa-toolbar-font">Apply</div>
                 </div>                
@@ -331,7 +363,7 @@ function sympa_drawList(data)
     listElement.innerHTML = htmlData;
     
     let totalArticlesElement = document.getElementById("sympa-total-articles");
-    totalArticlesElement.innerHTML = data.total + ' article(s)';   
+    totalArticlesElement.innerHTML = data.total + ' items(s)';   
 }
 
 
@@ -575,7 +607,11 @@ function sympa_postUiRedraw(){
         }       
     } 
 
-     
+    value = localStorage.getItem('sympa-article-list-bulk-mode');
+    if (value) { 
+        document.getElementById('sympa-select-bulk-mode').value = value;
+        
+    }   
 }
 
 

@@ -1,3 +1,10 @@
+0.1.9.1726429495
+=====
+Finished "Create category" in dashboard.
+Started working on "tags" dashboard view and TagController.
+Integrated tags and categories pill selection in "Create article". 
+Small bug fixes.
+
 0.1.9.1726176526
 =====
 Added search to "Article list".

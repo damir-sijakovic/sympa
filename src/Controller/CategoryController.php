@@ -33,26 +33,26 @@ class CategoryController extends AbstractController
     public function create(Request $request): Response
     {
         $name = $request->request->get('name');
-        $type = $request->request->get('type');
         $parent = $request->request->get('parent');
         $description = $request->request->get('description');
         $image = $request->request->get('image');
         $visible = $request->request->get('visible');
 
         // Check if the required fields are provided
-        if (!$name || !$type) {
-            return new Response('Name and Type are required', Response::HTTP_BAD_REQUEST);
+        if (!$name) {
+            return new Response('Name is required', Response::HTTP_BAD_REQUEST);
         }
 
         // Create new Category entity
         $category = new Category();
         $category->setName($name);
-        $category->setType($type);
+        $category->setType('article');
         $category->setParent($parent ? (int)$parent : null);
         $category->setDescription($description);
         $category->setImage($image);
         $category->setVisible($visible ? (bool)$visible : false);
-
+        $category->setCreatedAt(new \DateTimeImmutable());
+             
         // Generate slug using the slugger
         $slug = $this->slugger->slug($name)->lower();
         $category->setSlug($slug);
@@ -61,7 +61,11 @@ class CategoryController extends AbstractController
         $this->entityManager->persist($category);
         $this->entityManager->flush();
 
-        return new Response('Category created successfully');
+        return $this->json([
+            'error' => false,
+            'message' => 'Category created successfully',
+            'data' => null,
+        ]);
     }
    
     public function delete(int $id): Response
@@ -195,7 +199,43 @@ class CategoryController extends AbstractController
     }
 
 
-    
+    public function edit(Request $request): Response
+    {
+       $id = $request->request->get('id');
+        $name = $request->request->get('name');
+
+        if (!$name) {
+            return $this->json([
+                'error' => true,
+                'data' => null,
+                'message' => 'Catgeory name is required',            
+            ], Response::HTTP_BAD_REQUEST);
+        }
+
+        $categoryRepository = $this->entityManager->getRepository(Category::class);
+        $category = $id ? $categoryRepository->find($id) : new Category();
+
+        if (!$category) {
+            return $this->json([
+                'error' => true,
+                'data' => null,
+                'message' => 'Category not found',            
+            ], Response::HTTP_NOT_FOUND);
+        }
+
+        $slug = strtolower($this->slugger->slug($name)->toString());
+        $category->setName($name);        
+        $category->setSlug($slug);        
+        
+        $this->entityManager->persist($category);
+        $this->entityManager->flush();
+
+        return $this->json([
+                'error' => false,
+                'data' => null,
+                'message' => 'Category saved successfully',            
+            ]);
+    }
         
     
 };

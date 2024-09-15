@@ -50,33 +50,40 @@
     <div class="col-8">
     
     	<h6>Name:</h6>
-		<input class="form-control" id="ds-article-title" placeholder="" >
+		<input class="form-control" id="ds-category-name" placeholder="" >
 		
 		<br>
 		<h6>Description:</h6>
-		<textarea class="form-control" id="ds-article-excerpt" rows="3" maxlength="255" placeholder=""></textarea>
+		<textarea class="form-control" id="ds-category-description" rows="3" maxlength="255" placeholder=""></textarea>
 		<br />
+        
+    	<h6>Image:</h6>
+        <div class="mb-3">
+           <input class="form-control" id="sympa-category-image-string-input" placeholder="" >
+        </div>
 
+<!--
     	<h6>Image:</h6>
         <div class="mb-3">
            <input class="form-control" type="file" id="sympa-category-image-input" accept=".gif, .png, .jpg, .jpeg, .webp">
         </div>
+-->
 
     	<h6>Parent category:</h6>        
         <div class="input-group mb-3">
           <span class="input-group-text" onclick="sympa_openParentCategoryModal()" style="cursor:pointer">Select...</span>
-          <input id="sympa-parent-category-input" type="text" class="form-control" placeholder="">
+          <input readonly id="sympa-parent-category-input" type="text" class="form-control" placeholder="">
         </div>
 		
 		<br />
        
         <div class="form-check form-switch">
-            <input class="form-check-input" type="checkbox" role="switch" id="ds-article-active" checked>
+            <input id="sympa-visible-switch-category-input" class="form-check-input" type="checkbox" role="switch" id="ds-article-active" checked>
             <label class="form-check-label" for="flexSwitchCheckChecked">Visible</label>
         </div>
 			
        <br />
-       <div onclick="ds_publish()" class="btn btn-primary btn-lg" >Save</div>     
+       <div onclick="sympa_publish()" class="btn btn-primary btn-lg" >Save</div>     
 		
     </div>
 
@@ -87,6 +94,7 @@
 
 
 <div class="col-4">
+<!--
 <div class="accordion mx-2 mt-4" id="accordionExample">
   <div class="accordion-item">
     <h2 class="accordion-header">
@@ -128,6 +136,7 @@
     </div>
   </div>
 </div>
+-->
 </div>
 
 
@@ -161,43 +170,7 @@
        </div>
       
         <ul id="sympa-parent-category-ul-modal" class="list-group" style="display:none;">
-          <li onclick="sympa_toggleSelectedCategory(this)" class="sympa-category-select-list list-group-item">An active item</li>
-          <li onclick="sympa_toggleSelectedCategory(this)" class="sympa-category-select-list list-group-item">A second item</li>
-          <li onclick="sympa_toggleSelectedCategory(this)" class="sympa-category-select-list list-group-item">A third item</li>
-          <li onclick="sympa_toggleSelectedCategory(this)" class="sympa-category-select-list list-group-item">A fourth item</li>
-          <li onclick="sympa_toggleSelectedCategory(this)" class="sympa-category-select-list list-group-item">And a fifth one</li>
-          <li onclick="sympa_toggleSelectedCategory(this)" class="sympa-category-select-list list-group-item">A second item</li>
-          <li onclick="sympa_toggleSelectedCategory(this)" class="sympa-category-select-list list-group-item">A third item</li>
-          <li onclick="sympa_toggleSelectedCategory(this)" class="sympa-category-select-list list-group-item">A fourth item</li>
-          <li onclick="sympa_toggleSelectedCategory(this)" class="sympa-category-select-list list-group-item">And a fifth one</li>
-          <li onclick="sympa_toggleSelectedCategory(this)" class="sympa-category-select-list list-group-item">A second item</li>
-          <li onclick="sympa_toggleSelectedCategory(this)" class="sympa-category-select-list list-group-item">A third item</li>
-          <li onclick="sympa_toggleSelectedCategory(this)" class="sympa-category-select-list list-group-item">A fourth item</li>
-          <li onclick="sympa_toggleSelectedCategory(this)" class="sympa-category-select-list list-group-item">And a fifth one</li>
-          <li onclick="sympa_toggleSelectedCategory(this)" class="sympa-category-select-list list-group-item">A second item</li>
-          <li onclick="sympa_toggleSelectedCategory(this)" class="sympa-category-select-list list-group-item">A third item</li>
-          <li onclick="sympa_toggleSelectedCategory(this)" class="sympa-category-select-list list-group-item">A fourth item</li>
-          <li onclick="sympa_toggleSelectedCategory(this)" class="sympa-category-select-list list-group-item">And a fifth one</li>
-          <li onclick="sympa_toggleSelectedCategory(this)" class="sympa-category-select-list list-group-item">A fourth item</li>
-          <li onclick="sympa_toggleSelectedCategory(this)" class="sympa-category-select-list list-group-item">And a fifth one</li>
-          <li onclick="sympa_toggleSelectedCategory(this)" class="sympa-category-select-list list-group-item">A second item</li>
-          <li onclick="sympa_toggleSelectedCategory(this)" class="sympa-category-select-list list-group-item">A third item</li>
-          <li onclick="sympa_toggleSelectedCategory(this)" class="sympa-category-select-list list-group-item">A fourth item</li>
-          <li onclick="sympa_toggleSelectedCategory(this)" class="sympa-category-select-list list-group-item">And a fifth one</li>
-          <li onclick="sympa_toggleSelectedCategory(this)" class="sympa-category-select-list list-group-item">A second item</li>
-          <li onclick="sympa_toggleSelectedCategory(this)" class="sympa-category-select-list list-group-item">A third item</li>
-          <li onclick="sympa_toggleSelectedCategory(this)" class="sympa-category-select-list list-group-item">A fourth item</li>
-          <li onclick="sympa_toggleSelectedCategory(this)" class="sympa-category-select-list list-group-item">And a fifth one</li>
-          <li onclick="sympa_toggleSelectedCategory(this)" class="sympa-category-select-list list-group-item">A fourth item</li>
-          <li onclick="sympa_toggleSelectedCategory(this)" class="sympa-category-select-list list-group-item">And a fifth one</li>
-          <li onclick="sympa_toggleSelectedCategory(this)" class="sympa-category-select-list list-group-item">A second item</li>
-          <li onclick="sympa_toggleSelectedCategory(this)" class="sympa-category-select-list list-group-item">A third item</li>
-          <li onclick="sympa_toggleSelectedCategory(this)" class="sympa-category-select-list list-group-item">A fourth item</li>
-          <li onclick="sympa_toggleSelectedCategory(this)" class="sympa-category-select-list list-group-item">And a fifth one</li>
-          <li onclick="sympa_toggleSelectedCategory(this)" class="sympa-category-select-list list-group-item">A second item</li>
-          <li onclick="sympa_toggleSelectedCategory(this)" class="sympa-category-select-list list-group-item">A third item</li>
-          <li onclick="sympa_toggleSelectedCategory(this)" class="sympa-category-select-list list-group-item">A fourth item</li>
-          <li onclick="sympa_toggleSelectedCategory(this)" class="sympa-category-select-list list-group-item">And a fifth one</li>
+          <li class="sympa-category-select-list list-group-item">Empty list</li>
         </ul>
       </div>
       <div class="modal-footer">
@@ -237,34 +210,71 @@
 //ARTICLE
 
 
-function ds_getArticleData()
-{    
-    let articleTitle = document.getElementById("ds-article-title").value;
-    let articleExcerpt = document.getElementById("ds-article-excerpt").value;
-    let content = trumboEditor.html();
-    let active = document.getElementById("ds-article-active").checked;
-
+function sympa_getCategoryData()
+{      
     let data = {};
-    data.title = articleTitle;
-	data.content = content;
-	data.excerpt = articleExcerpt;
-	data.active = active;
+    data.image = document.getElementById("sympa-category-image-string-input").value;
+    data.name = document.getElementById("ds-category-name").value;
+    data.description = document.getElementById("ds-category-description").value;
+    data.parent = localStorage.getItem("sympa-category-parent-selected-item-id");
+    data.visible = document.getElementById("sympa-visible-switch-category-input").checked;                
     
-    return data;
+    if (data.parent === null) data.parent = -1;
+    
+    return data;    
+}
+
+function sympa_validateCategoryData(data){       
+    if (data.name === null) return "The 'name' must be set. Internal error!";
+    
+    if (data.name.length >= 3 && data.name.length <= 255) {} 
+    else {
+        return "The 'name' string is not set or in the range of 3 to 255 symbols.";
+    }
+            
+    if (data.description.length >= 3 && data.description.length <= 255) {} 
+    else {
+        return "The 'description' string is not set or in the range of 3 to 255 symbols.";
+    }        
+        
+    if (data.image.length >= 3 && data.image.length <= 255) {} 
+    else {
+        return "The 'image' string is not set or in the range of 3 to 255 symbols.";
+    }        
+        
+    if (typeof data.visible === 'boolean') {} 
+    else {
+        return "The value 'visible' is not a boolean.";
+    }         
+    
+    if (Number.isInteger(parseInt(data.parent))) {} 
+    else {
+        return "The value 'parent' is not an integer.";
+    }
+
+    return null;
 }
 
 
-async function ds_publish()
+async function sympa_publish()
 {
-	let data = ds_getArticleData();
-	
-	let postData = new FormData();  
-	postData.append('title', data.title);
-	postData.append('excerpt', data.excerpt);
-	postData.append('content', data.content);
+    let data = sympa_getCategoryData();    
+    let errorMessage = sympa_validateCategoryData(data);
+    
+    if (errorMessage){
+        sympa_message(errorMessage);
+        return null;
+    }
+        
+    var postData = new FormData();
+    
+    postData.append('name', data.name);
+	postData.append('description', data.description);
+	postData.append('parent', data.parent);
 	postData.append('active', data.active);
-
-	const response = await fetch('/article-create', {
+	postData.append('image', data.image);
+    
+    const response = await fetch('/category-create', {
 		method: 'POST', 
 		body: postData,
 	});
@@ -272,14 +282,16 @@ async function ds_publish()
 	const jsonData = await response.json();
 	
 	if (jsonData.error) {
-		ds_message(jsonData.message, 'warning');
+		sympa_message(jsonData.message, 'warning');
 	}
 	else {
-		ds_message('Article created!', 'success');
-		setTimeout(function () {
-		//	window.location.reload();
-		}, 2000);
+		sympa_message('Category created!', 'success');
+		// setTimeout(function () {
+        //     window.location.reload();
+		// }, 2000);
 	}
+    
+
 }
 
 
@@ -342,6 +354,34 @@ async function sympa_openParentCategoryModal(){
 }
 
 
+
+
+function sympa_initStorageSettings(){  
+    document.getElementById("ds-category-name").value = "";
+    document.getElementById("ds-category-description").value = "";
+    document.getElementById("sympa-parent-category-input").value = "";
+   // document.getElementById("sympa-category-image-input").value = "";
+    document.getElementById("sympa-category-image-string-input").value = "";
+    
+    const name = localStorage.getItem("sympa-category-parent-selected-item-name");
+    const id = localStorage.getItem("sympa-category-parent-selected-item-id");
+          
+    let value = localStorage.getItem('sympa-category-parent-selected-item-name');
+    if (value) {   
+        localStorage.removeItem('sympa-category-parent-selected-item-name');
+    }     
+    
+    value = localStorage.getItem('sympa-category-parent-selected-item-id');
+    if (value) {        
+        localStorage.removeItem('sympa-category-parent-selected-item-id');
+    }
+    
+    
+}
+
+
+
+
 function sympa_toggleSelectedCategory(that){
     document.querySelectorAll('.sympa-category-select-list').forEach(element => element.classList.remove('active'));
     that.classList.toggle("active");
@@ -352,6 +392,14 @@ function sympa_toggleSelectedCategory(that){
     localStorage.setItem("sympa-category-parent-selected-item-name", name);
     localStorage.setItem("sympa-category-parent-selected-item-id", id);
 }
+
+
+
+//MAIN
+window.addEventListener("load", async function(){
+    sympa_initStorageSettings();
+ 
+});
 
 
 

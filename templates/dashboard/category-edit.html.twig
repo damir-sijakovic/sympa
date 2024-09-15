@@ -1,9 +1,4 @@
-<link rel="stylesheet" href="{{rootUrl}}/assets/vendor/trumbowyg/trumbowyg.min.css">
-<link rel="stylesheet" href="{{rootUrl}}/assets/vendor/trumbowyg/plugins/table/trumbowyg.table.min.css">
 <style>
-	#trumbowyg-element{
-		background: #ffffff;
-	}
 
 	.ds-categories-between{
 		display:flex; 
@@ -33,7 +28,7 @@
 </style>
 
 
-<h2>Edit article</h2>
+<h2>Edit category</h2>
 
 <hr>
 
@@ -49,10 +44,8 @@
     
 		<br>
 		<h6>Excerpt:</h6>
-		<textarea class="form-control" id="ds-post-excerpt-textarea" rows="3" maxlength="255" placeholder="" value="{{excerpt|raw}}"></textarea>
-		<br />
-		<h6>Content:</h6>
-		<div id="trumbowyg-element"></div>
+		<textarea class="form-control" id="ds-post-excerpt-textarea" rows="3" maxlength="255" placeholder="" value=""></textarea>
+
 				
         
         <br />
@@ -61,8 +54,6 @@
     </div>
 
 <script src="{{rootUrl}}/assets/vendor/jquery-3.6.0/jquery-3.6.0.min.js"></script>
-<script src="{{rootUrl}}/assets/vendor/trumbowyg/trumbowyg.min.js"></script>
-<script src="{{rootUrl}}/assets/vendor/trumbowyg/plugins/table/trumbowyg.table.min.js"></script>
 <script src="{{rootUrl}}/assets/vendor/slugify/slugify.min.js"></script> 
 <script src="{{rootUrl}}/assets/vendor/slugify/speakingurl.min.js"></script> 
 
@@ -110,10 +101,10 @@ var trumboEditor = $('#trumbowyg-element').trumbowyg({
 
 
 window.addEventListener('load', async function() {
-    trumboEditor.trumbowyg('html', '{{content|raw}}');
-    document.getElementById('ds-article-id-input').value = '{{id|raw}}';
-    document.getElementById('ds-article-title-input').value = '{{title|raw}}';
-    document.getElementById('ds-post-excerpt-textarea').value = '{{excerpt|raw}}';
+    trumboEditor.trumbowyg('html', '');
+    document.getElementById('ds-article-id-input').value = '';
+    document.getElementById('ds-article-title-input').value = '';
+    document.getElementById('ds-post-excerpt-textarea').value = '';
 });
 
 
