@@ -13,13 +13,12 @@ class ArticleTag
     #[ORM\Column]
     private ?int $id = null;
 
-    // Update the ManyToOne relationship for Tag to include cascade operations
-    #[ORM\ManyToOne(inversedBy: 'Article', cascade: ['remove'])]
+    #[ORM\ManyToOne(inversedBy: 'Article')]
     private ?Tag $tag = null;
 
-    // Update the ManyToOne relationship for Article to include cascade operations
-    #[ORM\ManyToOne(cascade: ['remove'])]
+    #[ORM\ManyToOne]
     private ?Article $article = null;
+
 
     #[ORM\Column(length: 32)]
     private ?string $type = null;

@@ -13,14 +13,15 @@ class ArticleCategory
     #[ORM\Column]
     private ?int $id = null;
 
+
     #[ORM\ManyToOne(inversedBy: 'Article')]
     private ?Category $category = null;
 
-    #[ORM\Column(length: 32)]
-    private ?string $type = null;
-
     #[ORM\ManyToOne]
     private ?Article $article = null;
+
+    #[ORM\Column(length: 32)]
+    private ?string $type = null;
 
     public function getId(): ?int
     {

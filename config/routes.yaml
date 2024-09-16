@@ -71,7 +71,23 @@ article_delete:
     path: /article-delete
     controller: App\Controller\ArticleController::deleteArticleByIdPost
     methods: ['POST']
-  
+ 
+article_delete_by_ids:
+    path: /article-delete-by-ids
+    controller: App\Controller\ArticleController::deleteByIdsPost
+    methods: ['POST']
+    
+article_remove_categories_by_ids:
+    path: /remove-categories-by-ids
+    controller: App\Controller\ArticleController::removeArticleCategoryLinksPost
+    methods: ['POST']
+    
+article_get_category_and_tag_ids:
+    path: /get-article-categories-and-tags/{id}
+    controller: App\Controller\ArticleController::getArticleCategoryAndTagIds
+    methods: ['GET']  
+   
+    
 dashboard_home:
     path: /dashboard
     controller: App\Controller\DashboardController::index
@@ -149,6 +165,11 @@ category_get_all:
     controller: App\Controller\CategoryController::get 
     methods: ['GET']
     # queryparams: page, per_page, sort: id-asc, id-desc, asc, desc
+      
+category_get_by_ids: 
+    path: /category-get-by-ids
+    controller: App\Controller\CategoryController::getCategoriesByIds 
+    methods: ['POST']
           
 tag_get_all: 
     path: /tag-get-all
@@ -164,4 +185,9 @@ tag_create:
     path: /tag-create
     controller: App\Controller\TagController::create 
     methods: ['POST']
-    
+ 
+tag_get_by_ids: 
+    path: /tag-get-by-ids
+    controller: App\Controller\TagController::getTagsByIds 
+    methods: ['POST']
+ 

@@ -236,6 +236,49 @@ class CategoryController extends AbstractController
                 'message' => 'Category saved successfully',            
             ]);
     }
-        
+       
+       
+    public function getCategoriesByIds(Request $request): Response
+    {
+        try {
+            // Get the "ids" string from the request, e.g., "11,1,34,5"
+            $idsString = $request->request->get('ids');
+
+            $ids = array_map('intval', explode(',', $idsString));
+
+            if (empty($ids)) {
+                return $this->json(['error' => 'No IDs provided.'], Response::HTTP_BAD_REQUEST);
+            }
+
+            $categoryRepository = $this->entityManager->getRepository(Category::class);
+
+            // Fetch the categories with the provided IDs
+            $queryBuilder = $categoryRepository->createQueryBuilder('c')
+                                               ->where('c.id IN (:ids)')
+                                               ->setParameter('ids', $ids);
+
+            $categories = $queryBuilder->getQuery()->getResult();
+
+            $categoryData = [];
+            foreach ($categories as $category) {
+                $categoryData[] = [
+                    'id' => $category->getId(),
+                    'name' => $category->getName(),
+                    'slug' => $category->getSlug(),
+                    'type' => $category->getType(),
+                    'parent' => $category->getParent(),
+                    'description' => $category->getDescription(),
+                    'image' => $category->getImage(),
+                    'visible' => $category->getVisible(),
+                    'created_at' => $category->getCreatedAt()->format('Y-m-d H:i:s'),
+                    'modified_at' => $category->getModifiedAt() ? $category->getModifiedAt()->format('Y-m-d H:i:s') : null,
+                ];
+            }
+
+            return $this->json(['categories' => $categoryData]);
+        } catch (\Exception $e) {
+            return $this->json(['error' => $e->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    } 
     
 };

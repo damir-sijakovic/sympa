@@ -29,6 +29,10 @@
 		font-family: 'Consolas', 'Courier New', Courier, monospace;
 		line-height: 22px;
 	}
+    
+    .sympa-pill-button{
+        box-shadow: rgba(0, 0, 0, 0.02) 0px 1px 3px 0px, rgba(27, 31, 35, 0.15) 0px 0px 0px 1px;
+    }
 	
 </style>
 
@@ -54,25 +58,115 @@
 		<h6>Content:</h6>
 		<div id="trumbowyg-element"></div>			
             
-		<br />
+        <br />
 		<h6>Categories:</h6>
 		<div style="display:flex">		
-			<button style="margin-right:6px" onclick="ds_selectCategoriesModal()" type="button" class="btn btn-sm btn-light" data-bs-toggle="modal" data-bs-target="#ds-select-categories-modal"> Add <span class="badge bg-primary">+</span></button>
-			<div id="ds-selected-categories-list"></div>	
+			<button style="margin-right:6px" onclick="sympa_openCategoryModal()" type="button" class="btn btn-sm btn-light"> Add <span class="badge bg-primary">+</span></button>
+			<div id="sympa-selected-categories-list"></div>	
 		</div>
 		
 		<br />
 		<h6>Tags:</h6>
 		<div style="display:flex">		
-			<button style="margin-right:6px" onclick="ds_selectTagsModal()" type="button" class="btn btn-sm btn-light" data-bs-toggle="modal" data-bs-target="#ds-select-tags-modal"> Add <span class="badge bg-primary">+</span></button>
-			<div id="ds-selected-tags-list"></div>	
-		</div>
+			<button style="margin-right:6px" onclick="sympa_openTagModal()" type="button" class="btn btn-sm btn-light"> Add <span class="badge bg-primary">+</span></button>
+			<div id="sympa-selected-tags-list"></div>	
+		</div>  
         
         
         <br />
         <div onclick="ds_publish()" class="btn btn-primary btn-lg" >Save</div>   
        
     </div>
+
+
+
+
+
+
+
+
+
+
+
+
+<div class="modal sympa-modal" id="sympa-tag-modal" style="display:none;">
+  <div class="modal-dialog" >
+    <div class="modal-content" >
+      <div class="modal-header">
+        <h5 class="modal-title">Select tag</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" onclick="document.getElementById('sympa-tag-modal').style.display='none'"></button>
+      </div>
+      <div class="modal-body" style="height: calc(100vh - 200px) !important; overflow:scroll;">
+        
+        <div id="sympa-tag-loading-modal" class="d-flex justify-content-center align-items-center h-100">
+            <div class="spinner-border" role="status">
+              <span class="visually-hidden">Loading...</span>
+            </div>
+       </div>
+      
+        <ul id="sympa-tag-ul-modal" class="list-group" style="display:none;">
+          <li class="sympa-category-select-list list-group-item">Empty list</li>
+        </ul>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" onclick="document.getElementById('sympa-tag-modal').style.display='none'">Cancel</button>
+        <button type="button" class="btn btn-primary" onclick="sympa_selectTagItemAction()">Select</button>
+      </div>
+
+	<div class="alert alert-warning alert-dismissible fade show" role="alert" style="display:none; margin-bottom: 0;">
+	   <span id="sympa-bulk-delete-modal-message"> Hello</span> 
+	  <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close" ></button>
+	</div>
+
+    </div>
+  </div>
+</div>
+
+
+<div class="modal sympa-modal" id="sympa-category-modal" style="display:none;">
+  <div class="modal-dialog" >
+    <div class="modal-content" >
+      <div class="modal-header">
+        <h5 class="modal-title">Select category</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" onclick="document.getElementById('sympa-category-modal').style.display='none'"></button>
+      </div>
+      <div class="modal-body" style="height: calc(100vh - 200px) !important; overflow:scroll;">
+        
+        <div id="sympa-category-loading-modal" class="d-flex justify-content-center align-items-center h-100">
+            <div class="spinner-border" role="status">
+              <span class="visually-hidden">Loading...</span>
+            </div>
+       </div>
+      
+        <ul id="sympa-category-ul-modal" class="list-group" style="display:none;">
+          <li class="sympa-category-select-list list-group-item">Empty list</li>
+        </ul>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" onclick="document.getElementById('sympa-category-modal').style.display='none'">Cancel</button>
+        <button type="button" class="btn btn-primary" onclick="sympa_selectCategoryItemAction()">Select</button>
+      </div>
+
+	<div class="alert alert-warning alert-dismissible fade show" role="alert" style="display:none; margin-bottom: 0;">
+	   <span id="sympa-bulk-delete-modal-message"> Hello</span> 
+	  <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close" ></button>
+	</div>
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
 
 <script src="{{rootUrl}}/assets/vendor/jquery-3.6.0/jquery-3.6.0.min.js"></script>
 <script src="{{rootUrl}}/assets/vendor/trumbowyg/trumbowyg.min.js"></script>
@@ -123,11 +217,277 @@ var trumboEditor = $('#trumbowyg-element').trumbowyg({
 });
 
 
+/////////
+
+
+// TAGS
+async function sympa_openTagModal(){    
+    const _createItem = function(item){
+        const name = item.name;
+        const id = item.id;
+        const slug = item.slug;
+        console.log(item);
+        return `<li onclick="sympa_toggleSelectedTag(this)" 
+            class="sympa-tag-select-list list-group-item" 
+            title="ID: ${id}\nSlug: ${slug}"
+            data-id="${id}" data-name="${name}" data-slug="${slug}"
+            >${name}</li>`;
+    }
+    
+    document.getElementById("sympa-tag-modal").style.display = "block";   
+    
+    const response = await fetch('/tag-get-all?per-page=1000&page=1');
+    const jsonData = await response.json();
+	
+	if (jsonData.error) {
+		sympa_message(jsonData.message, 'warning');
+	}
+    
+    if (jsonData.total > 0){        
+        document.getElementById("sympa-tag-loading-modal").classList.add("d-none");
+        document.getElementById("sympa-tag-ul-modal").style.display = "block";
+        let htmlData = "";
+        for (const key in jsonData.tags) {
+            htmlData += _createItem(jsonData.tags[key]);
+        }
+        document.getElementById("sympa-tag-ul-modal").innerHTML = htmlData;
+    }   
+      
+}
+
+function sympa_toggleSelectedTag(that){
+    document.querySelectorAll('.sympa-tag-select-list').forEach(element => element.classList.remove('active'));
+    that.classList.toggle("active");
+    console.log(that);
+    const id = that.getAttribute("data-id");
+    const name = that.getAttribute("data-name");
+    
+    localStorage.setItem("sympa-create-article-tag-item-name", name);
+    localStorage.setItem("sympa-create-article-tag-item-id", id);
+}
+
+
+function sympa_selectTagItemAction(){    
+    const createItem = function(id, slug, name){
+        return `<button data-id="${id}" data-slug="${slug}" data-name="${name}" type="button" class="btn btn-sm btn-light sympa-pill-button mx-1"> ${name} <span class="badge bg-danger" onclick="this.parentElement.remove()">×</span></button>	`;
+    }
+
+    document.getElementById("sympa-tag-modal").style.display = "none";  
+    let id = localStorage.getItem("sympa-create-article-tag-item-id");
+    let name = localStorage.getItem("sympa-create-article-tag-item-name");    
+    let slug = localStorage.getItem("sympa-create-article-tag-item-slug");
+    
+    let target = document.getElementById("sympa-selected-tags-list");
+	let divElements = target.querySelectorAll('button[data-id]');
+
+	for (let i = 0; i < divElements.length; i++) {
+		let dataId = divElements[i].getAttribute('data-id');		
+		if (dataId === id) {
+			return; 
+		}
+    }
+    
+    target.innerHTML += createItem(id, slug, name);    
+}
+
+function sympa_getSelectedTagIds() {
+	let parent = document.getElementById('sympa-selected-tags-list');
+	let elements = parent.querySelectorAll('[data-id]');
+	let tags = [];
+
+	for (let i = 0; i < elements.length; i++) {
+		let element = elements[i];
+		let id = element.getAttribute("data-id");
+		tags.push(parseInt(id));
+	}
+
+    console.log(tags);
+
+	return tags;
+}
+
+// CATEGORY
+async function sympa_openCategoryModal(){    
+    const _createItem = function(item){
+        const name = item.name;
+        const id = item.id;
+        const slug = item.slug;
+
+        return `<li onclick="sympa_toggleSelectedCategory(this)" 
+            class="sympa-category-select-list list-group-item" 
+            title="ID: ${id}\nSlug: ${slug}"
+            data-id="${id}" data-name="${name}" data-slug="${slug}"
+            >${name}</li>`;
+    }
+    
+    document.getElementById("sympa-category-modal").style.display = "block";   
+    
+    const response = await fetch('/category-get-all?per-page=1000&page=1');
+    const jsonData = await response.json();
+	
+	if (jsonData.error) {
+		sympa_message(jsonData.message, 'warning');
+	}
+    
+    if (jsonData.total > 0){        
+        document.getElementById("sympa-category-loading-modal").classList.add("d-none");
+        document.getElementById("sympa-category-ul-modal").style.display = "block";
+        let htmlData = "";
+        for (const key in jsonData.categories) {
+            htmlData += _createItem(jsonData.categories[key]);
+        }
+        document.getElementById("sympa-category-ul-modal").innerHTML = htmlData;
+    }   
+      
+}
+
+function sympa_toggleSelectedCategory(that){
+    document.querySelectorAll('.sympa-category-select-list').forEach(element => element.classList.remove('active'));
+    that.classList.toggle("active");
+    console.log(that);
+    const id = that.getAttribute("data-id");
+    const name = that.getAttribute("data-name");
+    
+    localStorage.setItem("sympa-create-article-category-item-name", name);
+    localStorage.setItem("sympa-create-article-category-item-id", id);
+}
+
+
+function sympa_selectCategoryItemAction(){    
+    const createItem = function(id, slug, name){
+        return `<button data-id="${id}" data-slug="${slug}" data-name="${name}" type="button" class="btn btn-sm btn-light sympa-pill-button mx-1"> ${name} <span class="badge bg-danger" onclick="this.parentElement.remove()">×</span></button>	`;
+    }
+        
+
+    document.getElementById("sympa-category-modal").style.display = "none";  
+    let id = localStorage.getItem("sympa-create-article-category-item-id");
+    let name = localStorage.getItem("sympa-create-article-category-item-name");    
+    let slug = localStorage.getItem("sympa-create-article-category-item-slug");
+    
+    let target = document.getElementById("sympa-selected-categories-list");
+	let divElements = target.querySelectorAll('button[data-id]');
+
+	for (let i = 0; i < divElements.length; i++) {
+		let dataId = divElements[i].getAttribute('data-id');		
+		if (dataId === id) {
+			return; 
+		}
+	}
+    
+    target.innerHTML += createItem(id, slug, name);    
+}
+
+function sympa_getSelectedCategoryIds() {
+	let parent = document.getElementById('sympa-selected-categories-list');
+	let elements = parent.querySelectorAll('[data-id]');
+	let categories = [];
+
+	for (let i = 0; i < elements.length; i++) {
+		let element = elements[i];
+		let categoryId = element.getAttribute("data-id");
+		categories.push(parseInt(categoryId));
+	}
+
+    console.log(categories);
+
+	return categories;
+}
+
+
+async function sympa_initCategoriesAndTags(){
+       
+    const response = await fetch('/get-article-categories-and-tags/{{id|raw}}'); 
+	const jsonData = await response.json();
+    
+	if (response.status != 200) {
+		console.log('ERROR!');
+		return null;
+	}
+    
+    if (jsonData.error){
+        sympa_message(jsonData.message);
+    }
+    
+    //TAGS
+    const tagIds = jsonData.data.tagIds;    
+    const _createTag = function(id, slug, name){
+        let target = document.getElementById("sympa-selected-tags-list");
+        let divElements = target.querySelectorAll('button[data-id]');
+
+        for (let i = 0; i < divElements.length; i++) {
+            let dataId = divElements[i].getAttribute('data-id');		
+            if (dataId === id) {
+                return; 
+            }
+        } 
+        
+        target.innerHTML += `<button data-id="${id}" data-slug="${slug}" data-name="${name}" type="button" class="btn btn-sm btn-light sympa-pill-button mx-1"> ${name} <span class="badge bg-danger" onclick="this.parentElement.remove()">×</span></button>`; 
+    }   
+        
+    let tagPostData = new FormData();  
+    tagPostData.append('ids', tagIds);
+
+    const tagResponse = await fetch('/tag-get-by-ids', {
+        method: 'POST', 
+        body: tagPostData,
+    });
+
+    const tagJsonData = await tagResponse.json();
+    if (tagResponse.status != 200) {		
+        sympa_message("tag(s) ERROR!", "warning");
+    }
+
+    tagJsonData.tags.forEach(x => {          
+        _createTag(x.id,x.name,x.slug);
+    });
+    
+    
+    //CATEGORY
+    const categoryIds = jsonData.data.categoryIds;
+    const _createCategory = function(id, slug, name){
+        let target = document.getElementById("sympa-selected-categories-list");
+        let divElements = target.querySelectorAll('button[data-id]');
+
+        for (let i = 0; i < divElements.length; i++) {
+            let dataId = divElements[i].getAttribute('data-id');		
+            if (dataId === id) {
+                return; 
+            }
+        } 
+        
+        target.innerHTML += `<button data-id="${id}" data-slug="${slug}" data-name="${name}" type="button" class="btn btn-sm btn-light sympa-pill-button mx-1"> ${name} <span class="badge bg-danger" onclick="this.parentElement.remove()">×</span></button>`; 
+    }
+
+    let categoryPostData = new FormData();  
+    categoryPostData.append('ids', categoryIds);
+
+    const categoryResponse = await fetch('/category-get-by-ids', {
+        method: 'POST', 
+        body: categoryPostData,
+    });
+
+    const categoryJsonData = await categoryResponse.json();
+    if (categoryResponse.status != 200) {		
+        sympa_message("category(s) ERROR!", "warning");
+    }
+
+    categoryJsonData.categories.forEach(x => {          
+        _createCategory(x.id,x.name,x.slug);
+    });
+}
+
+
+
+
+
+//MAIN
 window.addEventListener('load', async function() {
     trumboEditor.trumbowyg('html', '{{content|raw}}');
     document.getElementById('ds-article-id-input').value = '{{id|raw}}';
     document.getElementById('ds-article-title-input').value = '{{title|raw}}';
     document.getElementById('ds-post-excerpt-textarea').value = '{{excerpt|raw}}';
+    
+    sympa_initCategoriesAndTags();
 });
 
 

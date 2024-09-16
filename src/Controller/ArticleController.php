@@ -3,6 +3,8 @@
 namespace App\Controller;
 
 use App\Entity\Article;
+use App\Entity\ArticleTag;
+use App\Entity\ArticleCategory;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -26,6 +28,126 @@ class ArticleController extends AbstractController
         $this->utilityHelper = $utilityHelper;	
         $this->slugger = $slugger;
 	}        
+     
+    private function _getArticleCategoryAndTagIds(Article $article): array
+    {
+        $articleCategories = $this->entityManager->getRepository(ArticleCategory::class)->findBy(['article' => $article]);
+        $categoryIds = array_map(fn($articleCategory) => $articleCategory->getCategory()->getId(), $articleCategories);
+
+        $articleTags = $this->entityManager->getRepository(ArticleTag::class)->findBy(['article' => $article]);
+        $tagIds = array_map(fn($articleTag) => $articleTag->getTag()->getId(), $articleTags);
+
+        return [
+            'categoryIds' => $categoryIds,
+            'tagIds' => $tagIds,
+        ];
+    } 
+     
+    private function _removeArticleLinks(Article $article): void
+    {
+        // Remove ArticleTag links
+        $articleTags = $this->entityManager->getRepository(ArticleTag::class)->findBy(['article' => $article]);
+        foreach ($articleTags as $articleTag) {
+            $this->entityManager->remove($articleTag);
+        }
+
+        // Remove ArticleCategory links
+        $articleCategories = $this->entityManager->getRepository(ArticleCategory::class)->findBy(['article' => $article]);
+        foreach ($articleCategories as $articleCategory) {
+            $this->entityManager->remove($articleCategory);
+        }
+
+        // Persist and flush changes
+        $this->entityManager->flush();
+    }
+    
+    public function getArticleCategoryAndTagIds(Request $request, $id): Response
+    {
+        if (!$id)
+        {
+            return $this->json([
+                'data' => null,
+                'error' => true,
+                'message' => 'The id article was not found.',
+            ],404);
+        }
+        
+        $articleRepository = $this->entityManager->getRepository(Article::class);
+        $article = $articleRepository->findOneBy(['id' => $id]);
+        
+        if (!$article) 
+        {
+            return $this->json([
+                'data' => null,
+                'error' => true,
+                'message' => 'The article was not found.',
+            ],404);
+        }
+        
+        $articleCategories = $this->entityManager->getRepository(ArticleCategory::class)->findBy(['article' => $article]);
+        $categoryIds = array_map(fn($articleCategory) => $articleCategory->getCategory()->getId(), $articleCategories);
+
+        $articleTags = $this->entityManager->getRepository(ArticleTag::class)->findBy(['article' => $article]);
+        $tagIds = array_map(fn($articleTag) => $articleTag->getTag()->getId(), $articleTags);
+
+        return $this->json([
+            'data' => ['categoryIds' => $categoryIds,'tagIds' => $tagIds],
+            'error' => false,
+            'message' => '',
+        ],200);
+    } 
+    
+    
+    public function removeArticleCategoryLinksPost(Request $request, $id): void
+    {        
+        $id = $request->request->getInt('id'); 
+        if (!$id)
+        {
+            throw new NotFoundHttpException('The id article was not found.');
+        }
+        
+        $articleRepository = $this->entityManager->getRepository(Article::class);
+        $article = $articleRepository->findOneBy(['id' => $id]);
+        
+        if (!$article) 
+        {
+            throw new NotFoundHttpException('The article was not found.');
+        }
+        
+        $articleCategories = $this->entityManager->getRepository(ArticleCategory::class)->findBy(['article' => $article]);
+        foreach ($articleCategories as $articleCategory) {
+            $this->entityManager->remove($articleCategory);
+        }
+
+        $this->entityManager->flush();
+    }
+    
+     
+    public function removeArticleTagLinksPost(Request $request, $id): void
+    {
+        $id = $request->request->getInt('id'); 
+        if (!$id)
+        {
+            throw new NotFoundHttpException('The id article was not found.');
+        }
+        
+        $articleRepository = $this->entityManager->getRepository(Article::class);
+        $article = $articleRepository->findOneBy(['id' => $id]);
+        
+        if (!$article) 
+        {
+            throw new NotFoundHttpException('The article was not found.');
+        }
+        
+        $articleTags = $this->entityManager->getRepository(ArticleTag::class)->findBy(['article' => $article]);
+        foreach ($articleTags as $articleTag) {
+            $this->entityManager->remove($articleTag);
+        }
+
+        $this->entityManager->flush();
+    }
+     
+     
      
     
     public function getByIdPost(Request $request, $id): Response
@@ -60,6 +182,8 @@ class ArticleController extends AbstractController
         {
             throw new NotFoundHttpException('The article was not found.');
         }
+        
+        $this->_removeArticleLinks($article);
 
         $this->entityManager->remove($article);
         $this->entityManager->flush();
@@ -250,358 +374,145 @@ class ArticleController extends AbstractController
 
     
 
-
-
-    
-    /*
-    
-        public function getArticlesPost6(Request $request): Response
+ public function deleteByIdsPostNew(Request $request): Response
     {
-        try {
-            $perPage = $request->query->getInt('per-page', 10);
-            $page = $request->query->getInt('page', 1);
-            $sort = $request->query->get('sort', 'desc'); // Default sort order is descending
-            $active = $request->query->get('active'); // Get the active parameter
-            $search = $request->query->get('search'); // Get the search parameter
-            $offset = ($page - 1) * $perPage;
+        $ids = $request->request->get('ids');
 
-            // Determine the sorting order based on the "sort" parameter
-            if ($sort === 'id-asc') {
-                $order = ['id' => 'ASC'];
-            } elseif ($sort === 'id-desc') {
-                $order = ['id' => 'DESC'];
-            } else {
-                // Default to sorting by createdAt
-                $order = ($sort === 'asc') ? ['createdAt' => 'ASC'] : ['createdAt' => 'DESC'];
-            }
-
-            $articleRepository = $this->entityManager->getRepository(Article::class);
-
-            // Create criteria for the query, including active filter and type "article"
-            $criteria = ['type' => 'article'];
-            if ($active === '1') {
-                $criteria['active'] = true;
-            } elseif ($active === '0') {
-                $criteria['active'] = false;
-            }
-
-            // If search query param is present, add conditions for searching in title and excerpt
-            $queryBuilder = $articleRepository->createQueryBuilder('a')
-                ->where('a.type = :type')
-                ->setParameter('type', 'article');
-
-            if ($active === '1') {
-                $queryBuilder->andWhere('a.active = :active')->setParameter('active', true);
-            } elseif ($active === '0') {
-                $queryBuilder->andWhere('a.active = :active')->setParameter('active', false);
-            }
-
-            if (!empty($search)) {
-                $queryBuilder->andWhere('a.title LIKE :search OR a.excerpt LIKE :search')
-                             ->setParameter('search', '%' . $search . '%');
-            }
-
-            // First count all results that match the criteria
-            $totalQuery = clone $queryBuilder;
-            $totalArticles = count($totalQuery->getQuery()->getResult());
-
-            // Apply pagination and sorting
-            $queryBuilder->orderBy('a.' . key($order), current($order))
-                         ->setFirstResult($offset)
-                         ->setMaxResults($perPage);
-
-            $articles = $queryBuilder->getQuery()->getResult();
-
-            $articleData = [];
-            foreach ($articles as $article) {
-                $articleData[] = [
-                    'id' => $article->getId(),
-                    'title' => $article->getTitle(),
-                    'excerpt' => $article->getExcerpt(),
-                    'content' => $article->getContent(),
-                    'slug' => $article->getSlug(),
-                    'image' => $article->getImage(),
-                    'created_at' => $article->getCreatedAt()->format('Y-m-d H:i:s'),
-                    'modified_at' => $article->getModifiedAt() ? $article->getModifiedAt()->format('Y-m-d H:i:s') : null,
-                    'active' => $article->isActive(),
-                ];
-            }
-
-            $paginateData = $this->utilityHelper->paginate($totalArticles, $perPage, $page, 3); // 3 = visible pages
-
-            return $this->json(['total' => $totalArticles, 'articles' => $articleData, 'paginateData' => $paginateData]);
-        } catch (\Exception $e) {
-            return $this->json(['error' => $e->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR);
-        }
-    }
-    
-    
-    public function getArticlesPost5(Request $request): Response
-    {
-        try {
-            $perPage = $request->query->getInt('per-page', 10);
-            $page = $request->query->getInt('page', 1);
-            $sort = $request->query->get('sort', 'desc'); // Default sort order is descending
-            $active = $request->query->get('active'); // Get the active parameter
-            $offset = ($page - 1) * $perPage;
-
-            // Determine the sorting order based on the "sort" parameter
-            if ($sort === 'id-asc') {
-                $order = ['id' => 'ASC'];
-            } elseif ($sort === 'id-desc') {
-                $order = ['id' => 'DESC'];
-            } else {
-                // Default to sorting by createdAt
-                $order = ($sort === 'asc') ? ['createdAt' => 'ASC'] : ['createdAt' => 'DESC'];
-            }
-
-            $articleRepository = $this->entityManager->getRepository(Article::class);
-
-            // Create criteria for the query, including active filter and type "article"
-            $criteria = ['type' => 'article'];
-            if ($active === '1') {
-                $criteria['active'] = true;
-            } elseif ($active === '0') {
-                $criteria['active'] = false;
-            }
-
-            $totalArticles = $articleRepository->count($criteria);
-            $articles = $articleRepository->findBy($criteria, $order, $perPage, $offset);
-
-            $articleData = [];
-            foreach ($articles as $article) {
-                $articleData[] = [
-                    'id' => $article->getId(),
-                    'title' => $article->getTitle(),
-                    'excerpt' => $article->getExcerpt(),
-                    'content' => $article->getContent(),
-                    'slug' => $article->getSlug(),
-                    'image' => $article->getImage(),
-                    'created_at' => $article->getCreatedAt()->format('Y-m-d H:i:s'),
-                    'modified_at' => $article->getModifiedAt() ? $article->getModifiedAt()->format('Y-m-d H:i:s') : null,
-                    'active' => $article->isActive(),
-                ];
-            }
-
-            $paginateData = $this->utilityHelper->paginate($totalArticles, $perPage, $page, 3); // 3 = visible pages
-
-            return $this->json(['total' => $totalArticles, 'articles' => $articleData, 'paginateData' => $paginateData]);
-        } catch (\Exception $e) {
-            return $this->json(['error' => $e->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR);
-        }
-    }
-    
-    
-        public function getArticlesPost4(Request $request): Response
-    {
-        try {
-            $perPage = $request->query->getInt('per-page', 10);
-            $page = $request->query->getInt('page', 1);
-            $sort = $request->query->get('sort', 'desc'); // Default sort order is descending
-            $active = $request->query->get('active'); // Get the active parameter
-            $offset = ($page - 1) * $perPage;
-
-            // Determine the sorting order based on the "sort" parameter
-            if ($sort === 'id-asc') {
-                $order = ['id' => 'ASC'];
-            } elseif ($sort === 'id-desc') {
-                $order = ['id' => 'DESC'];
-            } else {
-                // Default to sorting by createdAt
-                $order = ($sort === 'asc') ? ['createdAt' => 'ASC'] : ['createdAt' => 'DESC'];
-            }
-
-            $articleRepository = $this->entityManager->getRepository(Article::class);
-
-            // Create criteria for the query, including active filter and type "article"
-            $criteria = ['type' => 'article'];
-            if ($active === '1') {
-                $criteria['active'] = true;
-            } elseif ($active === '0') {
-                $criteria['active'] = false;
-            }
-
-            $totalArticles = $articleRepository->count($criteria);
-            $articles = $articleRepository->findBy($criteria, $order, $perPage, $offset);
-
-            $articleData = [];
-            foreach ($articles as $article) {
-                $articleData[] = [
-                    'id' => $article->getId(),
-                    'title' => $article->getTitle(),
-                    'excerpt' => $article->getExcerpt(),
-                    'content' => $article->getContent(),
-                    'slug' => $article->getSlug(),
-                    'image' => $article->getImage(),
-                    'created_at' => $article->getCreatedAt()->format('Y-m-d H:i:s'),
-                    'modified_at' => $article->getModifiedAt() ? $article->getModifiedAt()->format('Y-m-d H:i:s') : null,
-                    'active' => $article->isActive(),
-                ];
-            }
-
-            $paginateData = $this->utilityHelper->paginate($totalArticles, $perPage, $page, 3); // 3 = visible pages
-
-            return $this->json(['total' => $totalArticles, 'articles' => $articleData, 'paginateData' => $paginateData]);
-        } catch (\Exception $e) {
-            return $this->json(['error' => $e->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR);
-        }
-    }
-
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    public function getArticlesPost3(Request $request): Response
-{
-    try {
-        $perPage = $request->query->getInt('per-page', 10);
-        $page = $request->query->getInt('page', 1);
-        $sort = $request->query->get('sort', 'desc'); // Default sort order is descending
-        $active = $request->query->get('active'); // Get the active parameter
-        $offset = ($page - 1) * $perPage;
-
-        // Determine the sorting order based on the "sort" parameter
-        if ($sort === 'id-asc') {
-            $order = ['id' => 'ASC'];
-        } elseif ($sort === 'id-desc') {
-            $order = ['id' => 'DESC'];
-        } else {
-            // Default to sorting by createdAt
-            $order = ($sort === 'asc') ? ['createdAt' => 'ASC'] : ['createdAt' => 'DESC'];
+        if (!$ids) {
+            return $this->json([
+                'error' => true,
+                'message' => 'No IDs provided',
+                'data' => null
+            ], 400);
         }
 
-        $articleRepository = $this->entityManager->getRepository(Article::class);
+        $idsArray = array_map('trim', explode(',', $ids));
 
-        // Create criteria for the query, including active filter if provided
-        $criteria = [];
-        if ($active === '1') {
-            $criteria['active'] = true;
-        } elseif ($active === '0') {
-            $criteria['active'] = false;
+        // Validate each ID is numeric
+        foreach ($idsArray as $id) {
+            if (!is_numeric($id)) {
+                return $this->json([
+                    'error' => true,
+                    'message' => 'Invalid ID format',
+                    'data' => null
+                ], 400);
+            }
         }
 
-        $totalArticles = $articleRepository->count($criteria);
-        $articles = $articleRepository->findBy($criteria, $order, $perPage, $offset);
+        // Fetch all articles with IDs in $idsArray
+        $articles = $this->entityManager->getRepository(Article::class)->findBy(['id' => $idsArray]);
 
-        $articleData = [];
+        if (!$articles) {
+            return $this->json([
+                'error' => true,
+                'message' => 'No articles found for the provided IDs',
+                'data' => null
+            ], 404);
+        }
+
+        // Loop over each article, remove associated ArticleTags and ArticleCategories, then remove the article
         foreach ($articles as $article) {
-            $articleData[] = [
-                'id' => $article->getId(),
-                'title' => $article->getTitle(),
-                'excerpt' => $article->getExcerpt(),
-                'content' => $article->getContent(),
-                'slug' => $article->getSlug(),
-                'image' => $article->getImage(),
-                'created_at' => $article->getCreatedAt()->format('Y-m-d H:i:s'),
-                'modified_at' => $article->getModifiedAt() ? $article->getModifiedAt()->format('Y-m-d H:i:s') : null,
-                'active' => $article->isActive(),
-            ];
+
+            // Remove related ArticleTags
+            $articleTags = $this->entityManager->getRepository(ArticleTag::class)->findBy(['article' => $article]);
+            foreach ($articleTags as $articleTag) {
+                $this->entityManager->remove($articleTag);
+            }
+
+            // Remove related ArticleCategories
+            $articleCategories = $this->entityManager->getRepository(ArticleCategory::class)->findBy(['article' => $article]);
+            foreach ($articleCategories as $articleCategory) {
+                $this->entityManager->remove($articleCategory);
+            }
+
+            // Finally remove the article itself
+            $this->entityManager->remove($article);
         }
 
-        $paginateData = $this->utilityHelper->paginate($totalArticles, $perPage, $page, 3); // 3 = visible pages
+        $this->entityManager->flush();
 
-        return $this->json(['total' => $totalArticles, 'articles' => $articleData, 'paginateData' => $paginateData]);
-    } catch (\Exception $e) {
-        return $this->json(['error' => $e->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR);
+        return $this->json([
+            'error' => false,
+            'message' => 'Articles deleted successfully',
+            'data' => null
+        ], 200);
     }
-}
 
-    
-    
-    public function getArticlesPost1(Request $request): Response
+
+
+
+
+    public function deleteByIdsPost(Request $request): Response
     {
-        try {
-            $perPage = $request->query->getInt('per-page', 10);
-            $page = $request->query->getInt('page', 1);
-            $sort = $request->query->get('sort', 'desc'); // Default sort order is descending
-            $offset = ($page - 1) * $perPage;
-
-            // Determine the sorting order based on the "sort" parameter
-            if ($sort === 'id-asc') {
-                $order = ['id' => 'ASC'];
-            } elseif ($sort === 'id-desc') {
-                $order = ['id' => 'DESC'];
-            } else {
-                // Default to sorting by createdAt
-                $order = ($sort === 'asc') ? ['createdAt' => 'ASC'] : ['createdAt' => 'DESC'];
-            }
-
-            $articleRepository = $this->entityManager->getRepository(Article::class);
-
-            $totalArticles = $articleRepository->count([]);
-            $articles = $articleRepository->findBy([], $order, $perPage, $offset);
-
-            $articleData = [];
-            foreach ($articles as $article) {
-                $articleData[] = [
-                    'id' => $article->getId(),
-                    'title' => $article->getTitle(),
-                    'excerpt' => $article->getExcerpt(),
-                    'content' => $article->getContent(),
-                    'slug' => $article->getSlug(),
-                    'image' => $article->getImage(),
-                    'created_at' => $article->getCreatedAt()->format('Y-m-d H:i:s'),
-                    'modified_at' => $article->getModifiedAt() ? $article->getModifiedAt()->format('Y-m-d H:i:s') : null,
-                    'active' => $article->isActive(),
-                ];
-            }
-
-            $paginateData = $this->utilityHelper->paginate($totalArticles, $perPage, $page, 3); // 3 = visible pages
-
-            return $this->json(['total' => $totalArticles, 'articles' => $articleData, 'paginateData' => $paginateData]);
-        } catch (\Exception $e) {
-            return $this->json(['error' => $e->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR);
+        /*
+        $session = $request->getSession();
+        if (!$session->has('userLoggedIn')) 
+        {
+            return new JsonResponse([
+                'error' => true,
+                'message' => 'User not logged on!', 
+                'data' => 'user-not-logged-on'
+            ]);
+        }   
+        */
+        
+        $ids = $request->request->get('ids');
+        
+        if (!$ids) {
+            return $this->json([
+                'error' => true,
+                'message' => 'No ID\'s provided', 
+                'data' => 'user-not-logged-on'
+            ], 400);
         }
+
+        $idsArray = array_map('trim', explode(',', $ids));
+
+        // Validate each ID is numeric
+        foreach ($idsArray as $id) {
+            if (!is_numeric($id)) {
+                return $this->json([
+                    'error' => true,
+                    'message' => 'No ID\'s provided', 
+                    'data' => 'user-not-logged-on'
+                ], 400);
+            }
+        }
+
+        $articles = $this->entityManager->getRepository(Article::class)->findBy(['id' => $idsArray]);
+
+        if (!$articles) {
+            return $this->json([
+                'error' => true,
+                'message' => 'No article\'s by ID found', 
+                'data' => 'no-articles-by-id-found'
+            ], 404);
+        }
+
+        foreach ($articles as $article) {
+               $articleCategories = $this->entityManager->getRepository(ArticleCategory::class)->findBy(['article' => $article]);
+            foreach ($articleCategories as $articleCategory) {
+                $this->entityManager->remove($articleCategory);
+            }
+
+            $articleTags = $this->entityManager->getRepository(ArticleTag::class)->findBy(['article' => $article]);
+            foreach ($articleTags as $articleTag) {
+                $this->entityManager->remove($articleTag);
+            }
+
+            $this->entityManager->remove($article);
+        }
+
+        $this->entityManager->flush();
+        return $this->json([
+            'error' => false,
+            'message' => 'Message deleted successfully.', 
+            'data' => 'message-deleted-successfully'
+        ], 200);
     }
-    
-    
-    public function getArticlesPost0(Request $request): Response
-	{
-		try {
-			$perPage = $request->query->getInt('per-page', 10);
-			$page = $request->query->getInt('page', 1);
-			$sort = $request->query->get('sort', 'desc'); // Default sort order is descending
-			$offset = ($page - 1) * $perPage;
 
-			$articleRepository = $this->entityManager->getRepository(Article::class);
-			$order = ($sort === 'asc') ? ['createdAt' => 'ASC'] : ['createdAt' => 'DESC'];
-
-			$totalArticles = $articleRepository->count([]);
-			$articles = $articleRepository->findBy([], $order, $perPage, $offset);
-
-			$articleData = [];
-			foreach ($articles as $article) {
-				$articleData[] = [
-					'id' => $article->getId(),
-					'title' => $article->getTitle(),
-					'excerpt' => $article->getExcerpt(),
-					'content' => $article->getContent(),
-					'slug' => $article->getSlug(),
-					'image' => $article->getImage(),
-					'created_at' => $article->getCreatedAt()->format('Y-m-d H:i:s'),
-					'modified_at' => $article->getModifiedAt() ? $article->getModifiedAt()->format('Y-m-d H:i:s') : null,
-					'active' => $article->isActive(),
-				];
-			}
-
-			$paginateData = $this->utilityHelper->paginate($totalArticles, $perPage, $page, 3); // 3 = visible pages
-
-			return $this->json(['total' => $totalArticles, 'articles' => $articleData, 'paginateData' => $paginateData]);
-		} catch (\Exception $e) {
-			return $this->json(['error' => $e->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR);
-		}
-	}
-    */
-    
+  
+  
     public function createPost(Request $request): Response
 	{          
 		$title = $request->request->get('title');

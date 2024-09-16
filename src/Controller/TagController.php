@@ -156,6 +156,42 @@ class TagController extends AbstractController
         ], Response::HTTP_CREATED);
     }
     
+    public function getTagsByIds(Request $request): Response
+    {
+        try {
+            // Get the "ids" string from the request, e.g., "11,1,34,5"
+            $idsString = $request->request->get('ids');
+
+            $ids = array_map('intval', explode(',', $idsString));
+
+            if (empty($ids)) {
+                return $this->json(['error' => 'No IDs provided.'], Response::HTTP_BAD_REQUEST);
+            }
+
+            $tagRepository = $this->entityManager->getRepository(Tag::class);
+
+            $queryBuilder = $tagRepository->createQueryBuilder('t')
+                                          ->where('t.id IN (:ids)')
+                                          ->setParameter('ids', $ids);
+
+            $tags = $queryBuilder->getQuery()->getResult();
+
+            $tagData = [];
+            foreach ($tags as $tag) {
+                $tagData[] = [
+                    'id' => $tag->getId(),
+                    'name' => $tag->getName(),
+                    'slug' => $tag->getSlug(),
+                    'type' => $tag->getType(),
+                ];
+            }
+
+            return $this->json(['tags' => $tagData]);
+        } catch (\Exception $e) {
+            return $this->json(['error' => $e->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }
+
     
 };
 

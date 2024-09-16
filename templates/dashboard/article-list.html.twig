@@ -107,6 +107,60 @@
 
 <!-- MODALS -->
 
+
+
+<div class="modal sympa-modal" id="sympa-delete-bulk-modal" style="display:none;">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Warning!</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" onclick="document.getElementById('sympa-delete-bulk-modal').style.display='none'"></button>
+      </div>
+      <div class="modal-body">
+        <p>Do you want to delete selected item(s)?</p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" onclick="document.getElementById('sympa-delete-bulk-modal').style.display='none'">Cancel</button>
+        <button type="button" class="btn btn-danger" onclick="sympa_deleteBulkModalAction()">Delete</button>
+      </div>
+
+	<div class="alert alert-warning alert-dismissible fade show" role="alert" style="display:none; margin-bottom: 0;">
+	   <span id="sympa-delete-bulk-modal-message"> Hello</span> 
+	  <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close" ></button>
+	</div>
+
+    </div>
+  </div>
+</div>
+
+
+<div class="modal sympa-modal" id="sympa-strip-categories-bulk-modal" style="display:none;">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Warning!</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" onclick="document.getElementById('sympa-strip-categories-bulk-modal').style.display='none'"></button>
+      </div>
+      <div class="modal-body">
+        <p>Do you want to remove categories from selected item(s)?</p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" onclick="document.getElementById('sympa-strip-categories-bulk-modal').style.display='none'">Cancel</button>
+        <button type="button" class="btn btn-danger" onclick="sympa_removeCategoriesBulkModalAction()">Remove</button>
+      </div>
+
+	<div class="alert alert-warning alert-dismissible fade show" role="alert" style="display:none; margin-bottom: 0;">
+	   <span id="sympa-strip-categories-bulk-modal-message"> Hello</span> 
+	  <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close" ></button>
+	</div>
+
+    </div>
+  </div>
+</div>
+
+
+
+
 <div class="modal sympa-modal" id="sympa-delete-single-modal" style="display:none;">
   <div class="modal-dialog">
     <div class="modal-content">
@@ -123,13 +177,14 @@
       </div>
 
 	<div class="alert alert-warning alert-dismissible fade show" role="alert" style="display:none; margin-bottom: 0;">
-	   <span id="sympa-bulk-delete-modal-message"> Hello</span> 
+	   <span id="sympa-delete-single-modal-message"> Hello</span> 
 	  <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close" ></button>
 	</div>
 
     </div>
   </div>
 </div>
+
 
 <div class="modal sympa-modal" id="sympa-list-value-modal" style="display:none;">
   <div class="modal-dialog">
@@ -152,7 +207,7 @@
       </div>
 
 	<div class="alert alert-warning alert-dismissible fade show" role="alert" style="display:none; margin-bottom: 0;">
-	   <span id="sympa-bulk-delete-modal-message"> Hello</span> 
+	   <span id="sympa-list-value-modal-message"> Hello</span> 
 	  <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close" ></button>
 	</div>
 
@@ -166,6 +221,71 @@
 
 <script>
 
+async function sympa_removeCategoriesBulkModalAction(){    
+    
+    const selectedIds = sympa_getSelectedItemIds();
+   
+    if (selectedIds.length === 0) {
+        document.getElementById("sympa-strip-categories-bulk-modal").style.display = 'none';
+        sympa_message("Select items first!", "warning");
+        return;
+    }    
+
+    console.log(selectedIds);
+
+    let postData = new FormData();  
+    postData.append('ids', selectedIds);
+
+    const response = await fetch('/remove-categories-by-ids', {
+        method: 'POST', 
+        body: postData,
+    });
+
+    const jsonData = await response.json();
+    if (response.status != 200) {		
+        return null;
+    }
+    else{
+       sympa_message("category(s) removed!", "success");
+       setTimeout(function () {
+            window.location.reload();
+       }, 2000);
+    } 
+     
+}
+
+
+async function sympa_deleteBulkModalAction(){    
+    
+    const selectedIds = sympa_getSelectedItemIds();
+   
+    if (selectedIds.length === 0) {
+        document.getElementById("sympa-strip-categories-bulk-modal").style.display = 'none';
+        sympa_message("Select items first!", "warning");
+        return;
+    }    
+
+    let postData = new FormData();  
+    postData.append('ids', selectedIds);
+
+    const response = await fetch('/article-delete-by-ids', {
+        method: 'POST', 
+        body: postData,
+    });
+
+    const jsonData = await response.json();
+    if (response.status != 200) {		
+        return null;
+    }
+    else{
+        sympa_message("Item(s) deleted!", "success");
+       setTimeout(function () {
+            window.location.reload();
+       }, 2000);
+    }    
+}
+
+
 function sympa_getSelectedItemIds(){
     const elements = document.querySelectorAll('.sympa-bulk-checkbox');
     let selectedIds = [];
@@ -178,6 +298,7 @@ function sympa_getSelectedItemIds(){
     
     return selectedIds;
 }
+
 
 function sympa_tableCheck(checked){
     if (checked){
@@ -199,13 +320,20 @@ function sympa_tableCheck(checked){
 
 function sympa_applyBulk(){
     const bulkMode = localStorage.getItem('sympa-article-list-bulk-mode');
-    const selectedIds = sympa_getSelectedItemIds();
-
-  
+    
+    if (bulkMode === 'delete-items'){
+        document.getElementById("sympa-delete-bulk-modal").style.display = "block";
+    }  
+    
+    if (bulkMode === 'strip-categories'){
+        document.getElementById("sympa-strip-categories-bulk-modal").style.display = "block";
+    }  
+    
+    
 }
 
+
 function sympa_changeBulkMode(that){
-    console.log(that);
     if (that.value === 'none'){
         localStorage.setItem('sympa-article-list-bulk-mode', 'none');
     }
@@ -215,10 +343,12 @@ function sympa_changeBulkMode(that){
     if (that.value === 'strip-categories'){
         localStorage.setItem('sympa-article-list-bulk-mode', 'strip-categories');  
     }
+    if (that.value === 'strip-tags'){
+        localStorage.setItem('sympa-article-list-bulk-mode', 'strip-tags');  
+    }
     if (that.value === 'add-to-category'){
         localStorage.setItem('sympa-article-list-bulk-mode', 'add-to-category'); 
     }
-
 }
 
 
@@ -303,6 +433,7 @@ function sympa_drawList(data)
                       <option onclick="sympa_changeBulkMode(this)" value="none" selected>Bulk actions...</option>
                       <option onclick="sympa_changeBulkMode(this)" value="delete-items">Delete items</option>
                       <option onclick="sympa_changeBulkMode(this)" value="strip-categories">Strip categories</option>
+                      <option onclick="sympa_changeBulkMode(this)" value="strip-tags">Strip tags</option>
                       <option onclick="sympa_changeBulkMode(this)" value="add-to-category">Add to category</option>
                     </select>
                     <div onclick="sympa_applyBulk()" class="btn btn-light btn-sm sympa-toolbar-font">Apply</div>
