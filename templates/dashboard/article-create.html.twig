@@ -30,6 +30,10 @@
 		line-height: 22px;
 	}
 	
+    .sympa-pill-button{
+        box-shadow: rgba(0, 0, 0, 0.02) 0px 1px 3px 0px, rgba(27, 31, 35, 0.15) 0px 0px 0px 1px;
+    }
+    
 </style>
 
 
@@ -294,6 +298,51 @@ function sympa_getArticleData()
 }
 
 
+async function sympa_saveCategories(articleId, categoryIds)
+{	
+	let postData = new FormData();  
+	postData.append('article_id', articleId);
+	postData.append('category_ids', categoryIds);
+
+	const response = await fetch('/add-article-to-categories', {
+		method: 'POST', 
+		body: postData,
+	});
+	
+	const jsonData = await response.json();
+	
+	if (jsonData.error) {
+		sympa_message(jsonData.message, 'warning');
+        return false;
+	}
+	else {
+		return true;
+	}    
+}
+
+async function sympa_saveTags(articleId, tagIds)
+{	
+	let postData = new FormData();  
+	postData.append('article_id', articleId);
+	postData.append('tag_ids', tagIds);
+
+	const response = await fetch('/add-article-to-tags', {
+		method: 'POST', 
+		body: postData,
+	});
+	
+	const jsonData = await response.json();
+	
+	if (jsonData.error) {
+		sympa_message(jsonData.message, 'warning');
+        return false;
+	}
+	else {
+		return true;
+	}    
+}
+
+
 async function sympa_save()
 {
     
@@ -304,8 +353,8 @@ async function sympa_save()
 	postData.append('excerpt', data.excerpt);
 	postData.append('content', data.content);
 	postData.append('active', data.active);
-    postData.append('categoryIds', sympa_getSelectedCategoryIds());
-    postData.append('tagIds', sympa_getSelectedTagIds());
+  //  postData.append('categoryIds', sympa_getSelectedCategoryIds());
+ //   postData.append('tagIds', sympa_getSelectedTagIds());
 
 	const response = await fetch('/article-create', {
 		method: 'POST', 
@@ -318,12 +367,31 @@ async function sympa_save()
 		sympa_message(jsonData.message, 'warning');
 	}
 	else {
-		sympa_message('Article created!', 'success');
-		setTimeout(function () {
-		//	window.location.reload();
-		}, 2000);
-	}
-    
+        let haveError = false;
+        if (jsonData.data && jsonData.data.article_id){ //'data' => ['article_id' => $articleId],
+            const articleId = jsonData.data.article_id;  
+            const categoryIds = sympa_getSelectedCategoryIds();
+            const tagIds = sympa_getSelectedTagIds();
+                                    
+            if (categoryIds.length){
+               haveError = await sympa_saveCategories(articleId, categoryIds); 
+               if (!haveError) return;  
+            }     
+            
+            if (tagIds.length){                
+               haveError = await sympa_saveTags(articleId, tagIds); 
+               if (!haveError) return;  
+            }   
+              
+            sympa_message('Article created!', 'success');                       
+        }
+        else{
+            sympa_message('Bad response: No article ID found!', 'warning');
+        }
+               
+        
+        
+	}    
 }
 
 
@@ -376,7 +444,7 @@ function sympa_toggleSelectedTag(that){
 
 function sympa_selectTagItemAction(){    
     const createItem = function(id, slug, name){
-        return `<button data-id="${id}" data-slug="${slug}" data-name="${name}" type="button" class="btn btn-sm btn-light"> ${name} <span class="badge bg-danger" onclick="this.parentElement.remove()">×</span></button>	`;
+        return `<button data-id="${id}" data-slug="${slug}" data-name="${name}" type="button" class="btn btn-sm btn-light sympa-pill-button mx-1"> ${name} <span class="badge bg-danger" onclick="this.parentElement.remove()">×</span></button>	`;
     }
 
     document.getElementById("sympa-tag-modal").style.display = "none";  
@@ -462,7 +530,7 @@ function sympa_toggleSelectedCategory(that){
 
 function sympa_selectCategoryItemAction(){    
     const createItem = function(id, slug, name){
-        return `<button data-id="${id}" data-slug="${slug}" data-name="${name}" type="button" class="btn btn-sm btn-light"> ${name} <span class="badge bg-danger" onclick="this.parentElement.remove()">×</span></button>	`;
+        return `<button data-id="${id}" data-slug="${slug}" data-name="${name}" type="button" class="btn btn-sm btn-light sympa-pill-button mx-1"> ${name} <span class="badge bg-danger" onclick="this.parentElement.remove()">×</span></button>	`;
     }
         
 

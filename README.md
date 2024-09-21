@@ -23,5 +23,8 @@ https://www.youtube.com/watch?v=OVPcdOmnYG0
 ## Note
 The project is in the early stages of development but is still functional and usable.
 
+## Requirements
+php-gd
+
 ## Licence
 MIT

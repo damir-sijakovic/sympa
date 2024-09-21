@@ -1,2 +1,253 @@
-<h1>Files</h1>
+<style>
+.sympa-bulk-actions, .sympa-list-options{
+    display:flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column; 
+    flex-direction: row;
+    white-space: nowrap;
+}
 
+#sympa-list-titlebar, #sympa-list-bottom-bar{
+    font-size: 12px !important;
+     font-weight: 500;
+     background: #eeeeee;
+}
+
+
+.sympa-toolbar-font{
+    font-size: 12px !important;
+}
+
+.sympa-list-font{
+    font-size: 12px !important;
+    font-weight: 500;
+}
+
+.sympa-modal{
+    background: #3e3e3ed1;
+}
+
+
+</style>
+
+
+
+<h2>Articles</h2>
+
+<hr>
+
+<div class="btn-group" role="group" aria-label="Basic example">
+  <a target="_blank" href="/dashboard/article-create" class="btn btn-primary btn-sm"><i class="bi bi-plus-circle mx-1"></i>Create</a>
+  <button type="button" class="btn btn-outline-primary btn-sm" onclick="sympa_reset()"> Reset query</button>
+</div>
+
+<br><br>
+
+<div id="sympa-no-article-list" class="alert alert-primary" role="alert" style="display:none">
+  There is no articles!
+</div>
+
+<ul id="sympa-article-list" class="list-group mb-3">
+          
+          <!--
+        <li class=
+          "list-group-item d-flex justify-content-between">
+            <div href="button" class="btn btn-primary btn-sm">Small button</div>
+            <strong>20</strong>
+          </li>
+  
+          
+          <li class="list-group-item d-flex justify-content-between bg-body-tertiary">
+            <div class="">
+              <h6 class="my-0">Promo code</h6>
+              <small>EXAMPLECODE</small>
+            </div>            
+            <span class="text-success">
+                <div class="btn-group" role="group" aria-label="Basic outlined example">
+                  <button type="button" class="btn btn-primary btn-sm">Edit</button>
+                  <button type="button" class="btn btn-outline-primary btn-sm">Delete</button>
+                </div>            
+            </span>
+          </li>
+          
+                    
+          <li class=
+          "list-group-item d-flex justify-content-between">
+            <span>Total:</span>
+            <strong id="sympa-total-articles"></strong>
+          </li>
+          
+          -->   
+          
+         <li class="list-group-item d-flex justify-content-between">
+            
+        </li> 
+ </ul>
+
+<nav aria-label="Page navigation example" id="sympa-pagination">
+<!--
+  <ul class="pagination">
+    <li class="page-item">
+      <a class="page-link" href="#" aria-label="Previous">
+        <span aria-hidden="true">&laquo;</span>
+      </a>
+    </li>
+    <li class="page-item"><a class="page-link active" href="#">1</a></li>
+    <li class="page-item"><a class="page-link" href="#">2</a></li>
+    <li class="page-item"><a class="page-link" href="#">3</a></li>
+    <li class="page-item">
+      <a class="page-link" href="#" aria-label="Next">
+        <span aria-hidden="true">&raquo;</span>
+      </a>
+    </li>
+  </ul>
+-->
+</nav>
+
+<!-- MODALS -->
+
+
+
+<div class="modal sympa-modal" id="sympa-delete-bulk-modal" style="display:none;">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Warning!</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" onclick="document.getElementById('sympa-delete-bulk-modal').style.display='none'"></button>
+      </div>
+      <div class="modal-body">
+        <p>Do you want to delete selected item(s)?</p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" onclick="document.getElementById('sympa-delete-bulk-modal').style.display='none'">Cancel</button>
+        <button type="button" class="btn btn-danger" onclick="sympa_deleteBulkModalAction()">Delete</button>
+      </div>
+
+	<div class="alert alert-warning alert-dismissible fade show" role="alert" style="display:none; margin-bottom: 0;">
+	   <span id="sympa-delete-bulk-modal-message"> Hello</span> 
+	  <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close" ></button>
+	</div>
+
+    </div>
+  </div>
+</div>
+
+
+<div class="modal sympa-modal" id="sympa-strip-categories-bulk-modal" style="display:none;">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Warning!</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" onclick="document.getElementById('sympa-strip-categories-bulk-modal').style.display='none'"></button>
+      </div>
+      <div class="modal-body">
+        <p>Do you want to remove categories from selected item(s)?</p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" onclick="document.getElementById('sympa-strip-categories-bulk-modal').style.display='none'">Cancel</button>
+        <button type="button" class="btn btn-danger" onclick="sympa_removeCategoriesBulkModalAction()">Remove</button>
+      </div>
+
+	<div class="alert alert-warning alert-dismissible fade show" role="alert" style="display:none; margin-bottom: 0;">
+	   <span id="sympa-strip-categories-bulk-modal-message"> Hello</span> 
+	  <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close" ></button>
+	</div>
+
+    </div>
+  </div>
+</div>
+
+
+
+
+<div class="modal sympa-modal" id="sympa-delete-single-modal" style="display:none;">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Warning!</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" onclick="document.getElementById('sympa-delete-single-modal').style.display='none'"></button>
+      </div>
+      <div class="modal-body">
+        <p>Do you want to delete post?</p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" onclick="document.getElementById('sympa-delete-single-modal').style.display='none'">Cancel</button>
+        <button type="button" class="btn btn-danger" onclick="sympa_deleteArticleModalAction()">Delete</button>
+      </div>
+
+	<div class="alert alert-warning alert-dismissible fade show" role="alert" style="display:none; margin-bottom: 0;">
+	   <span id="sympa-delete-single-modal-message"> Hello</span> 
+	  <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close" ></button>
+	</div>
+
+    </div>
+  </div>
+</div>
+
+
+<div class="modal sympa-modal" id="sympa-list-value-modal" style="display:none;">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Enter value</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" onclick="document.getElementById('sympa-list-value-modal').style.display='none'"></button>
+      </div>
+      <div class="modal-body">
+        
+      <div class="mb-3">
+        <p>Enter search term or category id:</p>
+        <input type="text" class="form-control" id="sympa-list-value-modal-input" aria-describedby="">
+      </div>
+
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" onclick="document.getElementById('sympa-list-value-modal').style.display='none'">Cancel</button>
+        <button type="button" class="btn btn-primary" onclick="sympa_setListValueAction()">Accept</button>
+      </div>
+
+	<div class="alert alert-warning alert-dismissible fade show" role="alert" style="display:none; margin-bottom: 0;">
+	   <span id="sympa-list-value-modal-message"> Hello</span> 
+	  <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close" ></button>
+	</div>
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+<div class="modal sympa-modal" id="sympa-category-modal" style="display:none;">
+  <div class="modal-dialog" >
+    <div class="modal-content" >
+      <div class="modal-header">
+        <h5 class="modal-title">Add to category</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" onclick="document.getElementById('sympa-category-modal').style.display='none'"></button>
+      </div>
+      <div class="modal-body" style="height: calc(100vh - 200px) !important; overflow:scroll;">
+        
+        <div id="sympa-category-loading-modal" class="d-flex justify-content-center align-items-center h-100">
+            <div class="spinner-border" role="status">
+              <span class="visually-hidden">Loading...</span>
+            </div>
+       </div>
+      
+        <ul id="sympa-category-ul-modal" class="list-group" style="display:none;">
+          <li class="sympa-category-select-list list-group-item">Empty list</li>
+        </ul>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" onclick="document.getElementById('sympa-category-modal').style.display='none'">Cancel</button>
+        <button type="button" class="btn btn-primary" onclick="sympa_selectCategoryItemAction()">Select</button>
+      </div>
+
+	<div class="alert alert-warning alert-dismissible fade show" role="alert" style="display:none; margin-bottom: 0;">
+	   <span id="sympa-bulk-delete-modal-message"> Hello</span> 
+	  <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close" ></button>
+	</div>
+
+    </div>
+  </div>
+</div>

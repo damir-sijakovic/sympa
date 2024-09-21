@@ -5,7 +5,7 @@
 		background: #ffffff;
 	}
 
-	.ds-categories-between{
+	.sympa-categories-between{
 		display:flex; 
 		justify-content:space-between;
 		align-items: baseline;
@@ -15,12 +15,12 @@
 		font-size: 13px;
 	}
 	
-	.ds-selected-table-item{
+	.sympa-selected-table-item{
 		background: #0d6efd !important;
 		color: white !important;
 	}
 	
-	.ds-error{
+	.sympa-error{
 		border: 1px red solid !important;
 	}
 	
@@ -45,18 +45,24 @@
     <div class="col-8">
     
 		<h6>ID:</h6>
-	    <input class="form-control" id="ds-article-id-input" placeholder="" readonly >        
+	    <input class="form-control" id="sympa-article-id-input" placeholder="" readonly >        
         
         <br>
         <h6>Title:</h6>
-		<input class="form-control" id="ds-article-title-input" value="" >    
+		<input class="form-control" id="sympa-article-title-input" value="" >    
     
 		<br>
 		<h6>Excerpt:</h6>
-		<textarea class="form-control" id="ds-post-excerpt-textarea" rows="3" maxlength="255" placeholder="" value="{{excerpt|raw}}"></textarea>
+		<textarea class="form-control" id="sympa-post-excerpt-textarea" rows="3" maxlength="255" placeholder="" value="{{excerpt|raw}}"></textarea>
 		<br />
 		<h6>Content:</h6>
 		<div id="trumbowyg-element"></div>			
+            
+		<br />       
+        <div class="form-check form-switch">
+            <input class="form-check-input" type="checkbox" role="switch" id="sympa-article-active" checked>
+            <label class="form-check-label" for="flexSwitchCheckChecked">Visible</label>
+        </div>
             
         <br />
 		<h6>Categories:</h6>
@@ -74,7 +80,7 @@
         
         
         <br />
-        <div onclick="ds_publish()" class="btn btn-primary btn-lg" >Save</div>   
+        <div onclick="sympa_save()" class="btn btn-primary btn-lg" >Save</div>   
        
     </div>
 
@@ -226,7 +232,7 @@ async function sympa_openTagModal(){
         const name = item.name;
         const id = item.id;
         const slug = item.slug;
-        console.log(item);
+        //console.log(item);
         return `<li onclick="sympa_toggleSelectedTag(this)" 
             class="sympa-tag-select-list list-group-item" 
             title="ID: ${id}\nSlug: ${slug}"
@@ -258,7 +264,7 @@ async function sympa_openTagModal(){
 function sympa_toggleSelectedTag(that){
     document.querySelectorAll('.sympa-tag-select-list').forEach(element => element.classList.remove('active'));
     that.classList.toggle("active");
-    console.log(that);
+   // console.log(that);
     const id = that.getAttribute("data-id");
     const name = that.getAttribute("data-name");
     
@@ -301,7 +307,7 @@ function sympa_getSelectedTagIds() {
 		tags.push(parseInt(id));
 	}
 
-    console.log(tags);
+    //console.log(tags);
 
 	return tags;
 }
@@ -344,7 +350,7 @@ async function sympa_openCategoryModal(){
 function sympa_toggleSelectedCategory(that){
     document.querySelectorAll('.sympa-category-select-list').forEach(element => element.classList.remove('active'));
     that.classList.toggle("active");
-    console.log(that);
+   // console.log(that);
     const id = that.getAttribute("data-id");
     const name = that.getAttribute("data-name");
     
@@ -388,7 +394,7 @@ function sympa_getSelectedCategoryIds() {
 		categories.push(parseInt(categoryId));
 	}
 
-    console.log(categories);
+   // console.log(categories);
 
 	return categories;
 }
@@ -477,16 +483,166 @@ async function sympa_initCategoriesAndTags(){
 }
 
 
+//ARTICLE
+function sympa_getArticleData()
+{    
+    let articleTitle = document.getElementById("sympa-article-title-input").value;
+    let articleExcerpt = document.getElementById("sympa-post-excerpt-textarea").value;
+    let content = trumboEditor.html();
+    let active = document.getElementById("sympa-article-active").checked;
+
+    let data = {};
+    data.title = articleTitle;
+	data.content = content;
+	data.excerpt = articleExcerpt;
+	data.active = active;
+    
+    return data;
+}
+
+//
+async function sympa_saveCategories(articleId, categoryIds)
+{	
+	let postData = new FormData();  
+	postData.append('article_id', articleId);
+	postData.append('category_ids', categoryIds);
+
+	const response = await fetch('/add-article-to-categories', {
+		method: 'POST', 
+		body: postData,
+	});
+	
+	const jsonData = await response.json();
+	
+	if (jsonData.error) {
+		sympa_message(jsonData.message, 'warning');
+        return false;
+	}
+	else {
+		return true;
+	}    
+}
+
+async function sympa_saveTags(articleId, tagIds)
+{	
+	let postData = new FormData();  
+	postData.append('article_id', articleId);
+	postData.append('tag_ids', tagIds);
+
+	const response = await fetch('/add-article-to-tags', {
+		method: 'POST', 
+		body: postData,
+	});
+	
+	const jsonData = await response.json();
+	
+	if (jsonData.error) {
+		sympa_message(jsonData.message, 'warning');
+        return false;
+	}
+	else {
+		return true;
+	}    
+}
 
 
+async function sympa_save()
+{
+    
+	let data = sympa_getArticleData();
+	
+	let postData = new FormData(); 
+    postData.append('id', {{id|raw}}); 
+	postData.append('title', data.title);
+	postData.append('excerpt', data.excerpt);
+	postData.append('content', data.content);
+	postData.append('active', data.active);
+  //  postData.append('categoryIds', sympa_getSelectedCategoryIds());
+ //   postData.append('tagIds', sympa_getSelectedTagIds());
+
+	const response = await fetch('/article-edit', {
+		method: 'POST', 
+		body: postData,
+	});
+	
+	const jsonData = await response.json();
+	
+	if (jsonData.error) {        
+		sympa_message(jsonData.message, 'warning');
+	}
+	else {
+        let haveError = false;
+        if (jsonData.data && jsonData.data.article_id){ //'data' => ['article_id' => $articleId],
+            const articleId = jsonData.data.article_id;  
+            const categoryIds = sympa_getSelectedCategoryIds();
+            const tagIds = sympa_getSelectedTagIds();
+                                    
+           // if (categoryIds.length){
+               haveError = await sympa_saveCategories(articleId, categoryIds); 
+               if (!haveError) return;  
+           // }     
+            
+          //  if (tagIds.length){                
+               haveError = await sympa_saveTags(articleId, tagIds); 
+               if (!haveError) return;  
+          //  }   
+              
+            sympa_message('Article updated!', 'success');                       
+        }
+        else{
+            sympa_message('Bad response: No article ID found!', 'warning');
+        }
+        
+	}    
+}
+
+
+/*
+async function sympa_save(){
+	let data = sympa_getArticleData();
+	
+	let postData = new FormData();  
+	postData.append('id', {{id|raw}});
+	postData.append('title', data.title);
+	postData.append('excerpt', data.excerpt);
+	postData.append('content', data.content);
+	postData.append('active', data.active);
+    postData.append('categoryIds', sympa_getSelectedCategoryIds());
+    postData.append('tagIds', sympa_getSelectedTagIds());
+
+    console.log(postData);
+ 
+	const response = await fetch('/article-edit', {
+		method: 'POST', 
+		body: postData,
+	});
+	
+	const jsonData = await response.json();
+	
+	if (jsonData.error) {
+		sympa_message(jsonData.message, 'warning');
+	}
+	else {
+		sympa_message('Article updated!', 'success');
+		setTimeout(function () {
+		//	window.location.reload();
+		}, 2000);
+	}    
+}
+*/
+
+
+function sympa_init(){
+    trumboEditor.trumbowyg('html', '{{content|raw}}');
+    document.getElementById('sympa-article-id-input').value = '{{id|raw}}';
+    document.getElementById('sympa-article-title-input').value = '{{title|raw}}';
+    document.getElementById('sympa-post-excerpt-textarea').value = '{{excerpt|raw}}';
+    document.getElementById('sympa-article-active').checked = {{active|raw}};    
+}
 
 //MAIN
 window.addEventListener('load', async function() {
-    trumboEditor.trumbowyg('html', '{{content|raw}}');
-    document.getElementById('ds-article-id-input').value = '{{id|raw}}';
-    document.getElementById('ds-article-title-input').value = '{{title|raw}}';
-    document.getElementById('ds-post-excerpt-textarea').value = '{{excerpt|raw}}';
-    
+    sympa_init();
     sympa_initCategoriesAndTags();
 });
 

@@ -64,7 +64,7 @@ article_create:
 
 article_edit: 
     path: /article-edit
-    controller: App\Controller\ArticleController::editPost 
+    controller: App\Controller\ArticleController::updatePost 
     methods: ['POST']
 
 article_delete:
@@ -86,7 +86,6 @@ article_get_category_and_tag_ids:
     path: /get-article-categories-and-tags/{id}
     controller: App\Controller\ArticleController::getArticleCategoryAndTagIds
     methods: ['GET']  
-   
     
 dashboard_home:
     path: /dashboard
@@ -107,7 +106,6 @@ dashboard_article_edit:
     path: /dashboard/article-edit/{id}
     controller: App\Controller\DashboardController::editArticle 
     methods: ['GET']
-
 
 dashboard_categories: 
     path: /dashboard/categories
@@ -137,6 +135,11 @@ dashboard_files:
 dashboard_images: 
     path: /dashboard/images
     controller: App\Controller\DashboardController::images 
+    methods: ['GET']
+    
+dashboard_images_edit: 
+    path: /dashboard/images-edit/{slug}
+    controller: App\Controller\DashboardController::editImages 
     methods: ['GET']
     
 dashboard_category_edit: 
@@ -170,7 +173,19 @@ category_get_by_ids:
     path: /category-get-by-ids
     controller: App\Controller\CategoryController::getCategoriesByIds 
     methods: ['POST']
-          
+       
+category_add_article_to_categories: 
+    path: /add-article-to-categories
+    controller: App\Controller\CategoryController::addArticleToCategories 
+    methods: ['POST']
+
+category_link_articles_to_categories: 
+    path: /link-article-to-categories
+    controller: App\Controller\CategoryController::linkArticlesToCategory 
+    methods: ['POST']
+
+# linkArticlesToCategory
+
 tag_get_all: 
     path: /tag-get-all
     controller: App\Controller\TagController::get 
@@ -191,3 +206,40 @@ tag_get_by_ids:
     controller: App\Controller\TagController::getTagsByIds 
     methods: ['POST']
  
+tag_add_article_to_tags: 
+    path: /add-article-to-tags
+    controller: App\Controller\TagController::addArticleToTags 
+    methods: ['POST']
+    
+image_add: 
+    path: /image-add
+    controller: App\Controller\ImagesController::addImage
+    methods: ['POST']
+
+image_get_group: 
+    path: /image-get-groups
+    controller: App\Controller\ImagesController::getGroups
+    methods: ['GET']
+    
+image_create_group: 
+    path: /image-create-group
+    controller: App\Controller\ImagesController::createGroupPost
+    methods: ['POST']
+
+image_get_group_images: 
+    path: /image-get-group-images/{slug}
+    controller: App\Controller\ImagesController::getGroupImages
+    methods: ['GET']
+
+image_upload: 
+    path: /image-upload
+    controller: App\Controller\ImagesController::upload
+    methods: ['POST']
+
+image_update_group_image_info: 
+    path: /image-update-group-info
+    controller: App\Controller\ImagesController::updateGroupInfoPost
+    methods: ['POST']
+
+
+

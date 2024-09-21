@@ -1,0 +1,406 @@
+<link rel="stylesheet" href="{{rootUrl}}/assets/vendor/trumbowyg/trumbowyg.min.css">
+<link rel="stylesheet" href="{{rootUrl}}/assets/vendor/trumbowyg/plugins/table/trumbowyg.table.min.css">
+<style>
+	#trumbowyg-element{
+		background: #ffffff;
+	}
+
+	.ds-categories-between{
+		display:flex; 
+		justify-content:space-between;
+		align-items: baseline;
+	}
+	
+	h6{
+		font-size: 13px;
+	}
+	
+	.ds-selected-table-item{
+		background: #0d6efd !important;
+		color: white !important;
+	}
+	
+	.ds-error{
+		border: 1px red solid !important;
+	}
+	
+	.trumbowyg-textarea{
+		font-size: 16px;
+		font-family: 'Consolas', 'Courier New', Courier, monospace;
+		line-height: 22px;
+	}
+	
+    
+    .sympa-modal{
+        background: #3e3e3ed1;
+    }
+    
+    
+</style>
+
+
+<h2>Create category</h2>
+
+<hr>
+<br><br>
+
+
+<div class="d-flex">
+
+    <div class="col-8">
+    
+    	<h6>Name:</h6>
+		<input class="form-control" id="ds-category-name" placeholder="" >
+		
+		<br>
+		<h6>Description:</h6>
+		<textarea class="form-control" id="ds-category-description" rows="3" maxlength="255" placeholder=""></textarea>
+		<br />
+        
+    	<h6>Image:</h6>
+        <div class="mb-3">
+           <input class="form-control" id="sympa-category-image-string-input" placeholder="" >
+        </div>
+
+<!--
+    	<h6>Image:</h6>
+        <div class="mb-3">
+           <input class="form-control" type="file" id="sympa-category-image-input" accept=".gif, .png, .jpg, .jpeg, .webp">
+        </div>
+-->
+
+    	<h6>Parent category:</h6>        
+        <div class="input-group mb-3">
+          <span class="input-group-text" onclick="sympa_openParentCategoryModal()" style="cursor:pointer">Select...</span>
+          <input readonly id="sympa-parent-category-input" type="text" class="form-control" placeholder="">
+        </div>
+		
+		<br />
+       
+        <div class="form-check form-switch">
+            <input id="sympa-visible-switch-category-input" class="form-check-input" type="checkbox" role="switch" id="ds-article-active" checked>
+            <label class="form-check-label" for="flexSwitchCheckChecked">Visible</label>
+        </div>
+			
+       <br />
+       <div onclick="sympa_publish()" class="btn btn-primary btn-lg" >Save</div>     
+		
+    </div>
+
+
+
+
+
+
+
+<div class="col-4">
+<!--
+<div class="accordion mx-2 mt-4" id="accordionExample">
+  <div class="accordion-item">
+    <h2 class="accordion-header">
+      <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+        Publish
+      </button>
+    </h2>
+    <div id="collapseOne" class="accordion-collapse collapse show" data-bs-parent="#accordionExample">
+      <div class="accordion-body">      
+          <div class="d-flex justify-content-between">  
+            <button type="button" class="btn btn-primary btn-lg">Create</button>
+            <button type="button" class="btn btn-primary btn-lg">Create</button>
+          </div>
+      </div>
+    </div>
+  </div>
+  <div class="accordion-item">
+    <h2 class="accordion-header">
+      <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
+        Categories
+      </button>
+    </h2>
+    <div id="collapseTwo" class="accordion-collapse collapse" data-bs-parent="#accordionExample">
+      <div class="accordion-body">
+        <strong>This is the second item's accordion body.</strong> It is hidden by default, until the collapse plugin adds the appropriate classes that we use to style each element. These classes control the overall appearance, as well as the showing and hiding via CSS transitions. You can modify any of this with custom CSS or overriding our default variables. It's also worth noting that just about any HTML can go within the <code>.accordion-body</code>, though the transition does limit overflow.
+      </div>
+    </div>
+  </div>
+  <div class="accordion-item">
+    <h2 class="accordion-header">
+      <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
+        Images
+      </button>
+    </h2>
+    <div id="collapseThree" class="accordion-collapse collapse" data-bs-parent="#accordionExample">
+      <div class="accordion-body">
+        <strong>This is the third item's accordion body.</strong> It is hidden by default, until the collapse plugin adds the appropriate classes that we use to style each element. These classes control the overall appearance, as well as the showing and hiding via CSS transitions. You can modify any of this with custom CSS or overriding our default variables. It's also worth noting that just about any HTML can go within the <code>.accordion-body</code>, though the transition does limit overflow.
+      </div>
+    </div>
+  </div>
+</div>
+-->
+</div>
+
+
+
+
+
+</div>
+
+
+
+
+
+
+
+
+
+
+<div class="modal sympa-modal" id="sympa-parent-category-modal" style="display:none;">
+  <div class="modal-dialog" >
+    <div class="modal-content" >
+      <div class="modal-header">
+        <h5 class="modal-title">Select category</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" onclick="document.getElementById('sympa-parent-category-modal').style.display='none'"></button>
+      </div>
+      <div class="modal-body" style="height: calc(100vh - 200px) !important; overflow:scroll;">
+        
+        <div id="sympa-parent-category-loading-modal" class="d-flex justify-content-center align-items-center h-100">
+            <div class="spinner-border" role="status">
+              <span class="visually-hidden">Loading...</span>
+            </div>
+       </div>
+      
+        <ul id="sympa-parent-category-ul-modal" class="list-group" style="display:none;">
+          <li class="sympa-category-select-list list-group-item">Empty list</li>
+        </ul>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" onclick="document.getElementById('sympa-parent-category-modal').style.display='none'">Cancel</button>
+        <button type="button" class="btn btn-primary" onclick="sympa_selectParentCategoryItemAction()">Select</button>
+      </div>
+
+	<div class="alert alert-warning alert-dismissible" role="alert" style="display:none; margin-bottom: 0;">
+	   <span id="sympa-bulk-delete-modal-message"> Hello</span> 
+	  <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close" ></button>
+	</div>
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+<script src="{{rootUrl}}/assets/vendor/jquery-3.6.0/jquery-3.6.0.min.js"></script>
+<script src="{{rootUrl}}/assets/vendor/slugify/slugify.min.js"></script> 
+<script src="{{rootUrl}}/assets/vendor/slugify/speakingurl.min.js"></script> 
+
+<script>
+
+
+
+
+//ARTICLE
+
+
+function sympa_getCategoryData()
+{      
+    let data = {};
+    data.image = document.getElementById("sympa-category-image-string-input").value;
+    data.name = document.getElementById("ds-category-name").value;
+    data.description = document.getElementById("ds-category-description").value;
+    data.parent = localStorage.getItem("sympa-category-parent-selected-item-id");
+    data.visible = document.getElementById("sympa-visible-switch-category-input").checked;                
+    
+    if (data.parent === null) data.parent = -1;
+    
+    return data;    
+}
+
+function sympa_validateCategoryData(data){       
+    if (data.name === null) return "The 'name' must be set. Internal error!";
+    
+    if (data.name.length >= 3 && data.name.length <= 255) {} 
+    else {
+        return "The 'name' string is not set or in the range of 3 to 255 symbols.";
+    }
+            
+    if (data.description.length >= 3 && data.description.length <= 255) {} 
+    else {
+        return "The 'description' string is not set or in the range of 3 to 255 symbols.";
+    }        
+        
+    if (data.image.length >= 3 && data.image.length <= 255) {} 
+    else {
+        return "The 'image' string is not set or in the range of 3 to 255 symbols.";
+    }        
+        
+    if (typeof data.visible === 'boolean') {} 
+    else {
+        return "The value 'visible' is not a boolean.";
+    }         
+    
+    if (Number.isInteger(parseInt(data.parent))) {} 
+    else {
+        return "The value 'parent' is not an integer.";
+    }
+
+    return null;
+}
+
+
+async function sympa_publish()
+{
+    let data = sympa_getCategoryData();    
+    let errorMessage = sympa_validateCategoryData(data);
+    
+    if (errorMessage){
+        sympa_message(errorMessage);
+        return null;
+    }
+        
+    var postData = new FormData();
+    
+    postData.append('name', data.name);
+	postData.append('description', data.description);
+	postData.append('parent', data.parent);
+	postData.append('active', data.active);
+	postData.append('image', data.image);
+    
+    const response = await fetch('/category-create', {
+		method: 'POST', 
+		body: postData,
+	});
+	
+	const jsonData = await response.json();
+	
+	if (jsonData.error) {
+		sympa_message(jsonData.message, 'warning');
+	}
+	else {
+		sympa_message('Category created!', 'success');
+		// setTimeout(function () {
+        //     window.location.reload();
+		// }, 2000);
+	}
+    
+
+}
+
+
+function sympa_selectParentCategoryItemAction(){
+    console.log("sympa_selectParentCategoryItemAction");
+    const name = localStorage.getItem("sympa-category-parent-selected-item-name");
+    const id = localStorage.getItem("sympa-category-parent-selected-item-id");
+    
+    document.getElementById("sympa-parent-category-input").value = name;   
+    document.getElementById("sympa-parent-category-input").title = "ID: "+ id;   
+    document.getElementById("sympa-parent-category-modal").style.display = "none";  
+}
+
+async function sympa_openParentCategoryModal(){
+    
+    const _createItem = function(item){
+        const name = item.name;
+        const id = item.id;
+        const description = item.description;
+        console.log(item);
+        return `<li onclick="sympa_toggleSelectedCategory(this)" 
+            class="sympa-category-select-list list-group-item" 
+            title="ID: ${id}\nDescription: ${description}"
+            data-id="${id}" data-name="${name}"
+            >${name}</li>`;
+    }
+    
+    document.getElementById("sympa-parent-category-modal").style.display = "block";   
+    // category-get-all
+    // sympa-parent-category-loading-modal
+    // sympa-parent-category-ul-modal
+    
+    const response = await fetch('/category-get-all?per-page=1000&page=1');
+    const jsonData = await response.json();
+	
+	if (jsonData.error) {
+		sympa_message(jsonData.message, 'warning');
+	}
+    
+    if (jsonData.total > 0){        
+        document.getElementById("sympa-parent-category-loading-modal").classList.add("d-none");
+        document.getElementById("sympa-parent-category-ul-modal").style.display = "block";
+        let htmlData = "";
+        for (const key in jsonData.categories) {
+            htmlData += _createItem(jsonData.categories[key]);
+        }
+        document.getElementById("sympa-parent-category-ul-modal").innerHTML = htmlData;
+    }
+    
+    
+    /*
+	else {
+		//sympa_message('Article created!', 'success');
+		setTimeout(function () {
+		//	window.location.reload();
+		}, 2000);
+	}
+    */
+    
+}
+
+
+
+
+function sympa_initStorageSettings(){  
+    document.getElementById("ds-category-name").value = "";
+    document.getElementById("ds-category-description").value = "";
+    document.getElementById("sympa-parent-category-input").value = "";
+   // document.getElementById("sympa-category-image-input").value = "";
+    document.getElementById("sympa-category-image-string-input").value = "";
+    
+    const name = localStorage.getItem("sympa-category-parent-selected-item-name");
+    const id = localStorage.getItem("sympa-category-parent-selected-item-id");
+          
+    let value = localStorage.getItem('sympa-category-parent-selected-item-name');
+    if (value) {   
+        localStorage.removeItem('sympa-category-parent-selected-item-name');
+    }     
+    
+    value = localStorage.getItem('sympa-category-parent-selected-item-id');
+    if (value) {        
+        localStorage.removeItem('sympa-category-parent-selected-item-id');
+    }
+    
+    
+}
+
+
+
+
+function sympa_toggleSelectedCategory(that){
+    document.querySelectorAll('.sympa-category-select-list').forEach(element => element.classList.remove('active'));
+    that.classList.toggle("active");
+    console.log(that);
+    const id = that.getAttribute("data-id");
+    const name = that.getAttribute("data-name");
+    
+    localStorage.setItem("sympa-category-parent-selected-item-name", name);
+    localStorage.setItem("sympa-category-parent-selected-item-id", id);
+}
+
+
+
+//MAIN
+window.addEventListener("load", async function(){
+    sympa_initStorageSettings();
+ 
+});
+
+
+
+</script>

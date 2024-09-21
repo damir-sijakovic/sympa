@@ -4,7 +4,7 @@ namespace App\Controller;
 
 use App\Entity\Tag;
 use App\Entity\Article;
-use App\Entity\ArticleCategory;
+use App\Entity\ArticleTag;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -190,6 +190,87 @@ class TagController extends AbstractController
         } catch (\Exception $e) {
             return $this->json(['error' => $e->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
+    }
+
+
+    public function addArticleToTags(Request $request): Response
+    {
+        $articleId = $request->request->get('article_id');
+        $tagIds = $request->request->get('tag_ids');
+
+        if (!$articleId) {
+            return $this->json([
+                'error' => true,
+                'message' => 'Article ID not provided',
+                'data' => null,
+            ], 400);
+        }
+        
+        if (!$tagIds){
+            $articleTags = $this->entityManager->getRepository(ArticleTag::class)->findBy(['article' => $articleId]);        
+            foreach ($articleTags as $articleTag) {
+                $this->entityManager->remove($articleTag);
+            }
+            $this->entityManager->flush();
+            return $this->json([
+                'error' => false,
+                'message' => 'Article linked to tags successfully',
+                'data' => null,
+            ], 200);            
+        }
+   
+            
+        $tagIdsArray = array_map('trim', explode(',', $tagIds));
+        $article = $this->entityManager->getRepository(Article::class)->find($articleId);
+
+        if (!$article) {
+            return $this->json([
+                'error' => true,
+                'message' => 'Article not found',
+                'data' => null,
+            ], 404);
+        }
+        
+        //delete old links
+        $articleTags = $this->entityManager->getRepository(ArticleTag::class)->findBy(['article' => $articleId]);        
+        foreach ($articleTags as $articleTag) {
+            $this->entityManager->remove($articleTag);
+        }
+
+        foreach ($tagIdsArray as $tagId) {
+            if (!is_numeric($tagId)) {
+                return $this->json([
+                    'error' => true,
+                    'message' => 'Invalid tag ID provided',
+                    'data' => null,
+                ], 400);
+            }
+
+            $tag = $this->entityManager->getRepository(Tag::class)->find($tagId);
+
+            if (!$tag) {
+                return $this->json([
+                    'error' => true,
+                    'message' => 'Tag with ID ' . $tagId . ' not found',
+                    'data' => null,
+                ], 404);
+            }
+ 
+            $articleTag = new ArticleTag();
+            $articleTag->setArticle($article);
+            $articleTag->setType('article');
+            $articleTag->setTag($tag);
+            $this->entityManager->persist($articleTag);
+            
+        }
+                
+        $this->entityManager->flush();
+
+        return $this->json([
+            'error' => false,
+            'message' => 'Article linked to categories successfully',
+            'data' => null,
+        ], 200);
     }
 
     

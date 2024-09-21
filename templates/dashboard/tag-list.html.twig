@@ -245,7 +245,9 @@ function sympa_drawList(data)
             </div>            
             <span class="text-success">
                 <div class="btn-group" role="group" aria-label="Basic outlined example">
+                 <!--
                   <div onclick="sympa_viewCategory(${id})" class="btn btn-primary btn-sm sympa-list-font" target="_blank">View</div>
+                  -->
                   <a href="/dashboard/tag-edit/${id}" class="btn btn-primary btn-sm sympa-list-font" target="_blank">Edit</a>
                   <div onclick="sympa_deleteArticleModal(${id})" class="btn btn-outline-primary btn-sm sympa-list-font">Delete</div>
                 </div>            
@@ -635,11 +637,11 @@ async function sympa_goAction(){
 }
 
 function sympa_viewCategory(id){
-    localStorage.setItem("sympa-article-list-view-mode", "category");
+    localStorage.setItem("sympa-article-list-view-mode", "tag");
     localStorage.setItem("sympa-article-list-value", id);
    // window.location.href = '/dashboard';
    // setTimeout(() => {
-        window.location.href = '/dashboard';
+       window.location.href = '/dashboard/articles';
   //  }, 2000);
 }
 

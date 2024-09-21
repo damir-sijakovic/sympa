@@ -147,27 +147,23 @@ class CategoryController extends AbstractController
 
             $categoryRepository = $this->entityManager->getRepository(Category::class);
 
-            // Create the query with filters
             $queryBuilder = $categoryRepository->createQueryBuilder('c');
 
-            // Apply the active filter if set
             if ($active === '1') {
                 $queryBuilder->andWhere('c.visible = :visible')->setParameter('visible', true);
             } elseif ($active === '0') {
                 $queryBuilder->andWhere('c.visible = :visible')->setParameter('visible', false);
             }
 
-            // Apply search filter to name or description
+
             if (!empty($search)) {
                 $queryBuilder->andWhere('c.name LIKE :search OR c.description LIKE :search')
                              ->setParameter('search', '%' . $search . '%');
             }
 
-            // First, count the total matching results
             $totalQuery = clone $queryBuilder;
             $totalCategories = count($totalQuery->getQuery()->getResult());
 
-            // Apply pagination and sorting
             $queryBuilder->orderBy('c.' . key($order), current($order))
                          ->setFirstResult($offset)
                          ->setMaxResults($perPage);
@@ -280,5 +276,154 @@ class CategoryController extends AbstractController
             return $this->json(['error' => $e->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     } 
+    
+    
+    public function addArticleToCategories(Request $request): Response
+    {
+        $articleId = $request->request->get('article_id');
+        $categoryIds = $request->request->get('category_ids');
+
+        if (!$articleId) {
+            return $this->json([
+                'error' => true,
+                'message' => 'Article ID not provided',
+                'data' => null,
+            ], 400);
+        }
+
+        if (!$categoryIds){
+            $articleCategories = $this->entityManager->getRepository(ArticleCategory::class)->findBy(['article' => $articleId]);        
+            foreach ($articleCategories as $articleCategory) {
+                $this->entityManager->remove($articleCategory);
+            }
+            $this->entityManager->flush();
+            return $this->json([
+                'error' => false,
+                'message' => 'Article linked to categories successfully',
+                'data' => null,
+            ], 200);            
+        }
+
+        $categoryIdsArray = array_map('trim', explode(',', $categoryIds));
+        $article = $this->entityManager->getRepository(Article::class)->find($articleId);
+
+        if (!$article) {
+            return $this->json([
+                'error' => true,
+                'message' => 'Article not found',
+                'data' => null,
+            ], 404);
+        }
+        
+        //delete old links
+        $articleCategories = $this->entityManager->getRepository(ArticleCategory::class)->findBy(['article' => $articleId]);        
+        foreach ($articleCategories as $articleCategory) {
+            $this->entityManager->remove($articleCategory);
+        }
+        
+        foreach ($categoryIdsArray as $categoryId) {
+            if (!is_numeric($categoryId)) {
+                return $this->json([
+                    'error' => true,
+                    'message' => 'Invalid category ID provided',
+                    'data' => null,
+                ], 400);
+            }
+
+            $category = $this->entityManager->getRepository(Category::class)->find($categoryId);
+
+            if (!$category) {
+                return $this->json([
+                    'error' => true,
+                    'message' => 'Category with ID ' . $categoryId . ' not found',
+                    'data' => null,
+                ], 404);
+            }
+
+            $articleCategory = new ArticleCategory();
+            $articleCategory->setArticle($article);
+            $articleCategory->setCategory($category);
+            $articleCategory->setType('article');
+            $this->entityManager->persist($articleCategory);            
+        }
+
+        $this->entityManager->flush();
+
+        return $this->json([
+            'error' => false,
+            'message' => 'Article linked to categories successfully',
+            'data' => null,
+        ], 200);
+    }
+
+    
+  
+    public function linkArticlesToCategory(Request $request): Response
+    {
+        $articleIds = $request->request->get('article_ids');
+        $categoryId = $request->request->get('category_id');
+
+        if (!$articleIds || !$categoryId) {
+            return $this->json([
+                'error' => true,
+                'message' => 'Article IDs or Category ID not provided',
+                'data' => null,
+            ], 400);
+        }
+
+        $articleIdsArray = array_map('trim', explode(',', $articleIds));
+
+        $category = $this->entityManager->getRepository(Category::class)->find($categoryId);
+
+        if (!$category) {
+            return $this->json([
+                'error' => true,
+                'message' => 'Category not found',
+                'data' => null,
+            ], 404);
+        }
+
+        foreach ($articleIdsArray as $articleId) {
+            if (!is_numeric($articleId)) {
+                return $this->json([
+                    'error' => true,
+                    'message' => 'Invalid article ID provided: ' . $articleId,
+                    'data' => null,
+                ], 400);
+            }
+
+            $article = $this->entityManager->getRepository(Article::class)->find($articleId);
+
+            if (!$article) {
+                return $this->json([
+                    'error' => true,
+                    'message' => 'Article with ID ' . $articleId . ' not found',
+                    'data' => null,
+                ], 404);
+            }
+
+            $existingArticleCategory = $this->entityManager->getRepository(ArticleCategory::class)
+                ->findOneBy(['article' => $article, 'category' => $category]);
+
+            if (!$existingArticleCategory) {
+                $articleCategory = new ArticleCategory();
+                $articleCategory->setArticle($article);
+                $articleCategory->setCategory($category);
+                $articleCategory->setType('article');
+                $this->entityManager->persist($articleCategory);
+            }
+        }
+
+        $this->entityManager->flush();
+
+        return $this->json([
+            'error' => false,
+            'message' => 'Articles linked to category successfully',
+            'data' => null,
+        ], 200);
+    }
+  
+  
+  
     
 };

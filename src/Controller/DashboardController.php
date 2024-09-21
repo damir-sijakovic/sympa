@@ -11,6 +11,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\RouterInterface;
 
+use DirectoryIterator;
 use App\Helper\UtilityHelper;
 
 class DashboardController extends AbstractController
@@ -82,7 +83,7 @@ class DashboardController extends AbstractController
             'content' => $article->getContent(),
             'image' => $article->getImage(),
             'type' => $article->getType(),
-            'active' => $article->isActive() ? 'yes' : 'no',
+            'active' => $article->isActive() ? 'true' : 'false',
             'id' => $id
         ]);
 		
@@ -93,6 +94,8 @@ class DashboardController extends AbstractController
         ]);
     }
   
+  
+
   
     
     public function createArticle(Request $request): Response
@@ -278,6 +281,43 @@ class DashboardController extends AbstractController
     }
   
 
+
+    public function editImages(Request $request, $slug): Response
+    {         
+        $session = $request->getSession();	
+        $imagesUrl = $this->utilityHelper->getRootUrl() . '/uploads/images';
+        
+		$body = $this->renderView('dashboard/images-edit.html.twig', [
+			'rootUrl' => $this->utilityHelper->getRootUrl(),
+			'slug' => $slug,
+			'imagesUrl' => $imagesUrl,
+        ]);
+		
+        return $this->render('dashboard/main.html.twig', [ 
+            'userId' => $session->get('userId'),           
+			'rootUrl' => $this->utilityHelper->getRootUrl(),
+            'body' => $body,
+        ]);
+    }
+  
+  
+  
+    /*
+        THE MOST COMMON WEB IMAGE THUMBNAIL SIZES ARE:
+
+        Small Thumbnail: 150px x 150px
+        This is a very common size for small thumbnails or icons on websites.
+
+        Medium Thumbnail: 300px x 300px
+        This is a popular size for product thumbnails, blog post thumbnails, and other medium-sized thumbnails on websites.
+
+        Large Thumbnail: 600px x 600px
+        This size is often used for larger thumbnails, such as featured images on blog posts or product images on e-commerce sites.
+
+        Extra-Large Thumbnail: 1200px x 1200px
+        This size is typically used for high-resolution thumbnails, such as hero images or gallery thumbnails that need to look sharp on high-DPI displays.
+    */
+    
     
     
     

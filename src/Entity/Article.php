@@ -204,6 +204,11 @@ class Article
         return $this->active;
     }
 
+    public function getActive(): ?bool
+    {
+        return $this->active;
+    }
+
     public function setActive(bool $active): static
     {
         $this->active = $active;

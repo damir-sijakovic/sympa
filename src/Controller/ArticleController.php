@@ -29,6 +29,7 @@ class ArticleController extends AbstractController
         $this->slugger = $slugger;
 	}        
      
+     
     private function _getArticleCategoryAndTagIds(Article $article): array
     {
         $articleCategories = $this->entityManager->getRepository(ArticleCategory::class)->findBy(['article' => $article]);
@@ -42,6 +43,7 @@ class ArticleController extends AbstractController
             'tagIds' => $tagIds,
         ];
     } 
+        
      
     private function _removeArticleLinks(Article $article): void
     {
@@ -60,6 +62,7 @@ class ArticleController extends AbstractController
         // Persist and flush changes
         $this->entityManager->flush();
     }
+    
     
     public function getArticleCategoryAndTagIds(Request $request, $id): Response
     {
@@ -98,57 +101,108 @@ class ArticleController extends AbstractController
     } 
     
     
-    public function removeArticleCategoryLinksPost(Request $request, $id): void
+    public function removeArticleCategoryLinksPost(Request $request): Response
     {        
-        $id = $request->request->getInt('id'); 
-        if (!$id)
-        {
-            throw new NotFoundHttpException('The id article was not found.');
+        $ids = $request->request->get('ids'); 
+        
+        // Check if 'ids' is provided
+        if (!$ids) {
+            throw new NotFoundHttpException('The article IDs were not found.');
         }
         
+        // Convert the 'ids' string into an array of integers
+        $idsArray = array_map('trim', explode(',', $ids));
+
+        // Validate that each ID is numeric
+        foreach ($idsArray as $id) {
+            if (!is_numeric($id)) {
+                throw new NotFoundHttpException('Invalid article ID: ' . $id);
+            }
+        }
+
         $articleRepository = $this->entityManager->getRepository(Article::class);
-        $article = $articleRepository->findOneBy(['id' => $id]);
         
-        if (!$article) 
-        {
-            throw new NotFoundHttpException('The article was not found.');
+        $categoryIds = [];       
+
+        foreach ($idsArray as $id) {
+            // Find the article
+            $article = $articleRepository->findOneBy(['id' => $id]);
+            
+            if (!$article) {
+                throw new NotFoundHttpException('The article with ID ' . $id . ' was not found.');
+            }
+
+            // Find and remove all associated ArticleCategory links
+            $articleCategories = $this->entityManager->getRepository(ArticleCategory::class)->findBy(['article' => $article]);
+            foreach ($articleCategories as $articleCategory) {
+                $categoryIds[] = $articleCategory->getId(); // Collect the category ID
+                $this->entityManager->remove($articleCategory);
+            }            
+          
+        }
+
+        // Flush the changes to the database
+        $this->entityManager->flush();
+
+        // Return the JSON response
+        return $this->json([
+            'data' => ['categoryIds' => $categoryIds],
+            'error' => false,
+            'message' => '',
+        ], 200);
+    }
+
+    
+       
+    public function removeArticleTagLinksPost(Request $request): Response
+    {        
+        $ids = $request->request->get('ids'); 
+        
+        // Check if 'ids' is provided
+        if (!$ids) {
+            throw new NotFoundHttpException('The article IDs were not found.');
         }
         
-        $articleCategories = $this->entityManager->getRepository(ArticleCategory::class)->findBy(['article' => $article]);
-        foreach ($articleCategories as $articleCategory) {
-            $this->entityManager->remove($articleCategory);
+        $idsArray = array_map('trim', explode(',', $ids));
+
+        foreach ($idsArray as $id) {
+            if (!is_numeric($id)) {
+                throw new NotFoundHttpException('Invalid article ID: ' . $id);
+            }
+        }
+
+        $articleRepository = $this->entityManager->getRepository(Article::class);
+        
+        $tagIds = []; 
+
+        foreach ($idsArray as $id) {
+            $article = $articleRepository->findOneBy(['id' => $id]);            
+            if (!$article) {
+                throw new NotFoundHttpException('The article with ID ' . $id . ' was not found.');
+            }
+
+            $articleTags = $this->entityManager->getRepository(ArticleTag::class)->findBy(['article' => $article]);
+            foreach ($articleTags as $articleTag) {
+                $tagIds[] = $articleTag->getId(); // Collect the tag ID
+                $this->entityManager->remove($articleTag);
+            }
         }
 
         $this->entityManager->flush();
+
+        return $this->json([
+            'data' => ['tagIds' => $tagIds],
+            'error' => false,
+            'message' => '',
+        ], 200);
     }
+
+    
+    
     
      
-    public function removeArticleTagLinksPost(Request $request, $id): void
-    {
-        $id = $request->request->getInt('id'); 
-        if (!$id)
-        {
-            throw new NotFoundHttpException('The id article was not found.');
-        }
-        
-        $articleRepository = $this->entityManager->getRepository(Article::class);
-        $article = $articleRepository->findOneBy(['id' => $id]);
-        
-        if (!$article) 
-        {
-            throw new NotFoundHttpException('The article was not found.');
-        }
-        
-        $articleTags = $this->entityManager->getRepository(ArticleTag::class)->findBy(['article' => $article]);
-        foreach ($articleTags as $articleTag) {
-            $this->entityManager->remove($articleTag);
-        }
-
-        $this->entityManager->flush();
-    }
-     
-     
-     
+ 
+          
     
     public function getByIdPost(Request $request, $id): Response
     {
@@ -165,6 +219,7 @@ class ArticleController extends AbstractController
             "content" => $article->getContent(),
         ]);	      
     }
+    
     
     public function deleteArticleByIdPost(Request $request): Response
     {
@@ -193,93 +248,93 @@ class ArticleController extends AbstractController
     
     
     
- public function getArticlesPost(Request $request): Response
-{
-    try {
-        $perPage = $request->query->getInt('per-page', 10);
-        $page = $request->query->getInt('page', 1);
-        $sort = $request->query->get('sort', 'desc'); // Default sort order is descending
-        $active = $request->query->get('active'); // Get the active parameter
-        $search = $request->query->get('search'); // Get the search parameter
-        $category = $request->query->get('category'); // Get the category parameter
-        $tag = $request->query->get('tag'); // Get the tag parameter
-        $offset = ($page - 1) * $perPage;
+    public function getArticlesPost(Request $request): Response
+    {
+        try {
+            $perPage = $request->query->getInt('per-page', 10);
+            $page = $request->query->getInt('page', 1);
+            $sort = $request->query->get('sort', 'desc'); // Default sort order is descending
+            $active = $request->query->get('active'); // Get the active parameter
+            $search = $request->query->get('search'); // Get the search parameter
+            $category = $request->query->get('category'); // Get the category parameter
+            $tag = $request->query->get('tag'); // Get the tag parameter
+            $offset = ($page - 1) * $perPage;
 
-        // Determine the sorting order based on the "sort" parameter
-        if ($sort === 'id-asc') {
-            $order = ['id' => 'ASC'];
-        } elseif ($sort === 'id-desc') {
-            $order = ['id' => 'DESC'];
-        } else {
-            // Default to sorting by createdAt
-            $order = ($sort === 'asc') ? ['createdAt' => 'ASC'] : ['createdAt' => 'DESC'];
+            // Determine the sorting order based on the "sort" parameter
+            if ($sort === 'id-asc') {
+                $order = ['id' => 'ASC'];
+            } elseif ($sort === 'id-desc') {
+                $order = ['id' => 'DESC'];
+            } else {
+                // Default to sorting by createdAt
+                $order = ($sort === 'asc') ? ['createdAt' => 'ASC'] : ['createdAt' => 'DESC'];
+            }
+
+            $articleRepository = $this->entityManager->getRepository(Article::class);
+
+            // Create criteria for the query, including active filter and type "article"
+            $queryBuilder = $articleRepository->createQueryBuilder('a')
+                ->where('a.type = :type')
+                ->setParameter('type', 'article');
+
+            if ($active === '1') {
+                $queryBuilder->andWhere('a.active = :active')->setParameter('active', true);
+            } elseif ($active === '0') {
+                $queryBuilder->andWhere('a.active = :active')->setParameter('active', false);
+            }
+
+            if (!empty($search)) {
+                $queryBuilder->andWhere('a.title LIKE :search OR a.excerpt LIKE :search')
+                             ->setParameter('search', '%' . $search . '%');
+            }
+
+            if (!empty($category)) {
+                // Join with ArticleCategory entity to filter by category
+                $queryBuilder->join('App\Entity\ArticleCategory', 'ac', 'WITH', 'ac.article = a')
+                             ->andWhere('ac.category = :category')
+                             ->setParameter('category', $category);
+            }
+
+            if (!empty($tag)) {
+                // Join with ArticleTag entity to filter by tag
+                $queryBuilder->join('App\Entity\ArticleTag', 'at', 'WITH', 'at.article = a')
+                             ->andWhere('at.tag = :tag')
+                             ->setParameter('tag', $tag);
+            }
+
+            // First count all results that match the criteria
+            $totalQuery = clone $queryBuilder;
+            $totalArticles = count($totalQuery->getQuery()->getResult());
+
+            // Apply pagination and sorting
+            $queryBuilder->orderBy('a.' . key($order), current($order))
+                         ->setFirstResult($offset)
+                         ->setMaxResults($perPage);
+
+            $articles = $queryBuilder->getQuery()->getResult();
+
+            $articleData = [];
+            foreach ($articles as $article) {
+                $articleData[] = [
+                    'id' => $article->getId(),
+                    'title' => $article->getTitle(),
+                    'excerpt' => $article->getExcerpt(),
+                    'content' => $article->getContent(),
+                    'slug' => $article->getSlug(),
+                    'image' => $article->getImage(),
+                    'created_at' => $article->getCreatedAt()->format('Y-m-d H:i:s'),
+                    'modified_at' => $article->getModifiedAt() ? $article->getModifiedAt()->format('Y-m-d H:i:s') : null,
+                    'active' => $article->isActive(),
+                ];
+            }
+
+            $paginateData = $this->utilityHelper->paginate($totalArticles, $perPage, $page, 3); // 3 = visible pages
+
+            return $this->json(['total' => $totalArticles, 'articles' => $articleData, 'paginateData' => $paginateData]);
+        } catch (\Exception $e) {
+            return $this->json(['error' => $e->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
-
-        $articleRepository = $this->entityManager->getRepository(Article::class);
-
-        // Create criteria for the query, including active filter and type "article"
-        $queryBuilder = $articleRepository->createQueryBuilder('a')
-            ->where('a.type = :type')
-            ->setParameter('type', 'article');
-
-        if ($active === '1') {
-            $queryBuilder->andWhere('a.active = :active')->setParameter('active', true);
-        } elseif ($active === '0') {
-            $queryBuilder->andWhere('a.active = :active')->setParameter('active', false);
-        }
-
-        if (!empty($search)) {
-            $queryBuilder->andWhere('a.title LIKE :search OR a.excerpt LIKE :search')
-                         ->setParameter('search', '%' . $search . '%');
-        }
-
-        if (!empty($category)) {
-            // Join with ArticleCategory entity to filter by category
-            $queryBuilder->join('App\Entity\ArticleCategory', 'ac', 'WITH', 'ac.article = a')
-                         ->andWhere('ac.category = :category')
-                         ->setParameter('category', $category);
-        }
-
-        if (!empty($tag)) {
-            // Join with ArticleTag entity to filter by tag
-            $queryBuilder->join('App\Entity\ArticleTag', 'at', 'WITH', 'at.article = a')
-                         ->andWhere('at.tag = :tag')
-                         ->setParameter('tag', $tag);
-        }
-
-        // First count all results that match the criteria
-        $totalQuery = clone $queryBuilder;
-        $totalArticles = count($totalQuery->getQuery()->getResult());
-
-        // Apply pagination and sorting
-        $queryBuilder->orderBy('a.' . key($order), current($order))
-                     ->setFirstResult($offset)
-                     ->setMaxResults($perPage);
-
-        $articles = $queryBuilder->getQuery()->getResult();
-
-        $articleData = [];
-        foreach ($articles as $article) {
-            $articleData[] = [
-                'id' => $article->getId(),
-                'title' => $article->getTitle(),
-                'excerpt' => $article->getExcerpt(),
-                'content' => $article->getContent(),
-                'slug' => $article->getSlug(),
-                'image' => $article->getImage(),
-                'created_at' => $article->getCreatedAt()->format('Y-m-d H:i:s'),
-                'modified_at' => $article->getModifiedAt() ? $article->getModifiedAt()->format('Y-m-d H:i:s') : null,
-                'active' => $article->isActive(),
-            ];
-        }
-
-        $paginateData = $this->utilityHelper->paginate($totalArticles, $perPage, $page, 3); // 3 = visible pages
-
-        return $this->json(['total' => $totalArticles, 'articles' => $articleData, 'paginateData' => $paginateData]);
-    } catch (\Exception $e) {
-        return $this->json(['error' => $e->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR);
     }
-}
 
 
 
@@ -381,7 +436,7 @@ class ArticleController extends AbstractController
         if (!$ids) {
             return $this->json([
                 'error' => true,
-                'message' => 'No IDs provided',
+                'message' => 'No IDs provided.',
                 'data' => null
             ], 400);
         }
@@ -393,7 +448,7 @@ class ArticleController extends AbstractController
             if (!is_numeric($id)) {
                 return $this->json([
                     'error' => true,
-                    'message' => 'Invalid ID format',
+                    'message' => 'Invalid ID format.',
                     'data' => null
                 ], 400);
             }
@@ -405,7 +460,7 @@ class ArticleController extends AbstractController
         if (!$articles) {
             return $this->json([
                 'error' => true,
-                'message' => 'No articles found for the provided IDs',
+                'message' => 'No articles found for the provided IDs.',
                 'data' => null
             ], 404);
         }
@@ -433,7 +488,7 @@ class ArticleController extends AbstractController
 
         return $this->json([
             'error' => false,
-            'message' => 'Articles deleted successfully',
+            'message' => 'Articles deleted successfully.',
             'data' => null
         ], 200);
     }
@@ -461,7 +516,7 @@ class ArticleController extends AbstractController
         if (!$ids) {
             return $this->json([
                 'error' => true,
-                'message' => 'No ID\'s provided', 
+                'message' => 'No ID\'s provided.', 
                 'data' => 'user-not-logged-on'
             ], 400);
         }
@@ -473,7 +528,7 @@ class ArticleController extends AbstractController
             if (!is_numeric($id)) {
                 return $this->json([
                     'error' => true,
-                    'message' => 'No ID\'s provided', 
+                    'message' => 'No ID\'s provided.', 
                     'data' => 'user-not-logged-on'
                 ], 400);
             }
@@ -484,7 +539,7 @@ class ArticleController extends AbstractController
         if (!$articles) {
             return $this->json([
                 'error' => true,
-                'message' => 'No article\'s by ID found', 
+                'message' => 'No article\'s by ID found.', 
                 'data' => 'no-articles-by-id-found'
             ], 404);
         }
@@ -524,7 +579,7 @@ class ArticleController extends AbstractController
         if (empty($title) || strlen($title)<3 ) {
 			return $this->json([
                 'error' => true, 
-                'message' => 'Title too short', 
+                'message' => 'Title too short.', 
                 'data' => null
             ]);
 		}
@@ -533,13 +588,15 @@ class ArticleController extends AbstractController
 		if ($existingArticle){
 			return $this->json([
                 'error' => true, 
-                'message' => 'A article with the same title already exists', 
+                'message' => 'A article with the same title already exists.', 
                 'data' => null
             ], 409);
 		}
         
         $article = new Article();
 		
+        $active = ($request->request->get('active') === "true");
+        
 		$article->setTitle($title)
 			 ->setSlug($slug)
 			 ->setContent($contentNoEscape)
@@ -549,19 +606,91 @@ class ArticleController extends AbstractController
 			 ->setAuthor("administrator")
 			 ->setCreatedAt(new \DateTimeImmutable())
 			 ->setModifiedAt(new \DateTimeImmutable())
-			 ->setActive($request->request->get('active', true)); // Default to true if not set
+			 ->setActive($active); // Default to true if not set
 
 		$this->entityManager->persist($article);
         $this->entityManager->flush();
         
+        $articleId = $article->getId();
+     
         return $this->json([
             'error' => false,
-            'message' => 'Post added successfully',
-            'data' => null,
+            'message' => 'Post added successfully.',
+            'data' => ['article_id' => $articleId],
         ], 201);    
 	}
+
     
+    public function updatePost(Request $request): Response
+    {
+        $id = $request->request->get('id');
+      
+        $article = $this->entityManager->getRepository(Article::class)->find($id);
+
+        if ($article === null) {
+            return $this->json([
+                'error' => true,
+                'message' => 'Article not found.',
+                'data' => null,
+            ], 404);
+        }
+
+        $title = $request->request->get('title');
+        $slug = strtolower($this->slugger->slug($title)->toString());
+        $excerpt = $request->request->get('excerpt');
+        $content = $request->request->get('content');
+        $contentNoEscape = $this->utilityHelper->removeNewLines($content);
+        
+       
     
+        if (empty($title) || strlen($title) < 3) {
+            return $this->json([
+                'error' => true,
+                'message' => 'Title too short.',
+                'data' => null,
+            ]);
+        }
+
+/*
+        $existingArticle = $this->entityManager->getRepository(Article::class)->createQueryBuilder('a')
+            ->where('a.id != :id')
+            ->andWhere('a.title = :title OR a.slug = :slug')
+            ->setParameter('id', $id)
+            ->setParameter('title', $title)
+            ->setParameter('slug', $slug)
+            ->getQuery()
+            ->getOneOrNullResult();
+
+        if ($existingArticle) {
+            return $this->json([
+                'error' => true,
+                'message' => 'An article with the same title or slug already exists.',
+                'data' => null,
+            ], 409);
+        }
+*/
+
+        $active = ($request->request->get('active') === "true");
+
+        $article->setTitle($title)
+            ->setSlug($slug)
+            ->setContent($contentNoEscape)
+            ->setExcerpt($excerpt)
+            ->setModifiedAt(new \DateTimeImmutable())
+            ->setActive($active); 
+
+        $this->entityManager->flush();
+
+        $articleId = $article->getId();
+
+        return $this->json([
+            'error' => false,
+            'message' => 'Post updated successfully.',
+            'data' => ['article_id' => $articleId],
+        ], 201);   
+    }
+
+        
     public function viewById(Request $request, $id): Response
 	{          
 		$htmlTemplate = $this->renderView('/pages/home.html.twig', [

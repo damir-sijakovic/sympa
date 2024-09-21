@@ -1,3 +1,12 @@
+0.2.0.1726952403
+=====
+Added "Images" to dashboard, this section provides ability to create image groups (for galeries and sliders)
+with thumbnail sizes 200x200 and 400x400 and all images are converted to webp format.
+Also there is now "dropzone" library included for drag and drop uploads.
+Edit article - fixing bugs
+Create article - fixing bugs
+Tag list - fixing bugs
+
 0.1.9.1726520429
 =====
 "Create article" tag and category pills.

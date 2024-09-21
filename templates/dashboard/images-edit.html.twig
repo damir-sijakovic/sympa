@@ -1,0 +1,530 @@
+<link rel="stylesheet" href="{{rootUrl}}/assets/vendor/dropzone-v6.0.0-beta.2/dropzone.css">
+
+<style>
+.sympa-bulk-actions, .sympa-list-options{
+    display:flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column; 
+    flex-direction: row;
+    white-space: nowrap;
+}
+
+#sympa-list-titlebar, #sympa-list-bottom-bar{
+    font-size: 12px !important;
+     font-weight: 500;
+     background: #eeeeee;
+}
+
+
+.sympa-toolbar-font{
+    font-size: 12px !important;
+}
+
+.sympa-list-font{
+    font-size: 12px !important;
+    font-weight: 500;
+}
+
+.sympa-modal{
+    background: #3e3e3ed1;
+}
+
+.sympa-image-container{
+    height:64px; 
+    width:64px; 
+    background:#666; 
+    border-radius: 6px; 
+    overflow: clip;    
+    background-image: linear-gradient(45deg, #a1a1a1 25%, #737373 25%, #737373 50%, #a1a1a1 50%, #a1a1a1 75%, #737373 75%, #737373 100%);
+    background-size: 14.14px 14.14px;    
+    box-shadow: rgba(0, 0, 0, 0.12) 0px 1px 3px, rgba(0, 0, 0, 0.24) 0px 1px 2px;
+}
+
+.sympa-image-container-text{
+    
+}
+
+
+.modal-dialog{
+    max-width: 80% !important;
+}
+
+#my-dropzone{
+    border: 4px dashed lightgray;
+}
+
+</style>
+
+
+
+<h2 id="sympa-title">My group</h2>
+
+<p class="lead">{{slug}}</p>
+<hr>
+
+<div class="btn-group" role="group" aria-label="Basic example">
+  <div onclick="sympa_openUploadModalAction()" class="btn btn-primary btn-sm"><i class="bi bi-plus-circle mx-1"></i>Upload images</div>
+  <!--button type="button" class="btn btn-outline-primary btn-sm" onclick="sympa_reset()"> <i class="bi bi-search"></i> Search</button-->
+</div>
+
+<br><br>
+
+
+<div id="sympa-no-image-list" class="alert alert-primary" role="alert" style="display:none">
+  No images found!
+</div>
+
+
+<div id="sympa-main-content">
+
+<ul id="sympa-image-list" class="list-group mb-3">
+    
+    <!--
+        <li id="sympa-list-titlebar" class="list-group-item d-flex justify-content-between">             
+			<div>
+                <div class="sympa-bulk-actions">
+                    <div>
+                    <input style="margin-right: 1rem;" class="form-check-input" type="checkbox" onclick="sympa_tableCheck(this.checked)">
+                    </div>     
+                    <select class="form-select sympa-toolbar-font" aria-label="Default select example">
+                      <option value="-1" selected>Bulk actions...</option>
+                      <option value="1">Delete items</option>
+                    </select>
+                    <div onclick="sympa_applyBulk()" class="btn btn-light btn-sm sympa-toolbar-font">Apply</div>
+                </div>                
+                
+            </div>
+			<div class="d-flex">
+            
+                <button data="" style="display:none" onclick="sympa_openSetListValueModal()" id="sympa-list-value-button" type="button" class="btn btn-light btn-sm sympa-toolbar-font">Enter value...</button>
+                            
+                <div class="sympa-list-options mx-1">                    
+                    <select id="sympa-select-right-sort" class="form-select sympa-toolbar-font" aria-label="Default select example">
+                      <option selected onclick="sympa_changeListSort(this)" value="newest">Newest</option>
+                      <option onclick="sympa_changeListMode(this)" value="oldest">Oldest</option>                
+                    </select>
+                    <button onclick="sympa_goAction()" type="button" class="btn btn-light btn-sm sympa-toolbar-font">Go</button>
+                </div>
+             
+            </div>
+        </li> 
+        
+         
+         
+        
+         <li class="list-group-item d-flex justify-content-between bg-body-tertiary" title="ID: ${id} \nCreated: ${createdAt}\nModified: ${modifiedAt}" data-id="${id}">
+            <div class="d-flex gap-3">                
+                <input class="form-check-input sympa-bulk-checkbox" type="checkbox">
+                <div class="d-flex justify-content-center align-items-center gap-1">  
+                
+                    <div class="d-flex justify-content-center align-items-center sympa-image-container">  
+                        <img loading="lazy" src="{{rootUrl}}/uploads/images/group-one/image-one/image-0.png" style="height:64px"/>
+                    </div>
+                    
+                    <div class="sympa-image-container-text">
+                        <div style="display: flex;"> <h6 class="my-0">${name}</h6></div>  
+                        <small>${description}</small>
+                    </div>
+                </div>
+            </div>            
+            <span class="text-success">
+                <div class="btn-group" role="group" aria-label="Basic outlined example">                  
+                  <a href="/dashboard/category-edit/${id}" class="btn btn-primary btn-sm sympa-list-font" target="_blank">View</a>
+                  <div onclick="sympa_deleteArticleModal(${id})" class="btn btn-outline-primary btn-sm sympa-list-font">Delete</div>
+                </div>            
+            </span>
+          </li>
+        
+        
+                
+        
+         <li class="list-group-item d-flex justify-content-between bg-body-tertiary" title="ID: ${id} \nCreated: ${createdAt}\nModified: ${modifiedAt}" data-id="${id}">
+            <div class="d-flex gap-3">                
+                <input class="form-check-input sympa-bulk-checkbox" type="checkbox">
+                <div class="d-flex justify-content-center align-items-center gap-1">  
+                
+                    <div class="d-flex justify-content-center align-items-center sympa-image-container">  
+                        <img loading="lazy" src="{{rootUrl}}/uploads/images/group-one/image-two/image-0.jpg" style="height:64px"/>
+                    </div>
+                    
+                    <div class="sympa-image-container-text">
+                        <div style="display: flex;"> <h6 class="my-0">${name}</h6></div>  
+                        <small>${description}</small>
+                    </div>
+                </div>
+            </div>            
+            <span class="text-success">
+                <div class="btn-group" role="group" aria-label="Basic outlined example">                  
+                  <a href="/dashboard/category-edit/${id}" class="btn btn-primary btn-sm sympa-list-font" target="_blank">View</a>
+                  <div onclick="sympa_deleteArticleModal(${id})" class="btn btn-outline-primary btn-sm sympa-list-font">Delete</div>
+                </div>            
+            </span>
+          </li>
+              
+              
+        <li class="list-group-item d-flex justify-content-between" id="sympa-list-bottom-bar">
+            <div>Total: <span id="sympa-total-articles"></span> </div>
+            <div id="sympa-bottom-right-message">::</div>
+        </li> 
+    
+    
+    -->
+    
+</ul>
+
+
+</div>
+
+
+
+
+
+
+
+
+<div class="modal sympa-modal" id="sympa-upload-modal" style="display:none;">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="btn btn-outline-primary btn-lg m-1" onclick="sympa_uploadModalAction()">Upload</button>
+        <button type="button" class="btn btn-outline-primary btn-lg m-1" onclick="sympa_uploadRemoveSelected()">Clear</button>
+
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" onclick="sympa_uploadModalClose()"></button>
+      </div>
+      <div class="modal-body">
+        
+        <form action="/image-upload" class="dropzone" id="my-dropzone">
+            <div class="dz-message" data-dz-message><span>Drop files here or click to upload</span></div>
+        </form>       
+
+      </div>      
+      
+      
+	<div class="alert alert-warning alert-dismissible" role="alert" style="display:none; margin-bottom: 0;">
+        <span id="sympa-upload-modal-message">...</span> 
+        <button type="button" class="btn-close" onclick="this.parentElement.style.display='none'" ></button>
+	</div>
+    
+    </div>
+  </div>
+</div>
+
+
+
+
+
+
+
+
+
+<div class="modal sympa-modal" id="sympa-edit-image-info-modal" style="display:none;">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Edit image properties</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" onclick="document.getElementById('sympa-edit-image-info-modal').style.display='none'"></button>
+      </div>
+      <div class="modal-body">
+        
+      <div class="mb-3">
+        <p class="m-0">Name:</p>
+        <input type="text" class="form-control" id="sympa-edit-image-info-modal-name-input" aria-describedby="">
+      </div>
+
+      <div class="mb-3">
+        <p class="m-0">Description:</p>
+        <textarea class="form-control" id="sympa-edit-image-info-modal-description-input" rows="3"></textarea>
+      </div>
+
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary" onclick="sympa_saveEditImageInfoAction()">Save</button>
+      </div>
+
+	<div class="alert alert-warning alert-dismissible" role="alert" style="display:none; margin-bottom: 0;">
+	   <span id="sympa-create-modal-message">...</span> 
+	  <button type="button" class="btn-close" onclick="this.parentElement.style.display='none'" ></button>
+	</div>
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+
+
+
+
+<script src="{{rootUrl}}/assets/vendor/dropzone-v6.0.0-beta.2/dropzone-min.js"></script>
+
+<script>
+
+let myDropzone = new Dropzone("#my-dropzone", { 
+        url: "/image-upload",
+        paramName: "file",
+        autoProcessQueue: false,
+        maxFilesize: 2, // Maximum file size in MB
+        acceptedFiles: ".jpeg,.jpg,.png,.gif,.bmp,.webp", // Limit accepted file types
+        parallelUploads: 10, // Number of files to upload in parallel
+        maxFiles: null, // No limit on the total number of files
+        init: function() {
+            this.on("sending", function(file, xhr, formData){
+                formData.append("slug", "{{slug}}");
+            });
+        }
+    });
+
+
+function sympa_openUploadModalAction(){
+    document.getElementById("sympa-upload-modal").style.display = 'block';
+    myDropzone.removeAllFiles(true);
+}
+
+function sympa_uploadModalAction(){
+    myDropzone.processQueue();
+}
+
+function sympa_uploadRemoveSelected(){
+    myDropzone.removeAllFiles(true);
+}
+
+function sympa_saveEditImageInfoAction(){
+    console.log("sympa_saveEditImageInfoAction");
+}
+
+function sympa_uploadModalClose(){
+    document.getElementById('sympa-upload-modal').style.display='none';
+    sympa_message("Image(s) uploaded!", "success");
+    setTimeout(function () {
+        window.location.reload();
+    }, 2000);
+}
+
+////
+
+function sympa_copyToClipboard(text) {
+    const tempInput = document.createElement("input");
+    tempInput.value = text;
+    document.body.appendChild(tempInput);
+    tempInput.select();
+    document.execCommand("copy");
+    document.body.removeChild(tempInput);
+    sympa_message("Text copied: " + text, "success");
+}
+
+
+function sympa_drawList(data)
+{      
+    let _createItem = function(x){
+       
+        let name = x.name;
+        let group = x.group;
+        let description = x.description;
+        let slug = x.slug;
+        let url = x.url;
+        
+        /*
+        description: "test"​​​​
+        group: "group-one"​​​​
+        name: "Image one"​​​​
+        slug: "image-one"​​​​
+        url: "http:
+        */
+        
+        return `
+         <li class="list-group-item d-flex justify-content-between bg-body-tertiary" title="${description}">
+            <div class="d-flex gap-3">                
+                <input class="form-check-input sympa-bulk-checkbox" type="checkbox">
+                <div class="d-flex justify-content-center align-items-center gap-1">  
+                
+                    <div class="d-flex justify-content-center align-items-center sympa-image-container">  
+                        <img loading="lazy" src="${url}/200.webp" style="height:64px"/>
+                    </div>
+                    
+                    <div class="sympa-image-container-text">
+                        <div style="display: flex;"> <h6 class="my-0">${name}</h6></div>  
+                        <small>${description}</small>
+                    </div>
+                </div>
+            </div>            
+            <span class="text-success">
+                <div class="btn-group" role="group" aria-label="Basic outlined example"> 
+                   <!--              
+                  <div onclick="sympa_openEditImageInfoModal('${group}', '${slug}', '${url}')" class="btn btn-primary btn-sm sympa-list-font" target="_blank">Edit</div>
+                  -->
+                  <div onclick="sympa_copyToClipboard('${url}/original.webp')" class="btn btn-primary btn-sm sympa-list-font" target="_blank">Copy</div>
+                  <a href="${url}/original.webp" class="btn btn-primary btn-sm sympa-list-font" target="_blank">View</a>
+                  <div onclick="sympa_deleteArticleModal(${name})" class="btn btn-outline-primary btn-sm sympa-list-font">Delete</div>
+                </div>            
+            </span>
+          </li>
+        `;        
+    }
+    
+    let htmlData = `
+        <li id="sympa-list-titlebar" class="list-group-item d-flex justify-content-between">             
+			<div>
+                <div class="sympa-bulk-actions">
+                    <div>
+                    <input style="margin-right: 1rem;" class="form-check-input" type="checkbox" onclick="sympa_tableCheck(this.checked)">
+                    </div>     
+                    <select class="form-select sympa-toolbar-font" aria-label="Default select example">
+                      <option value="-1" selected>Bulk actions...</option>
+                      <option value="1">Delete items</option>
+                    </select>
+                    <div onclick="sympa_applyBulk()" class="btn btn-light btn-sm sympa-toolbar-font">Apply</div>
+                </div>                
+                
+            </div>
+			<div class="d-flex">
+            
+                <button data="" style="display:none" onclick="sympa_openSetListValueModal()" id="sympa-list-value-button" type="button" class="btn btn-light btn-sm sympa-toolbar-font">Enter value...</button>
+                            
+                <div class="sympa-list-options mx-1">                    
+                    <select id="sympa-select-right-sort" class="form-select sympa-toolbar-font" aria-label="Default select example">
+                      <option selected onclick="sympa_changeListSort(this)" value="newest">Newest</option>
+                      <option onclick="sympa_changeListMode(this)" value="oldest">Oldest</option>                
+                    </select>
+                    <button onclick="sympa_goAction()" type="button" class="btn btn-light btn-sm sympa-toolbar-font">Go</button>
+                </div>                               
+            </div>
+        </li>   
+    `;
+    
+    let listElement = document.getElementById("sympa-image-list");     
+    
+    for (const key in data.images) {
+        htmlData += _createItem(data.images[key]);
+    }
+    
+    htmlData += `
+        <li class="list-group-item d-flex justify-content-between" id="sympa-list-bottom-bar">
+            <div>Total: <span id="sympa-total-articles"></span> </div>
+            <div id="sympa-bottom-right-message">::</div>
+        </li> 
+    `;
+    
+    listElement.innerHTML = htmlData;
+    
+    let totalArticlesElement = document.getElementById("sympa-total-articles");
+    totalArticlesElement.innerHTML = data.count + ' item(s)';   
+}
+
+
+async function sympa_getImages(groupSlug){
+    const response = await fetch('/image-get-group-images/' + groupSlug); 
+	const jsonData = await response.json();
+	if (response.status != 200){
+		console.log('ERROR!');
+		return null;
+	}
+    
+    if (!jsonData.data){
+        sympa_message("Missing 'data' object. Bad url or invalid json format!");
+        throw new Error("Missing 'data' object. Bad json format!");
+        // "sympa-no-image-list"
+        // "sympa-main-content"
+    }
+    
+    return jsonData;
+}
+
+
+async function sympa_openEditImageInfoModal(group, slug, url){
+    localStorage.setItem("sympa-image-edit-group", group);
+    localStorage.setItem("sympa-image-edit-slug", slug);
+    localStorage.setItem("sympa-image-edit-url", url);
+    document.getElementById('sympa-edit-image-info-modal').style.display = "block";
+    
+    const jsonInfo = await sympa_getImageInfo(url);
+    if (!(jsonInfo.name && jsonInfo.slug && jsonInfo.description)) {
+        sympa_message("Can't load info.json properly.", "danger");
+        return;
+    }
+    
+    document.getElementById('sympa-edit-image-info-modal-name-input').value = jsonInfo.name;
+    document.getElementById('sympa-edit-image-info-modal-description-input').value = jsonInfo.description;    
+}
+
+function sympa_editImageInfo(){
+    console.log(3244234234); 
+}
+
+async function sympa_getImageInfo(url){
+    const response = await fetch(url + '/info.json'); 
+	const jsonData = await response.json();
+	if (response.status != 200){
+		console.log('ERROR!');
+		return null;
+	}
+    
+    console.log(jsonData);
+     
+    return jsonData;
+}
+
+async function sympa_getGroupInfo(){   
+    const url = '{{imagesUrl}}' +'/'+ '{{slug}}' +'/info.json';
+
+    const response = await fetch(url); 
+	const jsonData = await response.json();
+	if (response.status != 200){
+		console.log('ERROR!');
+		return null;
+	}
+     
+    return jsonData;
+}
+
+
+
+async function sympa_initList(){
+    const imagesJsonObj = await sympa_getImages('{{slug}}');
+        
+    if (imagesJsonObj.data.count === 0){
+        document.getElementById('sympa-no-image-list').style.display = "block";
+        document.getElementById('sympa-main-content').style.display = "none";
+    }
+    else{
+        sympa_drawList(imagesJsonObj.data);
+        // sympa-title
+    }  
+      
+    const groupJsonObj = await sympa_getGroupInfo();
+    document.getElementById('sympa-title').innerHTML = groupJsonObj.name;
+}
+
+
+//MAIN
+window.addEventListener("load", async function(){
+   
+  await sympa_initList();  
+
+});
+
+
+/*
+sympa-no-image-list
+sympa-main-content
+*/
+
+
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -219,7 +219,176 @@
 
 
 
+<div class="modal sympa-modal" id="sympa-category-modal" style="display:none;">
+  <div class="modal-dialog" >
+    <div class="modal-content" >
+      <div class="modal-header">
+        <h5 class="modal-title">Add to category</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" onclick="document.getElementById('sympa-category-modal').style.display='none'"></button>
+      </div>
+      <div class="modal-body" style="height: calc(100vh - 200px) !important; overflow:scroll;">
+        
+        <div id="sympa-category-loading-modal" class="d-flex justify-content-center align-items-center h-100">
+            <div class="spinner-border" role="status">
+              <span class="visually-hidden">Loading...</span>
+            </div>
+       </div>
+      
+        <ul id="sympa-category-ul-modal" class="list-group" style="display:none;">
+          <li class="sympa-category-select-list list-group-item">Empty list</li>
+        </ul>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" onclick="document.getElementById('sympa-category-modal').style.display='none'">Cancel</button>
+        <button type="button" class="btn btn-primary" onclick="sympa_selectCategoryItemAction()">Select</button>
+      </div>
+
+	<div class="alert alert-warning alert-dismissible fade show" role="alert" style="display:none; margin-bottom: 0;">
+	   <span id="sympa-bulk-delete-modal-message"> Hello</span> 
+	  <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close" ></button>
+	</div>
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+
 <script>
+
+
+// CATEGORY
+async function sympa_openCategoryModal(){    
+    const _createItem = function(item){
+        const name = item.name;
+        const id = item.id;
+        const slug = item.slug;
+
+        return `<li onclick="sympa_toggleSelectedCategory(this)" 
+            class="sympa-category-select-list list-group-item" 
+            title="ID: ${id}\nSlug: ${slug}"
+            data-id="${id}" data-name="${name}" data-slug="${slug}"
+            >${name}</li>`;
+    }
+    
+    document.getElementById("sympa-category-modal").style.display = "block";   
+    
+    const response = await fetch('/category-get-all?per-page=1000&page=1');
+    const jsonData = await response.json();
+	
+	if (jsonData.error) {
+		sympa_message(jsonData.message, 'warning');
+	}
+    
+    if (jsonData.total > 0){        
+        document.getElementById("sympa-category-loading-modal").classList.add("d-none");
+        document.getElementById("sympa-category-ul-modal").style.display = "block";
+        let htmlData = "";
+        for (const key in jsonData.categories) {
+            htmlData += _createItem(jsonData.categories[key]);
+        }
+        document.getElementById("sympa-category-ul-modal").innerHTML = htmlData;
+    }       
+}
+
+
+function sympa_toggleSelectedCategory(that){
+    document.querySelectorAll('.sympa-category-select-list').forEach(element => element.classList.remove('active'));
+    that.classList.toggle("active");
+    console.log(that);
+    const id = that.getAttribute("data-id");
+    const name = that.getAttribute("data-name");
+    
+    localStorage.setItem("sympa-add-to-category-item-name", name);
+    localStorage.setItem("sympa-add-to-category-item-id", id);
+}
+
+
+async function sympa_selectCategoryItemAction(){    
+        
+    let id = localStorage.getItem("sympa-add-to-category-item-id");
+    let name = localStorage.getItem("sympa-add-to-category-item-name");    
+    let slug = localStorage.getItem("sympa-add-to-category-item-slug");
+    
+    console.log(" sympa_selectCategoryItemAction ", 
+        id,
+        name,
+        slug
+    );
+        
+    console.log(" sympa_selectCategoryItemAction ", 
+            sympa_getSelectedItemIds()
+    );
+    
+    let postData = new FormData();  
+    postData.append('article_ids', sympa_getSelectedItemIds());
+    postData.append('category_id', id);
+
+    const response = await fetch('/link-article-to-categories', {
+        method: 'POST', 
+        body: postData,
+    });
+
+    const jsonData = await response.json();
+    if (response.status != 200) {		
+        return null;
+    }
+    else{
+       sympa_message("Article(s) added to list!", "success");
+      // setTimeout(function () {
+      //      window.location.reload();
+      // }, 2000);
+    } 
+    
+    
+    /*
+    const createItem = function(id, slug, name){
+        return `<button data-id="${id}" data-slug="${slug}" data-name="${name}" type="button" class="btn btn-sm btn-light sympa-pill-button mx-1"> ${name} <span class="badge bg-danger" onclick="this.parentElement.remove()">×</span></button>	`;
+    }        
+
+    document.getElementById("sympa-category-modal").style.display = "none";  
+    let id = localStorage.getItem("sympa-add-to-category-item-id");
+    let name = localStorage.getItem("sympa-add-to-category-item-name");    
+    let slug = localStorage.getItem("sympa-add-to-category-item-slug");
+    
+    let target = document.getElementById("sympa-selected-categories-list");
+	let divElements = target.querySelectorAll('button[data-id]');
+
+	for (let i = 0; i < divElements.length; i++) {
+		let dataId = divElements[i].getAttribute('data-id');		
+		if (dataId === id) {
+			return; 
+		}
+	}
+    
+    target.innerHTML += createItem(id, slug, name);  
+    */
+}
+
+
+
+function sympa_getSelectedCategoryIds() {
+	let parent = document.getElementById('sympa-selected-categories-list');
+	let elements = parent.querySelectorAll('[data-id]');
+	let categories = [];
+
+	for (let i = 0; i < elements.length; i++) {
+		let element = elements[i];
+		let categoryId = element.getAttribute("data-id");
+		categories.push(parseInt(categoryId));
+	}
+
+    console.log(categories);
+
+	return categories;
+}
+
+
+////////////////
+
 
 async function sympa_removeCategoriesBulkModalAction(){    
     
@@ -328,8 +497,11 @@ function sympa_applyBulk(){
     if (bulkMode === 'strip-categories'){
         document.getElementById("sympa-strip-categories-bulk-modal").style.display = "block";
     }  
-    
-    
+        
+    if (bulkMode === 'add-to-category'){
+        sympa_openCategoryModal();
+    }     
+        
 }
 
 
@@ -910,6 +1082,7 @@ function sympa_initStorageSettings(){
         localStorage.removeItem('sympa-article-empty');
     }    
 }
+
 
 //MAIN
 window.addEventListener("load", async function(){

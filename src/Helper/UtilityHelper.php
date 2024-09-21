@@ -5,6 +5,8 @@ use Symfony\Component\HttpFoundation\Session\SessionInterface;
 
 class UtilityHelper
 {
+    const PROJECT_DIR = __DIR__ . '/../..';
+    
 	private $session;
 	
 	function generateRandomString($length = 16) {
@@ -188,6 +190,11 @@ class UtilityHelper
 		return $html;
 	}
     
+    function humanFileSize($bytes, $decimals = 2) {
+		$size = ['B', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
+		$factor = floor((strlen($bytes) - 1) / 3);
+		return sprintf("%.{$decimals}f", $bytes / pow(1024, $factor)) . @$size[$factor];
+	}
         
     function getRootUrl() 
 	{
@@ -197,6 +204,11 @@ class UtilityHelper
 		$port = ($port == 80 || $port == 443) ? '' : ':' . $port;
 
 		return $protocol . $serverName . $port;
+	}		
+	
+    function getPublicDir() 
+	{
+		return self::PROJECT_DIR . '/public';
 	}		
 	
 	
