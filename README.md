@@ -18,7 +18,8 @@ See /development/DEVLOG file.
 
 ## Preview?
 
-https://www.youtube.com/watch?v=OVPcdOmnYG0
+1) https://www.youtube.com/watch?v=OVPcdOmnYG0
+2) https://www.youtube.com/watch?v=JE0UsqImY8M
 
 ## Note
 The project is in the early stages of development but is still functional and usable.
