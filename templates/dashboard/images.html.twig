@@ -45,11 +45,11 @@
 
 <br><br>
 
-<div id="sympa-no-category-list" class="alert alert-primary" role="alert" style="display:none">
-  There is no categories!
+<div id="sympa-no-image-list" class="alert alert-primary" role="alert" style="display:none">
+  There is no data!
 </div>
 
-<ul id="sympa-category-list" class="list-group mb-3">
+<ul id="sympa-image-list" class="list-group mb-3">
           
           <!--
         <li class=
@@ -438,7 +438,7 @@ function sympa_drawList(data)
         </li>   
     `;
     
-    let listElement = document.getElementById("sympa-category-list");     
+    let listElement = document.getElementById("sympa-image-list");     
     
     for (const key in data.groups) {
         htmlData += _createItem(data.groups[key]);
@@ -525,7 +525,7 @@ async function sympa_editGroupModalAction(){
     
 }
 
-async function sympa_getImages(){
+async function sympa_getImageGroups(){
     const response = await fetch('/image-get-groups'); 
 	const jsonData = await response.json();
 	if (response.status != 200){
@@ -569,13 +569,22 @@ function sympa_searchModalAction(){
 
 
 async function sympa_initList(){          
-    const images = await sympa_getImages();
-    sympa_drawList(images.data);	
+    const imagesGroups = await sympa_getImageGroups();
+              
+    console.log("YO",imagesGroups );          
+               
+    if (imagesGroups.data && imagesGroups.data.total === 0) {
+        document.getElementById("sympa-no-image-list").style.display = 'block';
+        document.getElementById("sympa-image-list").style.display = 'none';        
+        return;
+    }
+    
+    sympa_drawList(imagesGroups.data);	
     
     /*
     const data = await sympa_getCategoriesNew();
     if (data.total === 0){
-        document.getElementById("sympa-category-list").style.display = 'none';  
+        document.getElementById("sympa-image-list").style.display = 'none';  
         document.getElementById("sympa-no-category-list").style.display = 'block';         
         return;         
     }
