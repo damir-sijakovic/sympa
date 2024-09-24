@@ -137,6 +137,35 @@
 
 	.ds-animate-top{position:relative;animation:animatetop 0.4s}@keyframes animatetop{from{top:-300px;opacity:0} to{top:0;opacity:1}}
 		
+    @keyframes wobble {
+      0% {
+        transform: translateX(0%);
+      }
+      15% {
+        transform: translateX(-25%) rotate(-5deg);
+      }
+      30% {
+        transform: translateX(20%) rotate(3deg);
+      }
+      45% {
+        transform: translateX(-15%) rotate(-3deg);
+      }
+      60% {
+        transform: translateX(10%) rotate(2deg);
+      }
+      75% {
+        transform: translateX(-5%) rotate(-1deg);
+      }
+      100% {
+        transform: translateX(0%);
+      }
+    }
+
+    .sympa-wobble {
+      animation: wobble 1s ease-in-out;
+    }  
+        
+        
 	</style>
 
 	<div id="ds-top-message" class="ds-animate-top"> 
@@ -155,7 +184,7 @@
 	<div id="ds-dashboard-sidemenu" class="d-flex flex-column flex-shrink-0 p-3 text-bg-dark" style="width: 280px;">
     <a  target="_blank" href="/" class="d-flex align-items-center mb-3 mb-md-0 me-md-auto text-white text-decoration-none" title="Go to webpage...">
 
-      <img src="{{rootUrl}}/assets/img/sympa.png" style="height:60px; border-radius: 50%; background: antiquewhite;" />
+      <img class="sympa-wobble" src="{{rootUrl}}/assets/img/sympa.png" style="height:60px; border-radius: 50%; background: antiquewhite;" />
       <span class="fs-4 mx-1"> Sympa <i class="bi bi-box-arrow-in-up-right"></i>  </span>     
     </a>
     <hr>
@@ -225,7 +254,7 @@
       </li>
       
       <li>
-        <a id="ds-posts-link-about" href="/dashboard/files" class="nav-link text-white">
+        <a id="ds-posts-link-about" href="/dashboard/docs" class="nav-link text-white">
           <i class="bi bi-book"></i>
           Docs
         </a>

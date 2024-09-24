@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Entity\User;
+use App\Entity\Article;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\FormFactoryInterface;
@@ -24,15 +25,18 @@ class PageController extends AbstractController
     {
         $this->entityManager = $entityManager;	
         $this->utilityHelper = $utilityHelper;	
+                
 	}
     
 
     public function home(Request $request): Response
-    {
+    {        
         $htmlTemplate = $this->renderView('/pages/home.html.twig', [
             'rootUrl' => $this->utilityHelper->getRootUrl(),
             'controller_name' => 'DashboardController',
         ]);
+        
+        
         
         return $this->render('/pages/main.html.twig', [
             'rootUrl' => $this->utilityHelper->getRootUrl(),
@@ -42,15 +46,61 @@ class PageController extends AbstractController
     
     public function viewArticle(Request $request, $id): Response
     {
+        /*
+        $articleRepository = $this->entityManager->getRepository(Article::class);
+        $article = $articleRepository->findOneBy(['id' => $id]);
+		
+		if (!$article) {
+			throw new NotFoundHttpException('The article was not found.');
+		}
+
+        return $this->json([
+            "title" => $article->getTitle(),
+            "excerpt" => $article->getExcerpt(),
+            "content" => $article->getContent(),
+        ]);	
+        */
+        
+        $articleRepository = $this->entityManager->getRepository(Article::class);
+        $article = $articleRepository->findOneBy(['id' => $id]);
+		
+		if (!$article) {
+			throw new NotFoundHttpException('The article was not found.');
+		}
+        
         $htmlTemplate = $this->renderView('/pages/article.html.twig', [
             'rootUrl' => $this->utilityHelper->getRootUrl(),
-            'id' => $id
+            'id' => $id,
+            'title' => $article->getTitle(),
+            'excerpt' => $article->getExcerpt(),
+            'content' => $article->getContent(),
         ]);
-       
-        return $this->render('/pages/main.html.twig', [
+
+        $response = $this->render('/pages/main.html.twig', [
             'rootUrl' => $this->utilityHelper->getRootUrl(),
             'body' => $htmlTemplate,
         ]);
+
+        $response->headers->set('Content-Type', 'text/html');
+
+        return $response;
+    }
+
+    public function viewArticleFetch(Request $request, $id): Response
+    {
+        $htmlTemplate = $this->renderView('/pages/article-fetch.html.twig', [
+            'rootUrl' => $this->utilityHelper->getRootUrl(),
+            'id' => $id
+        ]);
+
+        $response = $this->render('/pages/main.html.twig', [
+            'rootUrl' => $this->utilityHelper->getRootUrl(),
+            'body' => $htmlTemplate,
+        ]);
+
+        $response->headers->set('Content-Type', 'text/html');
+
+        return $response;
     }
 
 

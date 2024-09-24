@@ -15,6 +15,11 @@ page_view_article:
     path: /article/{id}
     controller: App\Controller\PageController::viewArticle
     methods: ['GET']
+    
+page_view_article_fetch: #fetch post via POST after 
+    path: /article-view/{id}
+    controller: App\Controller\PageController::viewArticleFetch
+    methods: ['GET']
 
 page_about:
     path: /about
@@ -142,6 +147,11 @@ dashboard_images_edit:
     controller: App\Controller\DashboardController::editImages 
     methods: ['GET']
     
+dashboard_files_edit: 
+    path: /dashboard/files-edit/{slug}
+    controller: App\Controller\DashboardController::editFiles 
+    methods: ['GET']
+    
 dashboard_category_edit: 
     path: /dashboard/category-edit/{id}
     controller: App\Controller\DashboardController::editCategory 
@@ -151,7 +161,12 @@ dashboard_category_create:
     path: /dashboard/category-create
     controller: App\Controller\DashboardController::createCategory 
     methods: ['GET']
-
+    
+dashboard_docs: 
+    path: /dashboard/docs
+    controller: App\Controller\DashboardController::docs 
+    methods: ['GET']
+    
 category_create:
     path: /category-create
     controller: App\Controller\CategoryController::create
@@ -240,6 +255,28 @@ image_update_group_image_info:
     path: /image-update-group-info
     controller: App\Controller\ImagesController::updateGroupInfoPost
     methods: ['POST']
+    
+image_delete_image: 
+    path: /image-single-delete/{uuid}
+    controller: App\Controller\ImagesController::deleteGroupImage
+    methods: ['POST']
+    
+file_create_group: 
+    path: /file-create-group
+    controller: App\Controller\FilesController::createGroupPost
+    methods: ['POST']
+    
+file_get_group: 
+    path: /file-get-groups
+    controller: App\Controller\FilesController::getGroups
+    methods: ['GET']
+    
+file_get_group_files: 
+    path: /file-get-group-files/{slug}
+    controller: App\Controller\FilesController::getGroupFiles
+    methods: ['GET']
 
-
-
+file_upload: 
+    path: /file-upload
+    controller: App\Controller\FilesController::upload
+    methods: ['POST']

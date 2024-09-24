@@ -5,68 +5,57 @@ namespace App\EventListener;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\ControllerEvent;
 use Symfony\Component\HttpKernel\Event\ResponseEvent;
-use Symfony\Component\HttpFoundation\RedirectResponse;
-
+use App\Service\ShortCodeRegistrar;
 
 class MiddlewareListener
 {
-    
-	//BEFORE
-	public function onKernelController(ControllerEvent $event)
-    {	
+    private $shortCodeRegistrar;
+
+    public function __construct(ShortCodeRegistrar $shortCodeRegistrar)
+    {
+        $this->shortCodeRegistrar = $shortCodeRegistrar;
+    }
+
+    // BEFORE
+    public function onKernelController(ControllerEvent $event)
+    {
         error_log("BEFORE");
-        $request = $event->getRequest();	
-        if (strpos($request->getPathInfo(), '/dashboard') === 0) 
-        {	
-            $session = $request->getSession();	
-            if (!$session->has('userLoggedIn')) 
+
+        $request = $event->getRequest();
+        if (strpos($request->getPathInfo(), '/dashboard') === 0)
+        {
+            $session = $request->getSession();
+            if (!$session->has('userLoggedIn'))
             {
                 $event->setController(function() {
                     return new Response('Access Denied', 403);
                 });
-            }	
+            }            
+        }
+        else{
+            // Register shortcodes via ShortCodeRegistrar
+            $this->shortCodeRegistrar->registerShortcodes();
         }
         
-
-		
-		/*
-		if (strpos($request->getPathInfo(), '/dashboard') === 0) 
-        {	
-			if (!$request->hasSession()) 
-			{
-				//return;
-			}
-
-			$session = $request->getSession();
-			if ($session->has('userLoggedIn')) 
-			{
-				//$loggedIn = $session->get('userLoggedIn');
-				return new RedirectResponse('/dashboard');
-			} 
-			else 
-			{
-				$event->setController(function() {
-					return new Response('Access Denied', 403);
-				});
-			}
-        }	
-        */	        
-
     }
 
-	//AFTER
+    // AFTER
     public function onKernelResponse(ResponseEvent $event)
     {
-		error_log("AFTER");
-		/*
-		$response = $event->getResponse();
-		$response->headers->set('X-My-Header', 'my-value');
-		$event->setResponse($response); 
-		*/
+        error_log("AFTER");
+        $response = $event->getResponse();
+        
+        if ($response->headers->get('Content-Type') === 'text/html') 
+        {            
+            error_log("AFTER>>>>>>> " . $response->headers->get('Content-Type'));
+            
+            $content = $response->getContent();            
+            $newContent = $this->shortCodeRegistrar->getShortCodeService()->parseShortcodes($content); // Parse and replace shortcodes using the getter
+            $response->setContent($newContent); // Set the new content back to the response
+        }
+        
+        $response->headers->set('X-XSS-Protection', '1; mode=block');
+        
+        
     }
-	
-
-
-};
-
-
+}

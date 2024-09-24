@@ -33,22 +33,23 @@
 
 
 
-<h2>Articles</h2>
+<h2>Files</h2>
+<p class="lead">File groups</p>
 
 <hr>
 
 <div class="btn-group" role="group" aria-label="Basic example">
-  <a target="_blank" href="/dashboard/article-create" class="btn btn-primary btn-sm"><i class="bi bi-plus-circle mx-1"></i>Create</a>
-  <button type="button" class="btn btn-outline-primary btn-sm" onclick="sympa_reset()"> Reset query</button>
+  <div onclick="sympa_createGroupModal()" class="btn btn-primary btn-sm"><i class="bi bi-plus-circle mx-1"></i>New group</div>
+  <button type="button" class="btn btn-outline-primary btn-sm" onclick="sympa_openSearchModal()"> <i class="bi bi-search"></i> Search</button>
 </div>
 
 <br><br>
 
-<div id="sympa-no-article-list" class="alert alert-primary" role="alert" style="display:none">
-  There is no articles!
+<div id="sympa-no-image-list" class="alert alert-primary" role="alert" style="display:none">
+  There is no data!
 </div>
 
-<ul id="sympa-article-list" class="list-group mb-3">
+<ul id="sympa-image-list" class="list-group mb-3">
           
           <!--
         <li class=
@@ -75,7 +76,7 @@
           <li class=
           "list-group-item d-flex justify-content-between">
             <span>Total:</span>
-            <strong id="sympa-total-articles"></strong>
+            <strong id="sympa-total-groups"></strong>
           </li>
           
           -->   
@@ -107,60 +108,6 @@
 
 <!-- MODALS -->
 
-
-
-<div class="modal sympa-modal" id="sympa-delete-bulk-modal" style="display:none;">
-  <div class="modal-dialog">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title">Warning!</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" onclick="document.getElementById('sympa-delete-bulk-modal').style.display='none'"></button>
-      </div>
-      <div class="modal-body">
-        <p>Do you want to delete selected item(s)?</p>
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" onclick="document.getElementById('sympa-delete-bulk-modal').style.display='none'">Cancel</button>
-        <button type="button" class="btn btn-danger" onclick="sympa_deleteBulkModalAction()">Delete</button>
-      </div>
-
-	<div class="alert alert-warning alert-dismissible fade show" role="alert" style="display:none; margin-bottom: 0;">
-	   <span id="sympa-delete-bulk-modal-message"> Hello</span> 
-	  <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close" ></button>
-	</div>
-
-    </div>
-  </div>
-</div>
-
-
-<div class="modal sympa-modal" id="sympa-strip-categories-bulk-modal" style="display:none;">
-  <div class="modal-dialog">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title">Warning!</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" onclick="document.getElementById('sympa-strip-categories-bulk-modal').style.display='none'"></button>
-      </div>
-      <div class="modal-body">
-        <p>Do you want to remove categories from selected item(s)?</p>
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" onclick="document.getElementById('sympa-strip-categories-bulk-modal').style.display='none'">Cancel</button>
-        <button type="button" class="btn btn-danger" onclick="sympa_removeCategoriesBulkModalAction()">Remove</button>
-      </div>
-
-	<div class="alert alert-warning alert-dismissible fade show" role="alert" style="display:none; margin-bottom: 0;">
-	   <span id="sympa-strip-categories-bulk-modal-message"> Hello</span> 
-	  <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close" ></button>
-	</div>
-
-    </div>
-  </div>
-</div>
-
-
-
-
 <div class="modal sympa-modal" id="sympa-delete-single-modal" style="display:none;">
   <div class="modal-dialog">
     <div class="modal-content">
@@ -177,14 +124,13 @@
       </div>
 
 	<div class="alert alert-warning alert-dismissible fade show" role="alert" style="display:none; margin-bottom: 0;">
-	   <span id="sympa-delete-single-modal-message"> Hello</span> 
+	   <span id="sympa-bulk-delete-modal-message"> Hello</span> 
 	  <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close" ></button>
 	</div>
 
     </div>
   </div>
 </div>
-
 
 <div class="modal sympa-modal" id="sympa-list-value-modal" style="display:none;">
   <div class="modal-dialog">
@@ -196,7 +142,7 @@
       <div class="modal-body">
         
       <div class="mb-3">
-        <p>Enter search term or category id:</p>
+        <p>Enter search term:</p>
         <input type="text" class="form-control" id="sympa-list-value-modal-input" aria-describedby="">
       </div>
 
@@ -207,43 +153,6 @@
       </div>
 
 	<div class="alert alert-warning alert-dismissible fade show" role="alert" style="display:none; margin-bottom: 0;">
-	   <span id="sympa-list-value-modal-message"> Hello</span> 
-	  <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close" ></button>
-	</div>
-
-    </div>
-  </div>
-</div>
-
-
-
-
-
-<div class="modal sympa-modal" id="sympa-category-modal" style="display:none;">
-  <div class="modal-dialog" >
-    <div class="modal-content" >
-      <div class="modal-header">
-        <h5 class="modal-title">Add to category</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" onclick="document.getElementById('sympa-category-modal').style.display='none'"></button>
-      </div>
-      <div class="modal-body" style="height: calc(100vh - 200px) !important; overflow:scroll;">
-        
-        <div id="sympa-category-loading-modal" class="d-flex justify-content-center align-items-center h-100">
-            <div class="spinner-border" role="status">
-              <span class="visually-hidden">Loading...</span>
-            </div>
-       </div>
-      
-        <ul id="sympa-category-ul-modal" class="list-group" style="display:none;">
-          <li class="sympa-category-select-list list-group-item">Empty list</li>
-        </ul>
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" onclick="document.getElementById('sympa-category-modal').style.display='none'">Cancel</button>
-        <button type="button" class="btn btn-primary" onclick="sympa_selectCategoryItemAction()">Select</button>
-      </div>
-
-	<div class="alert alert-warning alert-dismissible fade show" role="alert" style="display:none; margin-bottom: 0;">
 	   <span id="sympa-bulk-delete-modal-message"> Hello</span> 
 	  <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close" ></button>
 	</div>
@@ -251,3 +160,453 @@
     </div>
   </div>
 </div>
+
+
+
+
+<div class="modal sympa-modal" id="sympa-create-modal" style="display:none;">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Create group</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" onclick="document.getElementById('sympa-create-modal').style.display='none'"></button>
+      </div>
+      <div class="modal-body">
+        
+      <div class="mb-3">
+        <p class="m-0">Name:</p>
+        <input type="text" class="form-control" id="sympa-create-name-modal-input" aria-describedby="">
+      </div>
+
+      <div class="mb-3">
+        <p class="m-0">Description:</p>
+        <textarea class="form-control" id="sympa-create-name-modal-input" rows="3"></textarea>
+      </div>
+
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" onclick="document.getElementById('sympa-create-modal').style.display='none'">Cancel</button>
+        <button type="button" class="btn btn-primary" onclick="sympa_createGroupModalAction()">Accept</button>
+      </div>
+
+	<div class="alert alert-warning alert-dismissible" role="alert" style="display:none; margin-bottom: 0;">
+	   <span id="sympa-create-modal-message">...</span> 
+	  <button type="button" class="btn-close" onclick="this.parentElement.style.display='none'" ></button>
+	</div>
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div class="modal sympa-modal" id="sympa-search-modal" style="display:none;">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Search</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" onclick="document.getElementById('sympa-search-modal').style.display='none'"></button>
+      </div>
+      <div class="modal-body">
+        
+      <div class="mb-3">
+        <input type="text" class="form-control" id="sympa-search-name-modal-input" placeholder="Enter term...">
+      </div>
+
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" onclick="document.getElementById('sympa-search-modal').style.display='none'">Cancel</button>
+        <button type="button" class="btn btn-primary" onclick="sympa_searchModalAction()">Go</button>
+      </div>
+
+	<div class="alert alert-warning alert-dismissible" role="alert" style="display:none; margin-bottom: 0;">
+	   <span id="sympa-create-modal-message">...</span> 
+	  <button type="button" class="btn-close" onclick="this.parentElement.style.display='none'" ></button>
+	</div>
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+
+
+
+
+<div class="modal sympa-modal" id="sympa-edit-group-modal" style="display:none;">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Edit group</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" onclick="document.getElementById('sympa-edit-group-modal').style.display='none'"></button>
+      </div>
+      <div class="modal-body">
+        
+      <div class="mb-3">
+        <p class="m-0">Name:</p>
+        <input type="text" class="form-control" id="sympa-edit-group-name-modal-input" aria-describedby="">
+      </div>
+
+      <div class="mb-3">
+        <p class="m-0">Description:</p>
+        <textarea class="form-control" id="sympa-edit-group-description-modal-input" rows="3"></textarea>
+      </div>
+
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary" onclick="sympa_editGroupModalAction()">Save</button>
+      </div>
+
+	<div class="alert alert-warning alert-dismissible" role="alert" style="display:none; margin-bottom: 0;">
+	   <span id="">...</span> 
+	  <button type="button" class="btn-close" onclick="this.parentElement.style.display='none'" ></button>
+	</div>
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<script>
+
+function sympa_createGroupModalMessage(message){
+    const modalElement = document.getElementById("sympa-create-modal-message");
+    modalElement.innerHTML = message;
+    modalElement.parentElement.style.display = 'block';
+}
+
+function sympa_createGroupModal(){
+    const modalElement = document.getElementById("sympa-create-modal");
+    modalElement.style.display = 'block';   
+}
+
+async function sympa_createGroupModalAction(){
+    const name = document.getElementById("sympa-create-name-modal-input").value;
+    if (name.length < 3 || name.length > 48) {
+        sympa_createGroupModalMessage("Group name must be between 3 and 48 characters long.");
+    }
+    
+    const description = document.getElementById("sympa-create-name-modal-input").value;
+    if (description.length < 3 || description.length > 256) {
+        sympa_createGroupModalMessage("Group description must be between 3 and 48 characters long.");
+    }
+    
+    // call api: create image group        
+    let postData = new FormData();  
+    postData.append('name', name);
+    postData.append('description', description);
+
+    const response = await fetch('/file-create-group', {
+        method: 'POST', 
+        body: postData,
+    });
+
+    const jsonData = await response.json();
+    if (response.status != 200) {	        
+        sympa_message(jsonData.message);	
+        return;
+    }
+    else{
+        sympa_message("Image group created!", "success");
+            setTimeout(function () {
+            window.location.reload();
+        }, 2000);
+    } 
+    
+    
+}
+
+
+function sympa_tableCheck(checked){
+    if (checked){
+        const elements = document.querySelectorAll('.sympa-bulk-checkbox');
+        elements.forEach(function(element) {
+            console.log(element);
+            element.checked = true;
+        });
+    }
+    else{
+        const elements = document.querySelectorAll('.sympa-bulk-checkbox');
+        elements.forEach(function(element) {
+            console.log(element);
+            element.checked = false;
+        });
+    }    
+}
+
+
+function sympa_applyBulk(){
+    console.log("BULK");
+}
+
+
+
+
+function sympa_drawList(data)
+{      
+   
+    let _createItem = function(x){
+        
+        let name = x.name;
+        let description = x.description;
+        let createdAt = x.createdAt;    
+        let dir = x.dir;
+        let infoFile = x.infoFile;
+        
+        return `
+        <li class="list-group-item d-flex justify-content-between bg-body-tertiary" title="Slug: ${dir}\nCreated: ${createdAt}" data-id="${dir}">
+            <div class="d-flex gap-3">                
+                <input class="form-check-input sympa-bulk-checkbox" type="checkbox">
+                <div>                  
+                    <div style="display: flex;"> <h6 class="my-0">${name}</h6></div>
+  
+                    <small>${description}</small>
+                </div>
+            </div>            
+            <span class="text-success">
+                <div class="btn-group" role="group" aria-label="Basic outlined example">  
+                  
+                  <!--
+                  <div onclick="sympa_editGroupModal('${infoFile}', '${dir}')" class="btn btn-primary btn-sm sympa-list-font">Edit</div>
+                  -->
+                  
+                  <a href="/dashboard/files-edit/${dir}" class="btn btn-primary btn-sm sympa-list-font" target="_blank">Edit</a>
+                  <div onclick="sympa_deleteArticleModal(${dir})" class="btn btn-outline-primary btn-sm sympa-list-font">Delete</div>
+                </div>            
+            </span>
+          </li>
+        `;        
+    }
+    
+    let htmlData = `
+        <li id="sympa-list-titlebar" class="list-group-item d-flex justify-content-between">             
+			<div>
+                <div class="sympa-bulk-actions">
+                    <div>
+                    <input style="margin-right: 1rem;" class="form-check-input" type="checkbox" onclick="sympa_tableCheck(this.checked)">
+                    </div>     
+                    <select class="form-select sympa-toolbar-font" aria-label="Default select example">
+                      <option value="-1" selected>Bulk actions...</option>
+                      <option value="1">Delete items</option>
+                    </select>
+                    <div onclick="sympa_applyBulk()" class="btn btn-light btn-sm sympa-toolbar-font">Apply</div>
+                </div>                
+                
+            </div>
+			<div class="d-flex">
+            
+                <button data="" style="display:none" onclick="sympa_openSetListValueModal()" id="sympa-list-value-button" type="button" class="btn btn-light btn-sm sympa-toolbar-font">Enter value...</button>
+                       
+                <div class="sympa-list-options mx-1">                    
+                    <select id="sympa-select-right-sort" class="form-select sympa-toolbar-font" aria-label="Default select example">
+                      <option selected onclick="sympa_changeListSort(this)" value="newest">Newest</option>
+                      <option onclick="sympa_changeListMode(this)" value="oldest">Oldest</option>                
+                    </select>
+                    <button onclick="sympa_goAction()" type="button" class="btn btn-light btn-sm sympa-toolbar-font">Go</button>
+                </div>
+            
+      
+                              
+            </div>
+        </li>   
+    `;
+    
+    let listElement = document.getElementById("sympa-image-list");     
+    
+    for (const key in data.groups) {
+        htmlData += _createItem(data.groups[key]);
+        //console.log(1111);
+    }
+    
+    htmlData += `
+        <li class="list-group-item d-flex justify-content-between" id="sympa-list-bottom-bar">
+            <div>Total: <span id="sympa-total-groups"></span> </div>
+            <div id="sympa-bottom-right-message">::</div>
+        </li> 
+        <!--li class="list-group-item d-flex justify-content-between" id="sympa-list-bottom-bar">
+            <span>Total:</span>
+            <div></div> <span id="sympa-total-articles"></span>
+        </li-->   
+    `;
+    
+    listElement.innerHTML = htmlData;
+    
+    console.log(data);
+    
+    let totalArticlesElement = document.getElementById("sympa-total-groups");
+    totalArticlesElement.innerHTML = data.total + ' items(s)';   
+}
+
+
+
+
+async function sympa_editGroupModal(url, groupName){
+    console.log(url);
+    document.getElementById("sympa-edit-group-modal").style.display = "block";
+    
+    const jsonInfo = await sympa_getImageInfo(url);
+    if (!(jsonInfo.name && jsonInfo.description)) {
+        sympa_message("Can't load info.json properly.", "danger");
+        return;
+    }
+    
+    document.getElementById("sympa-edit-group-name-modal-input").value = jsonInfo.name;
+    document.getElementById("sympa-edit-group-description-modal-input").value = jsonInfo.description;
+    
+    localStorage.setItem("sympa-images-group", groupName);
+    localStorage.setItem("sympa-images-url", url);
+    
+}
+
+async function sympa_getImageInfo(url){
+    const response = await fetch(url + '/info.json'); 
+	const jsonData = await response.json();
+	if (response.status != 200){
+		console.log('ERROR!');
+		return null;
+	}
+    
+    return jsonData;
+}
+
+async function sympa_editGroupModalAction(){
+    const name = document.getElementById("sympa-edit-group-name-modal-input").value;
+    const description = document.getElementById("sympa-edit-group-description-modal-input").value;
+        
+    let postData = new FormData();  
+    postData.append('name', name);
+    postData.append('description', description);
+    postData.append('group', localStorage.getItem("sympa-images-group"));
+
+
+    const response = await fetch('/image-update-group-info', {
+        method: 'POST', 
+        body: postData,
+    });
+    
+    const jsonData = await response.json();
+    if (response.status != 200) {		
+        return null;
+    }
+    else{
+        sympa_message("Info updated!", "success");
+        setTimeout(function () {
+            // window.location.reload();
+        }, 2000);
+    }
+    
+    
+}
+
+async function sympa_getFileGroups(){
+    const response = await fetch('/file-get-groups'); 
+	const jsonData = await response.json();
+	if (response.status != 200){
+		console.log('ERROR!');
+		return null;
+	}
+    
+    if (!jsonData.data){
+        sympa_message("Missing 'data' object. Bad json format!", "danger");
+        throw new Error("Missing 'data' object. Bad json format!");
+    }
+    
+    return jsonData;
+}
+
+
+
+function sympa_setTotal(amount){
+    document.getElementById("sympa-total-groups").innerHTML = amount;
+}
+
+
+function sympa_setBottomRightMessage(message){
+    document.getElementById("sympa-bottom-right-message").innerHTML = message;
+}
+
+
+function sympa_postUiRedraw(){
+
+}
+
+
+function sympa_openSearchModal(){
+    document.getElementById("sympa-search-modal").style.display = 'block';
+}
+
+
+function sympa_searchModalAction(){
+    console.log("SEARCH");
+}
+
+
+async function sympa_initList(){          
+    const imagesGroups = await sympa_getFileGroups();
+              
+    console.log("YO",imagesGroups );          
+               
+    if (imagesGroups.data && imagesGroups.data.total === 0) {
+        document.getElementById("sympa-no-image-list").style.display = 'block';
+        document.getElementById("sympa-image-list").style.display = 'none';        
+        return;
+    }
+    
+    sympa_drawList(imagesGroups.data);	
+    
+    /*
+    const data = await sympa_getCategoriesNew();
+    if (data.total === 0){
+        document.getElementById("sympa-image-list").style.display = 'none';  
+        document.getElementById("sympa-no-category-list").style.display = 'block';         
+        return;         
+    }
+    
+    sympa_drawList(data);	
+    sympa_paginate(data.paginateData);
+    */
+}
+
+
+//MAIN
+window.addEventListener("load", async function(){
+    //sympa_initStorageSettings();
+  // await sympa_getCategoriesNew();
+    // await sympa_getArticlesByUrl("page=1&perPage=10&category=1");
+    
+  await sympa_initList();
+  
+  sympa_postUiRedraw();    
+
+});
+
+</script>
+
+
+
+

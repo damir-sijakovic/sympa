@@ -76,8 +76,11 @@ class ImagesController extends AbstractController
                 "slug" => $newSlug,
                 "description" => $originalName,       
             ]);
+                
+            $uuid = $this->utilityHelper->generateUuid();   
                            
-            $imageDirName = $groupDirName .'/'. $newSlug .'-'. time();
+            //$imageDirName = $groupDirName .'/'. $newSlug .'-'. $uuid;
+            $imageDirName = $groupDirName .'/'. $uuid;
             $imageJsonFile = $imageDirName . '/info.json';
             
             if (mkdir($imageDirName, 0755, true))
@@ -92,8 +95,8 @@ class ImagesController extends AbstractController
                 }
                 
                 // $this->convertToWebp($file, $extension, $imageDirName .'/original.webp');
-                $this->convertToWebp($file, $extension, $imageDirName .'/original.webp');
-                $this->resizeAndConvertToWebp($file, $imageDirName);
+                $this->utilityHelper->convertToWebp($file, $extension, $imageDirName .'/original.webp');
+                $this->utilityHelper->resizeAndConvertToWebp($file, $imageDirName);
                 
                 return $this->json([
                     'error' => false, 
@@ -108,20 +111,7 @@ class ImagesController extends AbstractController
                     'data' => null
                 ], 500);  
             }
-            
-            /*
-            if (file_exists($imageDirName)){
-                return $this->json([
-                    'error' => true, 
-                    'message' => 'File name already exists.', 
-                    'data' => null
-                ],409);
-            }
-            */
-            
-          //  $this->convertToWebp($file, $extension, $imageDirName);
-            
-            
+                
             return $this->json(['ok' => $imageDirName]);           
         }
         else
@@ -131,36 +121,7 @@ class ImagesController extends AbstractController
                 'message' => 'Missing request params.', 
                 'data' => null
             ],400);
-        }
-            
-        /*
-        if ($file && $slug) {
-            $uploadDir = $this->getParameter('kernel.project_dir') . '/public/uploads';
-            $filename = uniqid() . '.' . $file->guessExtension();
-
-            // Move the uploaded file to the uploads directory
-            $file->move($uploadDir, $filename);
-
-            return $this->json(['status' => 'success', 'filename' => $filename, 'custom_field' => $customField]);
-        }
-        */
-        
-/*
-        if ($files && is_array($files)) {
-            foreach ($files as $file) {
-                if ($file instanceof UploadedFile) {
-                    $uploadDir = $this->getParameter('kernel.project_dir') . '/public/uploads';
-                    $filename = uniqid() . '.' . $file->guessExtension();
-
-                    // Move the uploaded file to the uploads directory
-                    $file->move($uploadDir, $filename);
-
-                    // Store the filename
-                    $uploadedFilenames[] = $filename;
-                }
-            }
-        }
-*/
+        }            
 
         return $this->json(['status' => $slug]);
     }
@@ -291,6 +252,7 @@ class ImagesController extends AbstractController
                               
 					$images[] = [
                         'group' => $slug,
+                        'dir' => $fileDirName,
                         'url' => $imageDirectory .'/'. $fileDirName,
                         'name' => $data['name'],
                         'slug' => $data['slug'],
@@ -315,6 +277,20 @@ class ImagesController extends AbstractController
 		}
                 
     }
+
+
+
+    public function deleteGroupImage(Request $request, $uuid): Response
+    {            
+        
+        return $this->json([
+            'data' =>null,
+            'error' => false,
+            'message' => 'OK'
+        ]);
+  
+    }
+
 
 
 
@@ -437,109 +413,6 @@ class ImagesController extends AbstractController
     }
 	
     
-    
-    
-    //PRIVATE
-    private function resizeAndConvertToWebp(UploadedFile $file, string $fileDir)
-    {
-        $extension = strtolower($file->getClientOriginalExtension());
 
-        switch ($extension) {
-            case 'jpeg':
-            case 'jpg':
-                $image = imagecreatefromjpeg($file->getPathname());
-                break;
-            case 'png':
-                $image = imagecreatefrompng($file->getPathname());
-                break;
-            case 'gif':
-                $image = imagecreatefromgif($file->getPathname());
-                break;
-            default:
-                throw new \Exception('Unsupported image type');
-        }
-
-        $originalWidth = imagesx($image);
-        $originalHeight = imagesy($image);
-
-        $sizes = [
-            ['width' => 200, 'height' => 200],
-            ['width' => 400, 'height' => 400]
-        ];
-
-        foreach ($sizes as $size) {
-            $resizedImage = $this->resizeImage($image, $originalWidth, $originalHeight, $size['width'], $size['height']);
-            //$webpFilePath = $fileDir . '/' . uniqid() . '_' . $size['width'] . 'x' . $size['height'] . '.webp';
-            //$webpFilePath = $fileDir . '/' . $size['width'] . 'x' . $size['height'] . '.webp';
-            $webpFilePath = $fileDir . '/' . $size['width'] . '.webp';
-            $this->convertToWebpFromResource($resizedImage, $webpFilePath);
-            imagedestroy($resizedImage);
-        }
-
-        imagedestroy($image);
-    }
-    
-    
-    private function convertToWebp(UploadedFile $file, string $extension, string $webpFilePath)
-    {
-        switch ($extension) {
-            case 'jpeg':
-            case 'jpg':
-                $image = imagecreatefromjpeg($file->getPathname());
-                break;
-            case 'png':
-                $image = imagecreatefrompng($file->getPathname());
-                break;
-            case 'gif':
-                $image = imagecreatefromgif($file->getPathname());
-                break;
-            default:
-                throw new \Exception('Unsupported image type');
-        }
-
-        // Save the image in WEBP format
-        if ($image !== false) {
-            imagewebp($image, $webpFilePath, 80); // 80 is the quality (0-100)
-            imagedestroy($image); // Free up memory
-        } else {
-            throw new \Exception('Image conversion failed');
-        }
-    }
-    
-    //Resize an image while preserving the aspect ratio.
-    private function resizeImage($image, int $originalWidth, int $originalHeight, int $targetWidth, int $targetHeight)
-    {
-        // Calculate aspect ratio
-        $aspectRatio = $originalWidth / $originalHeight;
-
-        // Determine new dimensions while preserving the aspect ratio
-        if ($originalWidth > $originalHeight) {
-            $newWidth = $targetWidth;
-            $newHeight = $targetWidth / $aspectRatio;
-        } else {
-            $newHeight = $targetHeight;
-            $newWidth = $targetHeight * $aspectRatio;
-        }
-
-        // Create a new true color image with the new dimensions
-        $resizedImage = imagecreatetruecolor($newWidth, $newHeight);
-
-        // Copy and resize the original image into the resized image
-        imagecopyresampled($resizedImage, $image, 0, 0, 0, 0, $newWidth, $newHeight, $originalWidth, $originalHeight);
-
-        return $resizedImage;
-    }
-
-
-    //Convert a GD image resource to WEBP format.
-    private function convertToWebpFromResource($image, string $webpFilePath)
-    {
-        if ($image !== false) {
-            imagewebp($image, $webpFilePath, 80); // Save as WEBP with 80 quality
-        } else {
-            throw new \Exception('Image conversion failed');
-        }
-    }
-    
 
 };

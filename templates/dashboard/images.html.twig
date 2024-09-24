@@ -220,19 +220,13 @@
       <div class="modal-body">
         
       <div class="mb-3">
-        <p class="m-0">Name:</p>
-        <input type="text" class="form-control" id="sympa-search-name-modal-input" aria-describedby="">
-      </div>
-
-      <div class="mb-3">
-        <p class="m-0">Description:</p>
-        <textarea class="form-control" id="sympa-search-name-modal-input" rows="3"></textarea>
+        <input type="text" class="form-control" id="sympa-search-name-modal-input" placeholder="Enter term...">
       </div>
 
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" onclick="document.getElementById('sympa-search-modal').style.display='none'">Cancel</button>
-        <button type="button" class="btn btn-primary" onclick="sympa_searchModalAction()">Accept</button>
+        <button type="button" class="btn btn-primary" onclick="sympa_searchModalAction()">Go</button>
       </div>
 
 	<div class="alert alert-warning alert-dismissible" role="alert" style="display:none; margin-bottom: 0;">
@@ -284,6 +278,10 @@
     </div>
   </div>
 </div>
+
+
+
+
 
 
 
@@ -397,7 +395,7 @@ function sympa_drawList(data)
                   <div onclick="sympa_editGroupModal('${infoFile}', '${dir}')" class="btn btn-primary btn-sm sympa-list-font">Edit</div>
                   -->
                   
-                  <a href="/dashboard/images-edit/${dir}" class="btn btn-primary btn-sm sympa-list-font" target="_blank">Add images</a>
+                  <a href="/dashboard/images-edit/${dir}" class="btn btn-primary btn-sm sympa-list-font" target="_blank">Edit</a>
                   <div onclick="sympa_deleteArticleModal(${dir})" class="btn btn-outline-primary btn-sm sympa-list-font">Delete</div>
                 </div>            
             </span>

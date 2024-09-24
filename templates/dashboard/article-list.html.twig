@@ -342,30 +342,8 @@ async function sympa_selectCategoryItemAction(){
       //      window.location.reload();
       // }, 2000);
     } 
-    
-    
-    /*
-    const createItem = function(id, slug, name){
-        return `<button data-id="${id}" data-slug="${slug}" data-name="${name}" type="button" class="btn btn-sm btn-light sympa-pill-button mx-1"> ${name} <span class="badge bg-danger" onclick="this.parentElement.remove()">×</span></button>	`;
-    }        
-
-    document.getElementById("sympa-category-modal").style.display = "none";  
-    let id = localStorage.getItem("sympa-add-to-category-item-id");
-    let name = localStorage.getItem("sympa-add-to-category-item-name");    
-    let slug = localStorage.getItem("sympa-add-to-category-item-slug");
-    
-    let target = document.getElementById("sympa-selected-categories-list");
-	let divElements = target.querySelectorAll('button[data-id]');
-
-	for (let i = 0; i < divElements.length; i++) {
-		let dataId = divElements[i].getAttribute('data-id');		
-		if (dataId === id) {
-			return; 
-		}
-	}
-    
-    target.innerHTML += createItem(id, slug, name);  
-    */
+   
+  
 }
 
 

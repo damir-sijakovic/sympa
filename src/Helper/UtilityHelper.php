@@ -1,7 +1,9 @@
 <?php
 
 namespace App\Helper;
+
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 class UtilityHelper
 {
@@ -211,5 +213,128 @@ class UtilityHelper
 		return self::PROJECT_DIR . '/public';
 	}		
 	
-	
+	function templateString($str, $assoc) 
+    {
+        if (!is_array($assoc))
+        {
+            error_log('templateString(): $assoc parametar must be associative array!');
+        }
+
+        $t = $str;
+
+        foreach($assoc as $k => $v)
+        {		
+            if (is_string($v))
+            {
+                $t = str_replace('{{'. $k .'}}', $v, $t);
+            }
+        }	
+        
+        $purgedTemplateData = preg_replace('/{{[\s\S]+?}}/', '', $t);
+        return $purgedTemplateData;
+    }
+    
+    
+    function resizeAndConvertToWebp(UploadedFile $file, string $fileDir)
+    {
+        $extension = strtolower($file->getClientOriginalExtension());
+
+        switch ($extension) {
+            case 'jpeg':
+            case 'jpg':
+                $image = imagecreatefromjpeg($file->getPathname());
+                break;
+            case 'png':
+                $image = imagecreatefrompng($file->getPathname());
+                break;
+            case 'gif':
+                $image = imagecreatefromgif($file->getPathname());
+                break;
+            default:
+                throw new \Exception('Unsupported image type');
+        }
+
+        $originalWidth = imagesx($image);
+        $originalHeight = imagesy($image);
+
+        $sizes = [
+            ['width' => 200, 'height' => 200],
+            ['width' => 400, 'height' => 400]
+        ];
+
+        foreach ($sizes as $size) {
+            $resizedImage = $this->resizeImage($image, $originalWidth, $originalHeight, $size['width'], $size['height']);
+            //$webpFilePath = $fileDir . '/' . uniqid() . '_' . $size['width'] . 'x' . $size['height'] . '.webp';
+            //$webpFilePath = $fileDir . '/' . $size['width'] . 'x' . $size['height'] . '.webp';
+            $webpFilePath = $fileDir . '/' . $size['width'] . '.webp';
+            $this->convertToWebpFromResource($resizedImage, $webpFilePath);
+            imagedestroy($resizedImage);
+        }
+
+        imagedestroy($image);
+    }
+    
+    
+    function convertToWebp(UploadedFile $file, string $extension, string $webpFilePath) 
+    {
+        switch ($extension) {
+            case 'jpeg':
+            case 'jpg':
+                $image = imagecreatefromjpeg($file->getPathname());
+                break;
+            case 'png':
+                $image = imagecreatefrompng($file->getPathname());
+                break;
+            case 'gif':
+                $image = imagecreatefromgif($file->getPathname());
+                break;
+            default:
+                throw new \Exception('Unsupported image type');
+        }
+
+        // Save the image in WEBP format
+        if ($image !== false) {
+            imagewebp($image, $webpFilePath, 80); // 80 is the quality (0-100)
+            imagedestroy($image); // Free up memory
+        } else {
+            throw new \Exception('Image conversion failed');
+        }
+    }
+    
+    //Resize an image while preserving the aspect ratio.
+    function resizeImage($image, int $originalWidth, int $originalHeight, int $targetWidth, int $targetHeight)
+    {
+        // Calculate aspect ratio
+        $aspectRatio = $originalWidth / $originalHeight;
+
+        // Determine new dimensions while preserving the aspect ratio
+        if ($originalWidth > $originalHeight) {
+            $newWidth = $targetWidth;
+            $newHeight = $targetWidth / $aspectRatio;
+        } else {
+            $newHeight = $targetHeight;
+            $newWidth = $targetHeight * $aspectRatio;
+        }
+
+        // Create a new true color image with the new dimensions
+        $resizedImage = imagecreatetruecolor($newWidth, $newHeight);
+
+        // Copy and resize the original image into the resized image
+        imagecopyresampled($resizedImage, $image, 0, 0, 0, 0, $newWidth, $newHeight, $originalWidth, $originalHeight);
+
+        return $resizedImage;
+    }
+
+
+    //Convert a GD image resource to WEBP format.
+    function convertToWebpFromResource($image, string $webpFilePath)
+    {
+        if ($image !== false) {
+            imagewebp($image, $webpFilePath, 80); // Save as WEBP with 80 quality
+        } else {
+            throw new \Exception('Image conversion failed');
+        }
+    }
+    
+    
 };

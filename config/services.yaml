@@ -25,9 +25,14 @@ services:
     # please note that last definitions always *replace* previous ones
 
     App\EventListener\MiddlewareListener:
+        arguments:
+            $shortCodeRegistrar: '@App\Service\ShortCodeRegistrar'
         tags:
             - { name: kernel.event_listener, event: kernel.controller, method: onKernelController }
             - { name: kernel.event_listener, event: kernel.response, method: onKernelResponse }
+
+    App\Service\ShortCodeService: ~
+    App\Service\ShortCodeRegistrar: ~
 
     # json exceptions for non-get requests
     App\EventSubscriber\ExceptionSubscriber:

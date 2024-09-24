@@ -75,7 +75,7 @@
           <li class=
           "list-group-item d-flex justify-content-between">
             <span>Total:</span>
-            <strong id="sympa-total-articles"></strong>
+            <strong id="sympa-total-categories"></strong>
           </li>
           
           -->   
@@ -119,7 +119,7 @@
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" onclick="document.getElementById('sympa-delete-single-modal').style.display='none'">Cancel</button>
-        <button type="button" class="btn btn-danger" onclick="sympa_deleteArticleModalAction()">Delete</button>
+        <button type="button" class="btn btn-danger" onclick="sympa_deleteCategoryModalAction()">Delete</button>
       </div>
 
 	<div class="alert alert-warning alert-dismissible fade show" role="alert" style="display:none; margin-bottom: 0;">
@@ -169,14 +169,14 @@ function sympa_tableCheck(checked){
     if (checked){
         const elements = document.querySelectorAll('.sympa-bulk-checkbox');
         elements.forEach(function(element) {
-            console.log(element);
+            //console.log(element);
             element.checked = true;
         });
     }
     else{
         const elements = document.querySelectorAll('.sympa-bulk-checkbox');
         elements.forEach(function(element) {
-            console.log(element);
+            //console.log(element);
             element.checked = false;
         });
     }    
@@ -188,14 +188,14 @@ function sympa_applyBulk(){
 }
 
 
-function sympa_deleteArticleModal(id){
+function sympa_deleteCategoryModal(id){
     let targetElement = document.getElementById("sympa-delete-single-modal");
     targetElement.style.display = "block";
     targetElement.setAttribute("data-id", id);
 }
 
 
-async function sympa_deleteArticleModalAction()
+async function sympa_deleteCategoryModalAction()
 {   
     let targetElement = document.getElementById("sympa-delete-single-modal");
     const id = targetElement.getAttribute("data-id"); 
@@ -203,7 +203,7 @@ async function sympa_deleteArticleModalAction()
     let postData = new FormData();  
     postData.append('id', id);
 
-    const response = await fetch('/article-delete', {
+    const response = await fetch('/category-delete', {
         method: 'POST', 
         body: postData,
     });
@@ -213,7 +213,7 @@ async function sympa_deleteArticleModalAction()
 		return null;
 	}
     else{
-        sympa_message("Article deleted!", "success");
+        sympa_message("Category deleted!", "success");
         setTimeout(function () {
             window.location.reload();
 		}, 2000);
@@ -249,7 +249,7 @@ function sympa_drawList(data)
                 <div class="btn-group" role="group" aria-label="Basic outlined example">
                   <div onclick="sympa_viewCategory(${id})" class="btn btn-primary btn-sm sympa-list-font" target="_blank">View</div>
                   <a href="/dashboard/category-edit/${id}" class="btn btn-primary btn-sm sympa-list-font" target="_blank">Edit</a>
-                  <div onclick="sympa_deleteArticleModal(${id})" class="btn btn-outline-primary btn-sm sympa-list-font">Delete</div>
+                  <div onclick="sympa_deleteCategoryModal(${id})" class="btn btn-outline-primary btn-sm sympa-list-font">Delete</div>
                 </div>            
             </span>
           </li>
@@ -312,19 +312,19 @@ function sympa_drawList(data)
     
     htmlData += `
         <li class="list-group-item d-flex justify-content-between" id="sympa-list-bottom-bar">
-            <div>Total: <span id="sympa-total-articles"></span> </div>
+            <div>Total: <span id="sympa-total-categories"></span> </div>
             <div id="sympa-bottom-right-message">::</div>
         </li> 
         <!--li class="list-group-item d-flex justify-content-between" id="sympa-list-bottom-bar">
             <span>Total:</span>
-            <div></div> <span id="sympa-total-articles"></span>
+            <div></div> <span id="sympa-total-categories"></span>
         </li-->   
     `;
     
     listElement.innerHTML = htmlData;
     
-    let totalArticlesElement = document.getElementById("sympa-total-articles");
-    totalArticlesElement.innerHTML = data.total + ' items(s)';   
+    let totalCategorysElement = document.getElementById("sympa-total-categories");
+    totalCategorysElement.innerHTML = data.total + ' items(s)';   
 }
 
 
@@ -344,7 +344,7 @@ function sympa_paginate(data){
 		visibleStartPage
 	} = data;
     
-    console.log("debug paginate data: ", data);
+    //console.log("debug paginate data: ", data);
     
     let htmlData = `
         <ul class="pagination">    
@@ -402,21 +402,18 @@ function sympa_paginate(data){
 }
 
 
-async function sympa_getArticles(page=1, perPage=3, sort='desc')
+async function sympa_getCategorys(page=1, perPage=3, sort='desc')
 {      
-    const response = await fetch('/category-get-all?page=' + page + '&per-page=' + perPage + '&sort=' + sort); // /article-get-all
+    const response = await fetch('/category-get-all?page=' + page + '&per-page=' + perPage + '&sort=' + sort); // /Category-get-all
 	const jsonData = await response.json();
 	if (response.status != 200) {
 		console.log('ERROR!');
 		return null;
 	}
     
-    if (!jsonData.articles){
-        throw new Error("Missing 'articles' object. Bad json format!");
+    if (!jsonData.Categorys){
+        throw new Error("Missing 'Categorys' object. Bad json format!");
     }
-    
-    // console.log( jsonData );    
-    // sympa-no-categories-found
     
     return jsonData;
 }
@@ -436,19 +433,6 @@ async function sympa_repaginate(page, perPage){
     
     sympa_drawList(data);	
     sympa_paginate(data.paginateData);
-    
-    /*
-   	const data = await sympa_getArticles(page, perPage, sort);
-    
-    if (data.total === 0){
-        document.getElementById("sympa-category-list").style.display = 'none';  
-        document.getElementById("sympa-no-category-list").style.display = 'block'; 
-        return;         
-    }
-            
-	sympa_drawList(data);	
-    sympa_paginate(data.paginateData);
-    */
 }
 
 
@@ -466,18 +450,7 @@ async function sympa_repaginateOld(page=1, perPage=10){
     sympa_drawList(data);	
     sympa_paginate(data.paginateData);
     
-    /*
-   	const data = await sympa_getArticles(page, perPage, sort);
-    
-    if (data.total === 0){
-        document.getElementById("sympa-category-list").style.display = 'none';  
-        document.getElementById("sympa-no-category-list").style.display = 'block'; 
-        return;         
-    }
-            
-	sympa_drawList(data);	
-    sympa_paginate(data.paginateData);
-    */
+
 }
 
 
@@ -491,13 +464,7 @@ async function sympa_getCategoriesNew()
     const sympaSort = localStorage.getItem("sympa-category-list-sort");     
     const sympaViewMode    = localStorage.getItem("sympa-category-list-view-mode");    
     const sympaSearch      = localStorage.getItem("sympa-category-list-search");  
-    
-    /* 
-    const sympaBulkMode    = localStorage.getItem("sympa-category-list-bulk-mode"); 
-    const sympaListMessage = localStorage.getItem("sympa-category-list-message"); 
-    const sympaCategory  = localStorage.getItem("sympa-category-list-category"); 
-    */
-    
+        
     let url = '/category-get-all?';  
     
     if (sympaViewMode === 'normal'){
@@ -527,27 +494,24 @@ async function sympa_getCategoriesNew()
     if (!jsonData.categories){
         throw new Error("Missing 'categories' object. Bad json format!");
     }
-    
-    // console.log( jsonData );    
-    // sympa-no-categories-found
-    
+        
     if (jsonData.total === 0) localStorage.setItem('sympa-category-empty', 'yes');
     
     return jsonData;
 }
 
 
-async function sympa_getArticlesByUrl(url)
+async function sympa_getCategorysByUrl(url)
 {          
-    const response = await fetch('/article-get-all?'+url); 
+    const response = await fetch('/Category-get-all?'+url); 
 	const jsonData = await response.json();
 	if (response.status != 200){
 		console.log('ERROR!');
 		return null;
 	}
     
-    if (!jsonData.articles){
-        throw new Error("Missing 'articles' object. Bad json format!");
+    if (!jsonData.Categorys){
+        throw new Error("Missing 'Categorys' object. Bad json format!");
     }
     
     return jsonData;
@@ -573,7 +537,7 @@ function sympa_openSetListValueModal(){
 
 
 function sympa_changeListMode(that){
-    console.log(that);
+    //console.log(that);
     if (that.value === 'normal'){
         document.getElementById("sympa-list-value-button").style.display = "none";
         document.getElementById("sympa-list-value-button").innerHTML = "Enter value...";
@@ -651,7 +615,7 @@ function sympa_viewCategory(id){
 
 function sympa_postUiRedraw(){
     
-    if (localStorage.getItem('sympa-article-empty') !== null) return; 
+    if (localStorage.getItem('sympa-Category-empty') !== null) return; 
 
     let value = localStorage.getItem('sympa-category-list-per-page');
     if (value) { 
@@ -723,7 +687,7 @@ async function sympa_initList(){
 window.addEventListener("load", async function(){
     sympa_initStorageSettings();
   // await sympa_getCategoriesNew();
-    // await sympa_getArticlesByUrl("page=1&perPage=10&category=1");
+    // await sympa_getCategorysByUrl("page=1&perPage=10&category=1");
     
   await sympa_initList();
   sympa_postUiRedraw();    
