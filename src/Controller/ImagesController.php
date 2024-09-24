@@ -280,15 +280,115 @@ class ImagesController extends AbstractController
 
 
 
-    public function deleteGroupImage(Request $request, $uuid): Response
+    public function deleteGroupImage(Request $request): Response
     {            
+        $group = $request->request->get('group');
+        $uuid = $request->request->get('uuid');
         
+        $groupDirName = $this->uploadDir .'/'. $group .'/'. $uuid;
+        //$jsonInfoFile = $groupDirName .'/info.json'; 
+        
+        if (!file_exists($groupDirName))
+        {
+            return $this->json([
+                'data' => null,
+                'error' => true,
+                'message' => 'No group file found!'
+            ]);
+        }        
+
+        if (!is_dir($groupDirName)) 
+        {
+            return $this->json([
+                'data' => null,
+                'error' => true,
+                'message' => 'No group file is not directory!'
+            ]);
+            
+        }
+        
+        array_map('unlink', glob("$groupDirName/*"));      
+        
+        if (!rmdir($groupDirName)) 
+        {
+            return $this->json([
+                'data' => null,
+                'error' => true,
+                'message' => "Can't group dir found!",
+            ]);
+        }
+                 
         return $this->json([
-            'data' =>null,
+            'data' => null,
             'error' => false,
-            'message' => 'OK'
+            'message' => 'Image deleted!'
         ]);
   
+    }
+
+
+
+    public function deleteBulkImage(Request $request): Response
+    {      
+        $deleteDir = function($_dir)
+        {
+            array_map('unlink', glob("$_dir/*"));      
+        
+            if (!rmdir($_dir)) 
+            {
+                return false; 
+            }
+            
+            return true;
+        };
+              
+        $group = $request->request->get('group');
+        $uuids = $request->request->get('uuids');
+        
+        $groupDirName = $this->uploadDir .'/'. $group;
+        if (!file_exists($groupDirName))
+        {
+            return $this->json([
+                'data' => null,
+                'error' => true,
+                'message' => 'No group file found!'
+            ]);
+        } 
+               
+        if (!is_dir($groupDirName)) 
+        {
+            return $this->json([
+                'data' => null,
+                'error' => true,
+                'message' => 'No group file is not directory!'
+            ]);            
+        }
+        
+        $idsArray = array_map('trim', explode(',', $uuids));
+                
+        for ($i=0; $i<count($idsArray); $i++)
+        {            
+            $target = $groupDirName .'/'. $idsArray[$i];      
+            if (!$deleteDir($target))
+            {
+                return $this->json([
+                    'data' => null,
+                    'error' => true,
+                    'message' => "Can't delete directory!"
+                ]);
+            }
+            
+            error_log($target);            
+        }                  
+        
+        return $this->json([
+            'data' => $group,
+            'error' => false,
+            'message' => $uuids,
+        ]);
+            
+            
+        
     }
 
 

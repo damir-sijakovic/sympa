@@ -291,6 +291,35 @@
 
 
 
+<div class="modal sympa-modal" id="sympa-bulk-ask-delete-modal" style="display:none;">
+  <div class="modal-dialog" style="max-width: 40% !important;">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Delete image</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" onclick="document.getElementById('sympa-bulk-ask-delete-modal').style.display='none'"></button>
+      </div>
+      <div class="modal-body">
+        
+      <div class="mb-3">
+        <p class="m-0"> Are you sure you want to delete image(s)? </p>
+      </div>
+
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-danger" onclick="sympa_bulkdeleteModalAction()">Delete</button>
+      </div>
+
+	<div class="alert alert-warning alert-dismissible" role="alert" style="display:none; margin-bottom: 0;">
+	   <span id="sympa-create-modal-message">...</span> 
+	  <button type="button" class="btn-close" onclick="this.parentElement.style.display='none'" ></button>
+	</div>
+
+    </div>
+  </div>
+</div>
+
+
+
 
 
 
@@ -370,7 +399,7 @@ function sympa_drawList(data)
         */
         
         return `
-         <li class="list-group-item d-flex justify-content-between bg-body-tertiary" title="${description}">
+         <li class="list-group-item d-flex justify-content-between bg-body-tertiary" title="${description}" data-id="${dir}">
             <div class="d-flex gap-3">                
                 <input class="form-check-input sympa-bulk-checkbox" type="checkbox">
                 <div class="d-flex justify-content-center align-items-center gap-1">  
@@ -407,8 +436,8 @@ function sympa_drawList(data)
                     <input style="margin-right: 1rem;" class="form-check-input" type="checkbox" onclick="sympa_tableCheck(this.checked)">
                     </div>     
                     <select class="form-select sympa-toolbar-font" aria-label="Default select example">
-                      <option value="-1" selected>Bulk actions...</option>
-                      <option value="1">Delete items</option>
+                      <option onclick="sympa_changeBulkMode(this)" value="none" selected>Bulk actions...</option>
+                      <option onclick="sympa_changeBulkMode(this)" value="delete-items">Delete items</option>
                     </select>
                     <div onclick="sympa_applyBulk()" class="btn btn-light btn-sm sympa-toolbar-font">Apply</div>
                 </div>                
@@ -418,13 +447,16 @@ function sympa_drawList(data)
             
                 <button data="" style="display:none" onclick="sympa_openSetListValueModal()" id="sympa-list-value-button" type="button" class="btn btn-light btn-sm sympa-toolbar-font">Enter value...</button>
                             
-                <div class="sympa-list-options mx-1">                    
+                <div class="sympa-list-options mx-1">   
+                    <!--             
                     <select id="sympa-select-right-sort" class="form-select sympa-toolbar-font" aria-label="Default select example">
                       <option selected onclick="sympa_changeListSort(this)" value="newest">Newest</option>
                       <option onclick="sympa_changeListMode(this)" value="oldest">Oldest</option>                
                     </select>
                     <button onclick="sympa_goAction()" type="button" class="btn btn-light btn-sm sympa-toolbar-font">Go</button>
+                    -->
                 </div>                               
+            
             </div>
         </li>   
     `;
@@ -468,18 +500,6 @@ async function sympa_getImages(groupSlug){
 }
 
 
-async function sympa_deleteImage(uuid){
-    const response = await fetch('/image-single-delete/' + uuid); 
-	const jsonData = await response.json();
-	if (response.status != 200){
-		console.log('ERROR!');
-		return null;
-	}
-
-    sympa_message("Image deleted!");
-    
-    return jsonData;
-}
 
 async function sympa_openEditImageInfoModal(group, slug, url){
     localStorage.setItem("sympa-image-edit-group", group);
@@ -512,6 +532,9 @@ async function sympa_getImageInfo(url){
     return jsonData;
 }
 
+
+
+
 async function sympa_getGroupInfo(){   
     const url = '{{imagesUrl}}' +'/'+ '{{slug}}' +'/info.json';
 
@@ -525,6 +548,71 @@ async function sympa_getGroupInfo(){
     return jsonData;
 }
 
+function sympa_getSelectedItemIds(){
+    const elements = document.querySelectorAll('.sympa-bulk-checkbox');
+    let selectedIds = [];
+    elements.forEach(function(element) {
+        if (element.checked){
+            const dataId = element.parentElement.parentElement.getAttribute('data-id');
+            selectedIds.push(dataId); 
+        }
+    });
+    
+    console.log("selectedIds", selectedIds);
+    return selectedIds;
+}
+
+
+async function sympa_deleteImage(uuid){
+    
+    let postData = new FormData();  
+    postData.append('uuid', uuid);
+    postData.append('group', '{{slug}}');
+
+    const response = await fetch('/image-single-delete', {
+        method: 'POST', 
+        body: postData,
+    });
+
+    const jsonData = await response.json();
+    if (response.status != 200) {	        
+        sympa_message(jsonData.message);	
+        return;
+    }
+    else{
+        sympa_message("Image deleted!", "success");
+            setTimeout(function () {
+            window.location.reload();
+        }, 2000);
+    } 
+  
+}
+
+async function sympa_bulkDeleteImages(uuids){
+    
+    let postData = new FormData();  
+    postData.append('uuids', uuids);
+    postData.append('group', '{{slug}}');
+
+    const response = await fetch('/image-bulk-delete', {
+        method: 'POST', 
+        body: postData,
+    });
+
+    const jsonData = await response.json();
+    if (response.status != 200) {	        
+        sympa_message(jsonData.message);	
+        return;
+    }
+    else{
+        sympa_message("Image(s) deleted!", "success");
+            setTimeout(function () {
+            window.location.reload();
+        }, 2000);
+    } 
+  
+}
+
 
 async function sympa_deleteImageModal(uuid, name){
     document.getElementById('sympa-delete-image-modal').style.display = "block";    
@@ -534,11 +622,80 @@ async function sympa_deleteImageModal(uuid, name){
 }
 
 
-function sympa_deleteImageModalAction(){
+async function sympa_deleteImageModalAction(){
     const uuid = localStorage.getItem("sympa-image-edit-uuid");
-    const name = localStorage.getItem("sympa-image-edit-name");
-    console.log(uuid, name);
+    const jsonData = await sympa_deleteImage(uuid);
 }
+
+
+async function sympa_bulkdeleteModalAction(){
+    const selectedItems = sympa_getSelectedItemIds(); 
+    if (selectedItems){            
+        await sympa_bulkDeleteImages(selectedItems);
+        document.getElementById("sympa-bulk-ask-delete-modal").style.display = "none";
+        console.log("selectedItems  +++ ");
+    } 
+}
+
+
+
+async function sympa_applyBulk(){
+    console.log("BULK");
+    //sympa_getSelectedItemIds();
+    
+    const bulkMode = localStorage.getItem('sympa-image-list-bulk-mode');
+    
+    if (bulkMode === 'delete-items'){
+        
+        document.getElementById("sympa-bulk-ask-delete-modal").style.display = "block";
+        
+        /*
+        // document.getElementById("sympa-delete-bulk-modal").style.display = "block";
+        const bulkMode = localStorage.getItem('sympa-image-list-bulk-mode');
+        console.log("BULK DELETE", bulkMode);
+        
+        const selectedItems = sympa_getSelectedItemIds();        
+        
+        if (selectedItems){            
+            await sympa_bulkDeleteImages(selectedItems);
+            console.log("selectedItems  +++ ");
+        }
+        */
+    }  
+    
+}
+
+
+
+function sympa_tableCheck(checked){
+    if (checked){
+        const elements = document.querySelectorAll('.sympa-bulk-checkbox');
+        elements.forEach(function(element) {
+            console.log(element);
+            element.checked = true;
+        });
+    }
+    else{
+        const elements = document.querySelectorAll('.sympa-bulk-checkbox');
+        elements.forEach(function(element) {
+            console.log(element);
+            element.checked = false;
+        });
+    }    
+}
+
+
+function sympa_changeBulkMode(that){
+    if (that.value === 'none'){
+        localStorage.setItem('sympa-image-list-bulk-mode', 'none');
+    }
+    if (that.value === 'delete-items'){
+        localStorage.setItem('sympa-image-list-bulk-mode', 'delete-items');
+    }
+}
+
+
+
 
 
 async function sympa_initList(){
@@ -556,6 +713,9 @@ async function sympa_initList(){
     const groupJsonObj = await sympa_getGroupInfo();
     document.getElementById('sympa-title').innerHTML = groupJsonObj.name;
 }
+
+
+
 
 
 

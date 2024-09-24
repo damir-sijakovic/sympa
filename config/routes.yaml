@@ -257,8 +257,13 @@ image_update_group_image_info:
     methods: ['POST']
     
 image_delete_image: 
-    path: /image-single-delete/{uuid}
+    path: /image-single-delete
     controller: App\Controller\ImagesController::deleteGroupImage
+    methods: ['POST']
+    
+image_bulk_image: 
+    path: /image-bulk-delete
+    controller: App\Controller\ImagesController::deleteBulkImage
     methods: ['POST']
     
 file_create_group: 
@@ -280,3 +285,14 @@ file_upload:
     path: /file-upload
     controller: App\Controller\FilesController::upload
     methods: ['POST']
+    
+file_delete_image: 
+    path: /file-single-delete
+    controller: App\Controller\FilesController::deleteGroupFile
+    methods: ['POST']
+    
+file_bulk_image: 
+    path: /file-bulk-delete
+    controller: App\Controller\FilesController::deleteBulkFile
+    methods: ['POST']    
+    

@@ -31,7 +31,7 @@
     background: #3e3e3ed1;
 }
 
-.sympa-image-container{
+.sympa-file-container{
     height:64px; 
     width:64px; 
     background:#666; 
@@ -42,7 +42,7 @@
     box-shadow: rgba(0, 0, 0, 0.12) 0px 1px 3px, rgba(0, 0, 0, 0.24) 0px 1px 2px;
 }
 
-.sympa-image-container-text{
+.sympa-file-container-text{
     
 }
 
@@ -72,14 +72,14 @@
 <br><br>
 
 
-<div id="sympa-no-image-list" class="alert alert-primary" role="alert" style="display:none">
+<div id="sympa-no-file-list" class="alert alert-primary" role="alert" style="display:none">
   No files found!
 </div>
 
 
 <div id="sympa-main-content">
 
-<ul id="sympa-image-list" class="list-group mb-3">
+<ul id="sympa-file-list" class="list-group mb-3">
     
     <!--
         <li id="sympa-list-titlebar" class="list-group-item d-flex justify-content-between">             
@@ -119,11 +119,11 @@
                 <input class="form-check-input sympa-bulk-checkbox" type="checkbox">
                 <div class="d-flex justify-content-center align-items-center gap-1">  
                 
-                    <div class="d-flex justify-content-center align-items-center sympa-image-container">  
+                    <div class="d-flex justify-content-center align-items-center sympa-file-container">  
                         <img loading="lazy" src="{{rootUrl}}/uploads/images/group-one/image-one/image-0.png" style="height:64px"/>
                     </div>
                     
-                    <div class="sympa-image-container-text">
+                    <div class="sympa-file-container-text">
                         <div style="display: flex;"> <h6 class="my-0">${name}</h6></div>  
                         <small>${description}</small>
                     </div>
@@ -145,11 +145,11 @@
                 <input class="form-check-input sympa-bulk-checkbox" type="checkbox">
                 <div class="d-flex justify-content-center align-items-center gap-1">  
                 
-                    <div class="d-flex justify-content-center align-items-center sympa-image-container">  
+                    <div class="d-flex justify-content-center align-items-center sympa-file-container">  
                         <img loading="lazy" src="{{rootUrl}}/uploads/images/group-one/image-two/image-0.jpg" style="height:64px"/>
                     </div>
                     
-                    <div class="sympa-image-container-text">
+                    <div class="sympa-file-container-text">
                         <div style="display: flex;"> <h6 class="my-0">${name}</h6></div>  
                         <small>${description}</small>
                     </div>
@@ -220,23 +220,23 @@
 
 
 
-<div class="modal sympa-modal" id="sympa-edit-image-info-modal" style="display:none;">
+<div class="modal sympa-modal" id="sympa-edit-file-info-modal" style="display:none;">
   <div class="modal-dialog">
     <div class="modal-content">
       <div class="modal-header">
         <h5 class="modal-title">Edit image properties</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" onclick="document.getElementById('sympa-edit-image-info-modal').style.display='none'"></button>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" onclick="document.getElementById('sympa-edit-file-info-modal').style.display='none'"></button>
       </div>
       <div class="modal-body">
         
       <div class="mb-3">
         <p class="m-0">Name:</p>
-        <input type="text" class="form-control" id="sympa-edit-image-info-modal-name-input" aria-describedby="">
+        <input type="text" class="form-control" id="sympa-edit-file-info-modal-name-input" aria-describedby="">
       </div>
 
       <div class="mb-3">
         <p class="m-0">Description:</p>
-        <textarea class="form-control" id="sympa-edit-image-info-modal-description-input" rows="3"></textarea>
+        <textarea class="form-control" id="sympa-edit-file-info-modal-description-input" rows="3"></textarea>
       </div>
 
       </div>
@@ -260,22 +260,22 @@
 
 
 
-<div class="modal sympa-modal" id="sympa-delete-image-modal" style="display:none;">
+<div class="modal sympa-modal" id="sympa-delete-file-modal" style="display:none;">
   <div class="modal-dialog" style="max-width: 40% !important;">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title">Delete image</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" onclick="document.getElementById('sympa-delete-image-modal').style.display='none'"></button>
+        <h5 class="modal-title">Delete File</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" onclick="document.getElementById('sympa-delete-file-modal').style.display='none'"></button>
       </div>
       <div class="modal-body">
         
       <div class="mb-3">
-        <p class="m-0"> Delete image '<span id="sympa-delete-image-modal-name"></span>' ? </p>
+        <p class="m-0"> Delete file '<span id="sympa-delete-file-modal-name"></span>' ? </p>
       </div>
 
       </div>
       <div class="modal-footer">
-        <button type="button" class="btn btn-danger" onclick="sympa_deleteImageModalAction()">Delete</button>
+        <button type="button" class="btn btn-danger" onclick="sympa_deleteFileModalAction()">Delete</button>
       </div>
 
 	<div class="alert alert-warning alert-dismissible" role="alert" style="display:none; margin-bottom: 0;">
@@ -286,6 +286,50 @@
     </div>
   </div>
 </div>
+
+
+
+
+
+
+
+
+
+
+
+<div class="modal sympa-modal" id="sympa-bulk-ask-delete-modal" style="display:none;">
+  <div class="modal-dialog" style="max-width: 40% !important;">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Delete file</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" onclick="document.getElementById('sympa-bulk-ask-delete-modal').style.display='none'"></button>
+      </div>
+      <div class="modal-body">
+        
+      <div class="mb-3">
+        <p class="m-0"> Are you sure you want to delete file(s)? </p>
+      </div>
+
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-danger" onclick="sympa_bulkdeleteModalAction()">Delete</button>
+      </div>
+
+	<div class="alert alert-warning alert-dismissible" role="alert" style="display:none; margin-bottom: 0;">
+	   <span id="sympa-create-modal-message">...</span> 
+	  <button type="button" class="btn-close" onclick="this.parentElement.style.display='none'" ></button>
+	</div>
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+
+
 
 
 
@@ -381,7 +425,7 @@ function sympa_drawList(data)
                         <i style="font-size:32px;" class="bi bi-file-text"></i>
                     </div>
                     
-                    <div class="sympa-image-container-text">
+                    <div class="sympa-file-container-text">
                         <div style="display: flex;"> <h6 class="my-0">${name}</h6></div>  
                         <small>${description}</small>
                     </div>
@@ -393,7 +437,7 @@ function sympa_drawList(data)
                   <div onclick="sympa_openEditImageInfoModal('${group}', '${slug}', '${url}')" class="btn btn-primary btn-sm sympa-list-font" target="_blank">Edit</div>
                   -->
                   <a href="${download}" class="btn btn-primary btn-sm sympa-list-font" target="_blank">Download</a>
-                  <div onclick="sympa_copyToClipboard('${url}/original.webp')" class="btn btn-primary btn-sm sympa-list-font" target="_blank">Copy link</div>
+                  <div onclick="sympa_copyToClipboard('${download}')" class="btn btn-primary btn-sm sympa-list-font" target="_blank">Copy link</div>
                   <div onclick="sympa_deleteImageModal('${dir}', '${name}')" class="btn btn-outline-primary btn-sm sympa-list-font">Delete</div>
                 </div>            
             </span>
@@ -409,8 +453,8 @@ function sympa_drawList(data)
                     <input style="margin-right: 1rem;" class="form-check-input" type="checkbox" onclick="sympa_tableCheck(this.checked)">
                     </div>     
                     <select class="form-select sympa-toolbar-font" aria-label="Default select example">
-                      <option value="-1" selected>Bulk actions...</option>
-                      <option value="1">Delete items</option>
+                      <option onclick="sympa_changeBulkMode(this)" value="none" selected>Bulk actions...</option>
+                      <option onclick="sympa_changeBulkMode(this)" value="delete-items">Delete items</option>
                     </select>
                     <div onclick="sympa_applyBulk()" class="btn btn-light btn-sm sympa-toolbar-font">Apply</div>
                 </div>                
@@ -431,7 +475,7 @@ function sympa_drawList(data)
         </li>   
     `;
     
-    let listElement = document.getElementById("sympa-image-list");     
+    let listElement = document.getElementById("sympa-file-list");     
     
     for (const key in data.files) {
         htmlData += _createItem(data.files[key]);
@@ -462,7 +506,7 @@ async function sympa_getImages(groupSlug){
     if (!jsonData.data){
         sympa_message("Missing 'data' object. Bad url or invalid json format!");
         throw new Error("Missing 'data' object. Bad json format!");
-        // "sympa-no-image-list"
+        // "sympa-no-file-list"
         // "sympa-main-content"
     }
     
@@ -471,23 +515,26 @@ async function sympa_getImages(groupSlug){
 
 
 async function sympa_deleteImage(uuid){
-    const response = await fetch('/image-single-delete/' + uuid); 
+    const response = await fetch('/file-single-delete/' + uuid); 
 	const jsonData = await response.json();
 	if (response.status != 200){
 		console.log('ERROR!');
 		return null;
 	}
 
-    sympa_message("Image deleted!");
+    sympa_message("File deleted!");
     
     return jsonData;
 }
 
+
+
+
 async function sympa_openEditImageInfoModal(group, slug, url){
-    localStorage.setItem("sympa-image-edit-group", group);
-    localStorage.setItem("sympa-image-edit-slug", slug);
-    localStorage.setItem("sympa-image-edit-url", url);
-    document.getElementById('sympa-edit-image-info-modal').style.display = "block";
+    localStorage.setItem("sympa-file-edit-group", group);
+    localStorage.setItem("sympa-file-edit-slug", slug);
+    localStorage.setItem("sympa-file-edit-url", url);
+    document.getElementById('sympa-edit-file-info-modal').style.display = "block";
     
     const jsonInfo = await sympa_getImageInfo(url);
     if (!(jsonInfo.name && jsonInfo.slug && jsonInfo.description)) {
@@ -495,8 +542,8 @@ async function sympa_openEditImageInfoModal(group, slug, url){
         return;
     }
     
-    document.getElementById('sympa-edit-image-info-modal-name-input').value = jsonInfo.name;
-    document.getElementById('sympa-edit-image-info-modal-description-input').value = jsonInfo.description;    
+    document.getElementById('sympa-edit-file-info-modal-name-input').value = jsonInfo.name;
+    document.getElementById('sympa-edit-file-info-modal-description-input').value = jsonInfo.description;    
 }
 
 function sympa_editImageInfo(){
@@ -527,27 +574,129 @@ async function sympa_getGroupInfo(){
     return jsonData;
 }
 
+function sympa_getSelectedItemIds(){
+    const elements = document.querySelectorAll('.sympa-bulk-checkbox');
+    let selectedIds = [];
+    elements.forEach(function(element) {
+        if (element.checked){
+            const dataId = element.parentElement.parentElement.getAttribute('data-id');
+            selectedIds.push(dataId); 
+        }
+    });
+    
+    console.log("selectedIds", selectedIds);
+    return selectedIds;
+}
+
+
 
 async function sympa_deleteImageModal(uuid, name){
-    document.getElementById('sympa-delete-image-modal').style.display = "block";    
-    localStorage.setItem("sympa-image-edit-uuid", uuid);
-    localStorage.setItem("sympa-image-edit-name", name);
-    document.getElementById('sympa-delete-image-modal-name').innerHTML = name;    
+    document.getElementById('sympa-delete-file-modal').style.display = "block";    
+    localStorage.setItem("sympa-file-edit-uuid", uuid);
+    localStorage.setItem("sympa-file-edit-name", name);
+    document.getElementById('sympa-delete-file-modal-name').innerHTML = name;    
 }
 
 
-function sympa_deleteImageModalAction(){
-    const uuid = localStorage.getItem("sympa-image-edit-uuid");
-    const name = localStorage.getItem("sympa-image-edit-name");
-    console.log(uuid, name);
+async function sympa_deleteFileModalAction(){
+    /*
+    const group = '{{slug}}';
+    const uuid = localStorage.getItem("sympa-file-edit-uuid");
+    const name = localStorage.getItem("sympa-file-edit-name");
+    console.log(uuid +' '+ name +' '+ group);
+    */
+    
+    const uuid = localStorage.getItem("sympa-file-edit-uuid");
+    const jsonData = await sympa_deleteFile(uuid);
 }
+
+
+async function sympa_deleteFile(uuid){
+    
+    let postData = new FormData();  
+    postData.append('uuid', uuid);
+    postData.append('group', '{{slug}}');
+
+    const response = await fetch('/file-single-delete', {
+        method: 'POST', 
+        body: postData,
+    });
+
+    const jsonData = await response.json();
+    if (response.status != 200) {	        
+        sympa_message(jsonData.message);	
+        return;
+    }
+    else{
+        sympa_message("File deleted!", "success");
+            setTimeout(function () {
+            window.location.reload();
+        }, 2000);
+    } 
+  
+}
+
+
+async function sympa_bulkDeleteFiles(uuids){
+    
+    let postData = new FormData();  
+    postData.append('uuids', uuids);
+    postData.append('group', '{{slug}}');
+
+    const response = await fetch('/file-bulk-delete', {
+        method: 'POST', 
+        body: postData,
+    });
+
+    const jsonData = await response.json();
+    if (response.status != 200) {	        
+        sympa_message(jsonData.message);	
+        return;
+    }
+    else{
+        sympa_message("File(s) deleted!", "success");
+            setTimeout(function () {
+            window.location.reload();
+        }, 2000);
+    } 
+  
+}
+
+function sympa_tableCheck(checked){
+    if (checked){
+        const elements = document.querySelectorAll('.sympa-bulk-checkbox');
+        elements.forEach(function(element) {
+            console.log(element);
+            element.checked = true;
+        });
+    }
+    else{
+        const elements = document.querySelectorAll('.sympa-bulk-checkbox');
+        elements.forEach(function(element) {
+            console.log(element);
+            element.checked = false;
+        });
+    }    
+}
+
+
+function sympa_changeBulkMode(that){
+    if (that.value === 'none'){
+        localStorage.setItem('sympa-image-list-bulk-mode', 'none');
+    }
+    if (that.value === 'delete-items'){
+        localStorage.setItem('sympa-image-list-bulk-mode', 'delete-items');
+    }
+}
+
+
 
 
 async function sympa_initList(){
     const imagesJsonObj = await sympa_getImages('{{slug}}');
         
     if (imagesJsonObj.data.count === 0){
-        document.getElementById('sympa-no-image-list').style.display = "block";
+        document.getElementById('sympa-no-file-list').style.display = "block";
         document.getElementById('sympa-main-content').style.display = "none";
         
     }
@@ -563,6 +712,30 @@ async function sympa_initList(){
 
 
 
+async function sympa_applyBulk(){
+    console.log("BULK");
+    //sympa_getSelectedItemIds();
+    
+    const bulkMode = localStorage.getItem('sympa-image-list-bulk-mode');
+    
+    if (bulkMode === 'delete-items'){        
+        document.getElementById("sympa-bulk-ask-delete-modal").style.display = "block";
+    }  
+    
+}
+
+
+
+async function sympa_bulkdeleteModalAction(){
+    const selectedItems = sympa_getSelectedItemIds(); 
+    if (selectedItems){            
+        await sympa_bulkDeleteFiles(selectedItems);
+        document.getElementById("sympa-bulk-ask-delete-modal").style.display = "none";
+        console.log("selectedItems  +++ ");
+    } 
+}
+
+
 
 //MAIN
 window.addEventListener("load", async function(){
@@ -573,7 +746,7 @@ window.addEventListener("load", async function(){
 
 
 /*
-sympa-no-image-list
+sympa-no-file-list
 sympa-main-content
 */
 

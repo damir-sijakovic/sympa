@@ -1,3 +1,8 @@
+0.2.1.1727210934
+=====
+"Files" - same as "Images"  
+Small bug fixes.
+
 0.2.1.1727151480
 =====
 Added Shortcodes :) use ShortCodeRegistrar to add your codes to use in content. This works only in html output.
