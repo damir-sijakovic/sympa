@@ -197,15 +197,36 @@ class CategoryController extends AbstractController
 
     public function edit(Request $request): Response
     {
-       $id = $request->request->get('id');
+        $id = $request->request->get('id');
         $name = $request->request->get('name');
+        $parent = $request->request->get('parent');
+        $description = $request->request->get('description');
+        $active = $request->request->get('active');
+        $image = $request->request->get('image');
 
-        if (!$name) {
-            return $this->json([
-                'error' => true,
-                'data' => null,
-                'message' => 'Catgeory name is required',            
-            ], Response::HTTP_BAD_REQUEST);
+        if (!$id) 
+        {
+            return $this->json([ 'error' => true, 'data' => null, 'message' => "Catgeory 'id' is required." ], Response::HTTP_BAD_REQUEST);
+        }
+
+        if (!$name) 
+        {
+            return $this->json([ 'error' => true, 'data' => null, 'message' => "Catgeory 'name' is required." ], Response::HTTP_BAD_REQUEST);
+        }
+
+        if (!$description) 
+        {
+            return $this->json([ 'error' => true, 'data' => null, 'message' => "Catgeory 'description' is required." ], Response::HTTP_BAD_REQUEST);
+        }
+
+        if (!$active) 
+        {
+            return $this->json([ 'error' => true, 'data' => null, 'message' => "Catgeory 'active' is required." ], Response::HTTP_BAD_REQUEST);
+        }
+
+        if (!$image) 
+        {
+            return $this->json([ 'error' => true, 'data' => null, 'message' => "Catgeory 'image' is required." ], Response::HTTP_BAD_REQUEST);
         }
 
         $categoryRepository = $this->entityManager->getRepository(Category::class);
@@ -232,6 +253,8 @@ class CategoryController extends AbstractController
                 'message' => 'Category saved successfully',            
             ]);
     }
+       
+       
        
        
     public function getCategoriesByIds(Request $request): Response

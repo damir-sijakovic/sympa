@@ -1,0 +1,222 @@
+<style>
+.popover{
+    box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
+}
+</style>
+
+<div class="modal sympa-modal" id="sympa-image-selector-modal" style="display:none;">
+  <div class="modal-dialog" style="min-width: 80%;">
+    <div class="modal-content" >
+      <div class="modal-header">
+        <h5 class="modal-title" >Select image</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" onclick="document.getElementById('sympa-image-selector-modal').style.display='none'"></button>
+      </div>
+      
+      <div class="modal-body" style="height: calc(100vh - 200px) !important; overflow:scroll;">
+                
+        <div id="sympa-image-selector-modal-loading" class="d-flex justify-content-center align-items-center h-100">
+            <div class="spinner-border" role="status">
+              <span class="visually-hidden">Loading...</span>
+            </div>
+       </div>
+      
+      <div id="sympa-image-selector-modal-main" style="display:none">
+      
+      <div class="d-flex align-items-center my-1">      
+       <span class="mx-1" style="font-size:12px;">Group: </span> 
+       <select id="sympa-image-selector-modal-select" class="form-select" style="font-size:12px;">
+            <option selected>Select...</option>
+            <option value="1">One</option>
+            <option value="2">Two</option>
+            <option value="3">Three</option>
+        </select>
+      </div>
+      
+        <ul id="sympa-image-selector-modal-select-ul" class="list-group">
+          <li class="sympa-image-selector-modal-li list-group-item">Empty list</li>
+        </ul>
+        </div>
+                
+      </div>
+      
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary" onclick="sympa_imageSelectorSelectButton()">Select</button>
+      </div>
+
+	<div class="alert alert-warning alert-dismissible fade show" role="alert" style="display:none; margin-bottom: 0;">
+	   <span id="sympa-image-selector-modal-message"> Hello</span> 
+	  <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close" ></button>
+	</div>
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+
+
+
+
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+
+
+function sympa_toggleSelectedImage(that){
+    console.log(that);
+    document.querySelectorAll('.sympa-image-selector-modal-li').forEach(element => element.classList.remove('active'));
+    that.classList.toggle("active");
+
+    const name = that.getAttribute('image-url');
+    localStorage.setItem("sympa-select-image-name", name);
+}
+
+async function sympa_getImages(groupSlug){
+    const response = await fetch('/image-get-group-images/' + groupSlug); 
+	const jsonData = await response.json();
+	if (response.status != 200){
+		console.log('ERROR!');
+		return null;
+	}
+    
+    if (!jsonData.data){
+        sympa_message("Missing 'data' object. Bad url or invalid json format!");
+        throw new Error("Missing 'data' object. Bad json format!");
+    }
+    
+    return jsonData;
+}
+
+
+async function sympa_getImageGroups(){
+    const response = await fetch('/image-get-groups'); 
+	const jsonData = await response.json();
+	if (response.status != 200){
+		console.log('ERROR!');
+		return null;
+	}
+    
+    if (!jsonData.data){
+        sympa_message("Missing 'data' object. Bad json format!", "danger");
+        throw new Error("Missing 'data' object. Bad json format!");
+    }
+    
+    return jsonData;
+}
+
+async function sympa_imageSelectorDropdownAction(groupSlug){
+    
+    const _applyPopup = function(element, url){
+        let t = new bootstrap.Popover(element, {
+            html: true,
+            content: `<img src="`+ url +`" 
+                alt="" style="max-width: 100%;">`,
+                trigger: 'hover',
+                placement: 'bottom',
+            show: 1000,
+        }); 
+          
+        element.addEventListener('shown.bs.popover', function () {
+            setTimeout(function () {
+                t.hide();
+            }, 5000);
+        });  
+           
+          
+        return element;
+    } 
+    
+    const _createLiElement = function(textContent, url){
+  
+        var liElement = document.createElement("li");
+        liElement.classList.add("sympa-image-selector-modal-li", "list-group-item", "d-flex", "justify-content-between");
+        // liElement.textContent = textContent;
+        
+        
+        var divLeft = document.createElement("div");
+        var divRight = document.createElement("div");
+        
+        divLeft.textContent = textContent;
+        divRight.innerHTML = '<i class="bi bi-eye"></i>';
+        
+        _applyPopup(divRight, url + '/200.webp'); 
+        
+        liElement.appendChild(divLeft);
+        liElement.appendChild(divRight);
+        
+        
+        liElement.setAttribute('image-url', url + '/original.webp');
+        
+        // Assign the function as a reference for the click event, wrapping it in an anonymous function
+        liElement.onclick = function() {
+            sympa_toggleSelectedImage(liElement);
+        };
+
+        return liElement;
+    }         
+        
+    
+    const jsonObj = await sympa_getImages(groupSlug);
+    //console.log(jsonObj.data.images);
+    let target = document.getElementById('sympa-image-selector-modal-select-ul');
+    target.innerHTML = '';
+    for (let i=0; i<jsonObj.data.count; i++){
+        console.log(">> ", jsonObj.data.images[i]);        
+        //target.innerHTML += '<li class="sympa-image-selector-modal-li list-group-item">'+ jsonObj.data.images[i].name +'</li>';
+        let li = _createLiElement(jsonObj.data.images[i].name, jsonObj.data.images[i].url);         
+        // _applyPopup(li, jsonObj.data.images[i].url + '/200.webp'); 
+        target.appendChild(li); 
+    }
+     
+}
+
+async function sympa_imageSelectorOpen(){
+    
+    localStorage.setItem("sympa-select-image-name", "");
+    const jsonObj = await sympa_getImageGroups();
+    console.log(jsonObj.data);
+    
+    if (jsonObj.error){
+        sympa_message("Can't open modal: " . jsonObj.error );
+        return;        
+    }
+    
+    if (!jsonObj.data){
+        sympa_message("Can't open modal, invalid server data!");
+        return;        
+    }
+    
+    document.getElementById('sympa-image-selector-modal').style.display = 'block';    
+    document.getElementById('sympa-image-selector-modal-loading').style.setProperty('display', 'none', 'important');
+    document.getElementById('sympa-image-selector-modal-main').style.display = 'block';
+    
+    document.getElementById("sympa-image-selector-modal-select").innerHTML = "<option selected>Select...</option>";
+    
+    const _createDropdownItem = function(name, slug, description){
+        let target = document.getElementById("sympa-image-selector-modal-select");        
+        target.innerHTML += `<option onclick="sympa_imageSelectorDropdownAction('${slug}')">${name}</option>`; 
+    } 
+    
+    for (let i=0; i<jsonObj.data.groups.length; i++) {
+        const name = jsonObj.data.groups[i].name;
+        const slug = jsonObj.data.groups[i].dir;
+        const description = jsonObj.data.groups[i].description;
+        _createDropdownItem(name, slug, description);
+    } 
+    
+
+    
+}
+
+function sympa_imageSelectorSelectButton(){    
+    const name = localStorage.getItem("sympa-select-image-name");
+    document.getElementById('sympa-category-image-string-input').value = name;
+    document.getElementById('sympa-image-selector-modal').style.display = 'none';   
+}
+
+
+</script>

@@ -46,6 +46,38 @@ class DashboardController extends AbstractController
             'body' => $articles,
         ]);
     }
+     
+    public function products(Request $request): Response
+    {
+        $session = $request->getSession();	
+		$articles = $this->renderView('dashboard/product-list.html.twig', [
+			'rootUrl' => $this->utilityHelper->getRootUrl(),
+            'controller_name' => 'DashboardController',
+        ]);
+		
+        return $this->render('dashboard/main.html.twig', [
+            'userId' => $session->get('userId'),
+			'rootUrl' => $this->utilityHelper->getRootUrl(),
+            'body' => $articles,
+        ]);
+    }
+       
+
+    public function orders(Request $request): Response
+    {
+        $session = $request->getSession();	
+		$articles = $this->renderView('dashboard/orders.html.twig', [
+			'rootUrl' => $this->utilityHelper->getRootUrl(),
+            'controller_name' => 'DashboardController',
+        ]);
+		
+        return $this->render('dashboard/main.html.twig', [
+            'userId' => $session->get('userId'),
+			'rootUrl' => $this->utilityHelper->getRootUrl(),
+            'body' => $articles,
+        ]);
+    }
+       
        
     public function articles(Request $request): Response
     {
@@ -221,19 +253,21 @@ class DashboardController extends AbstractController
             throw new NotFoundHttpException('The category was not found.');
         }
 
+        $components = $this->renderView('dashboard/components/select-image.html.twig', [
+            'rootUrl' => $this->utilityHelper->getRootUrl(), 
+        ]);
+
         $categories = $this->renderView('dashboard/category-edit.html.twig', [
-            'rootUrl' => $this->utilityHelper->getRootUrl(),    
-        /*
-            'rootUrl' => $this->utilityHelper->getRootUrl(),    
-            'title' => $category->getTitle(),
-            'slug' => $category->getSlug(),
-            'excerpt' => $category->getExcerpt(),
-            'content' => $category->getContent(),
+            'id' => $id,
+            'components' => $components, 
+            'rootUrl' => $this->utilityHelper->getRootUrl(), 
+            'name' => $category->getName(),   
+            'slug' => $category->getSlug(), 
+            'parent' => $category->getParent(),
+            'description' => $category->getDescription(),
             'image' => $category->getImage(),
             'type' => $category->getType(),
-            'active' => $category->isActive() ? 'yes' : 'no',
-            'id' => $id
-            */
+            'visible' => $category->getVisible() ? 'yes' : 'no',
         ]);
 
         return $this->render('dashboard/main.html.twig', [ 
@@ -259,7 +293,9 @@ class DashboardController extends AbstractController
             'rootUrl' => $this->utilityHelper->getRootUrl(), 
             'name' => $tag->getName(),   
             'slug' => $tag->getSlug(), 
-            'id' => $id,
+            'description' => $tag->getDescription(), 
+            
+            
         /*
             'rootUrl' => $this->utilityHelper->getRootUrl(),    
             'title' => $category->getTitle(),
@@ -326,12 +362,13 @@ class DashboardController extends AbstractController
         
 		$body = $this->renderView('dashboard/docs.html.twig', [
 			'rootUrl' => $this->utilityHelper->getRootUrl(),
+            'nonce' => $request->attributes->get('nonce'),
         ]);
 		
         return $this->render('dashboard/main.html.twig', [ 
             'userId' => $session->get('userId'),           
 			'rootUrl' => $this->utilityHelper->getRootUrl(),
-            'body' => $body,
+            'body' => $body,            
         ]);
     }
   

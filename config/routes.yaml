@@ -102,6 +102,16 @@ dashboard_articles:
     controller: App\Controller\DashboardController::articles
     methods: ['GET']
 
+dashboard_products:
+    path: /dashboard/products
+    controller: App\Controller\DashboardController::products
+    methods: ['GET']
+    
+dashboard_orders:
+    path: /dashboard/orders
+    controller: App\Controller\DashboardController::orders
+    methods: ['GET']
+
 dashboard_article_create: 
     path: /dashboard/article-create
     controller: App\Controller\DashboardController::createArticle 

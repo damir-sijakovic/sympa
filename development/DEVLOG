@@ -1,3 +1,9 @@
+0.2.2.1727545338
+=====
+Introduced components - "imageSelector" component is reusable component.
+"Products" dashboard view only some parts.
+Created "Attribute" entity that can be linked with Article id. For example, you could add attributes like "brand" or product specific stuff.
+
 0.2.1.1727210934
 =====
 "Files" - same as "Images"  

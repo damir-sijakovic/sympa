@@ -1,0 +1,56 @@
+<style>
+html{
+	margin-top: 20px !important;
+}	
+	
+#sympa-admin-toolbar{
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	background: black;
+	position: fixed;
+	height: 20px;
+	top: 0;
+	right: 0;
+	left: 0;
+	color: white;
+	font-family:sans;
+	font-size: 10px;
+	padding: 0 10px 0 10px;
+	box-shadow: rgba(0, 0, 0, 0.09) 0px 2px 1px, rgba(0, 0, 0, 0.09) 0px 4px 2px, rgba(0, 0, 0, 0.09) 0px 8px 4px, rgba(0, 0, 0, 0.09) 0px 16px 8px, rgba(0, 0, 0, 0.09) 0px 32px 16px;
+	z-index: 999999;
+	border-bottom: 1px solid white;
+}
+
+.sympa-admin-toolbar-inner{
+	display: flex;
+	align-items: center;
+	gap: 10px;
+}
+
+.sympa-admin-toolbar-button{
+	cursor:pointer;
+	font-weight: bold;
+}
+
+.sympa-admin-toolbar-inner a{
+	text-decoration: none;
+	color:white;
+}
+
+
+
+</style>
+
+
+
+<div id="sympa-admin-toolbar">
+	<div class="sympa-admin-toolbar-inner">	
+		<a href="/dashboard" class="sympa-admin-toolbar-button" target="_blank">▣ Dashboard</a>
+		<a href="/dashboard/post/create" class="sympa-admin-toolbar-button" target="_blank">⊕ Add post</a>
+		<a href="/dashboard/post/edit/{{id|raw}}" class="sympa-admin-toolbar-button"  target="_blank">✎ Edit post</a>
+	</div>
+	<div>
+		<div class="sympa-admin-toolbar-button">⚷ Logout</div>
+	</div>
+</div>
