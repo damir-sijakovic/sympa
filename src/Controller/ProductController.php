@@ -5,6 +5,9 @@ namespace App\Controller;
 use App\Entity\Article;
 use App\Entity\ArticleTag;
 use App\Entity\ArticleCategory;
+use App\Entity\Category;
+use App\Entity\Tag;
+use App\Entity\Attribute;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -247,8 +250,8 @@ class ProductController extends AbstractController
     }
     
     
-    
-    public function getArticlesPost(Request $request): Response
+    /*
+    public function getProductsPost(Request $request): Response
     {
         try {
             $perPage = $request->query->getInt('per-page', 10);
@@ -302,15 +305,17 @@ class ProductController extends AbstractController
                              ->setParameter('tag', $tag);
             }
 
-            // First count all results that match the criteria
-            $totalQuery = clone $queryBuilder;
-            $totalArticles = count($totalQuery->getQuery()->getResult());
+            // Count total articles using a COUNT query for better performance
+            $totalArticles = (int) $queryBuilder->select('COUNT(a.id)')->getQuery()->getSingleScalarResult();
+
 
             // Apply pagination and sorting
-            $queryBuilder->orderBy('a.' . key($order), current($order))
-                         ->setFirstResult($offset)
-                         ->setMaxResults($perPage);
-
+            if (!empty($order)) {
+                $queryBuilder->orderBy('a.' . key($order), current($order));                
+            }
+            
+            $queryBuilder->setFirstResult($offset)->setMaxResults($perPage);
+            
             $articles = $queryBuilder->getQuery()->getResult();
 
             $articleData = [];
@@ -331,12 +336,126 @@ class ProductController extends AbstractController
             $paginateData = $this->utilityHelper->paginate($totalArticles, $perPage, $page, 3); // 3 = visible pages
 
             return $this->json(['total' => $totalArticles, 'articles' => $articleData, 'paginateData' => $paginateData]);
-        } catch (\Exception $e) {
+        } 
+        catch (\Exception $e) 
+        {
             return $this->json(['error' => $e->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
+*/
 
 
+public function getProductsPost(Request $request): Response
+{
+    try {
+        $perPage = $request->query->getInt('per-page', 10);
+        $page = $request->query->getInt('page', 1);
+        $sort = $request->query->get('sort', 'desc'); // Default sort order is descending
+        $active = $request->query->get('active'); // Get the active parameter
+        $search = $request->query->get('search'); // Get the search parameter
+        $category = $request->query->get('category'); // Get the category parameter
+        $tag = $request->query->get('tag'); // Get the tag parameter
+        $offset = ($page - 1) * $perPage;
+
+        // Determine the sorting order based on the "sort" parameter
+        if ($sort === 'id-asc') {
+            $order = ['id' => 'ASC'];
+        } elseif ($sort === 'id-desc') {
+            $order = ['id' => 'DESC'];
+        } else {
+            // Default to sorting by createdAt
+            $order = ($sort === 'asc') ? ['createdAt' => 'ASC'] : ['createdAt' => 'DESC'];
+        }
+
+        $articleRepository = $this->entityManager->getRepository(Article::class);
+
+        // Create criteria for the query, including active filter and type "article"
+        $queryBuilder = $articleRepository->createQueryBuilder('a')
+            ->where('a.type = :type')
+            ->setParameter('type', 'product');
+
+        if ($active === '1') {
+            $queryBuilder->andWhere('a.active = :active')->setParameter('active', true);
+        } elseif ($active === '0') {
+            $queryBuilder->andWhere('a.active = :active')->setParameter('active', false);
+        }
+
+        if (!empty($search)) {
+            $queryBuilder->andWhere('a.title LIKE :search OR a.excerpt LIKE :search')
+                         ->setParameter('search', '%' . $search . '%');
+        }
+
+        if (!empty($category)) {
+            // Join with ArticleCategory entity to filter by category
+            $queryBuilder->join('App\Entity\ArticleCategory', 'ac', 'WITH', 'ac.article = a')
+                         ->andWhere('ac.category = :category')
+                         ->setParameter('category', $category);
+        }
+
+        if (!empty($tag)) {
+            // Join with ArticleTag entity to filter by tag
+            $queryBuilder->join('App\Entity\ArticleTag', 'at', 'WITH', 'at.article = a')
+                         ->andWhere('at.tag = :tag')
+                         ->setParameter('tag', $tag);
+        }
+
+        // Clone the query builder for counting results to avoid affecting the main query
+        $totalQueryBuilder = clone $queryBuilder;
+        $totalArticles = (int) $totalQueryBuilder->select('COUNT(a.id)')->getQuery()->getSingleScalarResult();
+
+        // Log the pagination values for debugging
+        //error_log("Page: " . $page);
+        //error_log("PerPage: " . $perPage);
+        //error_log("Offset: " . $offset);
+        //error_log("Total Articles: " . $totalArticles);
+
+        // Ensure offset doesn't exceed total articles
+        if ($offset >= $totalArticles) {
+            $offset = max(0, $totalArticles - $perPage);  // Adjust offset if it exceeds total
+            //error_log("Adjusted Offset: " . $offset);  // Log the adjusted offset
+        }
+
+        // Apply pagination and sorting
+        if (!empty($order)) {
+            $queryBuilder->orderBy('a.' . key($order), current($order));
+        }
+
+        $queryBuilder->setFirstResult($offset)->setMaxResults($perPage);
+
+        // Fetch articles after count, this should return Article entities
+        $articles = $queryBuilder->getQuery()->getResult();
+
+        //if (empty($articles)) {
+        //    error_log("No articles found for the current page and offset.");
+        //} else {
+        //    error_log("Found " . count($articles) . " articles.");
+        //}
+
+        // Prepare article data for response
+        $articleData = [];
+        foreach ($articles as $article) {
+            $articleData[] = [
+                'id' => $article->getId(),
+                'title' => $article->getTitle(),
+                'excerpt' => $article->getExcerpt(),
+                'content' => $article->getContent(),
+                'slug' => $article->getSlug(),
+                'image' => $article->getImage(),
+                'created_at' => $article->getCreatedAt()->format('Y-m-d H:i:s'),
+                'modified_at' => $article->getModifiedAt() ? $article->getModifiedAt()->format('Y-m-d H:i:s') : null,
+                'active' => $article->isActive(),
+            ];
+        }
+
+        $paginateData = $this->utilityHelper->paginate($totalArticles, $perPage, $page, 3); // 3 = visible pages
+
+        return $this->json(['total' => $totalArticles, 'articles' => $articleData, 'paginateData' => $paginateData]);
+    } 
+    catch (\Exception $e) 
+    {
+        return $this->json(['error' => $e->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR);
+    }
+}
 
 
     public function getArticlesPostOLD(Request $request): Response
@@ -569,56 +688,213 @@ class ProductController extends AbstractController
   
   
     public function createPost(Request $request): Response
-	{          
-		$title = $request->request->get('title');
-		$slug = strtolower($this->slugger->slug($title)->toString());
-		$excerpt = $request->request->get('excerpt');
-		$content = $request->request->get('content');
+    {
+        $title = $request->request->get('name');
+        $slug = strtolower($this->slugger->slug($title)->toString());
+        $excerpt = $request->request->get('shortDescription');
+        $content = $request->request->get('description');
         $contentNoEscape = $this->utilityHelper->removeNewLines($content);
-     	
-        if (empty($title) || strlen($title)<3 ) {
-			return $this->json([
-                'error' => true, 
-                'message' => 'Title too short.', 
-                'data' => null
-            ]);
-		}
-
-		$existingArticle = $this->entityManager->getRepository(Article::class)->findOneBy(['title' => $title]) ?: $this->entityManager->getRepository(Article::class)->findOneBy(['slug' => $slug]);
-		if ($existingArticle){
-			return $this->json([
-                'error' => true, 
-                'message' => 'A article with the same title already exists.', 
-                'data' => null
-            ], 409);
-		}
-        
-        $article = new Article();
-		
         $active = ($request->request->get('active') === "true");
+        $image = $request->request->get('image');        
+        $price = floatval($request->request->get('price'));
+        $quantity = intval($request->request->get('quantity'));
+        $metaDescription = $request->request->get('metaDescription');
+        $ogTitle = $request->request->get('ogTitle');
+        $ogDescription = $request->request->get('ogDescription');
+        $ogUrl = $request->request->get('ogUrl');
+        $uuid = $request->request->get('uuid');
+        $groupUuid = $request->request->get('groupUuid');
         
-		$article->setTitle($title)
-			 ->setSlug($slug)
-			 ->setContent($contentNoEscape)
-			 ->setExcerpt($excerpt)
-			 ->setType('product')
-			 ->setImage('image.jpg')
-			 ->setAuthor("administrator")
-			 ->setCreatedAt(new \DateTimeImmutable())
-			 ->setModifiedAt(new \DateTimeImmutable())
-			 ->setActive($active); // Default to true if not set
+        // Create new Article
+        $article = new Article();
+        $article->setTitle($title)
+                ->setSlug($slug)
+                ->setContent($contentNoEscape)
+                ->setExcerpt($excerpt)
+                ->setActive($active)
+                ->setImage($image)
+                ->setPrice($price)
+                ->setQuantity($quantity)
+                ->setMetaDescription($metaDescription)
+                ->setOgTitle($ogTitle)
+                ->setOgDescription($ogDescription)
+                ->setOgUrl($ogUrl)
+                ->setUuid($uuid)
+                ->setType('product')
+                ->setAuthor("administrator")
+                ->setGroupUuid($groupUuid)
+                ->setCreatedAt(new \DateTimeImmutable())
+                ->setModifiedAt(new \DateTimeImmutable());
 
-		$this->entityManager->persist($article);
+        // Persist Article
+        $this->entityManager->persist($article);
         $this->entityManager->flush();
-        
-        $articleId = $article->getId();
-     
+
+        // Link Categories to Article
+        $categoryIds = $request->request->get('categories');
+        if ($categoryIds) {
+            $idsArray = array_map('trim', explode(',', $categoryIds));
+            foreach ($idsArray as $id) {
+                $category = $this->entityManager->getRepository(Category::class)->find($id);
+                if ($category) {
+                    $articleCategory = new ArticleCategory();
+                    $articleCategory->setArticle($article)
+                                    ->setCategory($category)
+                                    ->setType('product');
+                    $this->entityManager->persist($articleCategory);
+                }
+            }
+        }
+
+        // Link Tags to Article
+        $tagIds = $request->request->get('tags');
+        if ($tagIds) {
+            $idsArray = array_map('trim', explode(',', $tagIds));
+            foreach ($idsArray as $id) {
+                $tag = $this->entityManager->getRepository(Tag::class)->find($id);
+                if ($tag) {
+                    $articleTag = new ArticleTag();
+                    $articleTag->setArticle($article)
+                               ->setTag($tag)
+                               ->setType('product');
+                    $this->entityManager->persist($articleTag);
+                }
+            }
+        }
+
+
+         // Link Attributes to Article
+         $attributes = $request->request->get('attributes'); 
+         if ($attributes) {
+             $decodedData = json_decode($attributes, true);
+             foreach ($decodedData as $key => $value) {
+                 $attribute = new Attribute();
+                 $attribute->setArticleId($article->getId())
+                           ->setKey($key)
+                           ->setValue($value);
+                 $this->entityManager->persist($attribute);
+             }
+         }
+
+        // Save all changes
+        $this->entityManager->flush();
+
         return $this->json([
             'error' => false,
-            'message' => 'Post added successfully.',
-            'data' => ['article_id' => $articleId],
-        ], 201);    
-	}
+            'message' => 'Article created successfully',
+            'article_id' => $article->getId(),
+        ], 201);
+    }
+
+  
+
+
+
+    public function createPostBak(Request $request): Response
+    {
+        $title = $request->request->get('name');
+        $slug = strtolower($this->slugger->slug($title)->toString());
+        $excerpt = $request->request->get('shortDescription');
+        $content = $request->request->get('description');
+        $contentNoEscape = $this->utilityHelper->removeNewLines($content);
+        $active = ($request->request->get('active') === "true");
+        $image = $request->request->get('image');        
+        $price = floatval($request->request->get('price'));
+        $quantity = intval($request->request->get('quantity'));
+        $metaDescription = $request->request->get('metaDescription');
+        $ogTitle = $request->request->get('ogTitle');
+        $ogDescription = $request->request->get('ogDescription');
+        $ogUrl = $request->request->get('ogUrl');
+        $uuid = $request->request->get('uuid');
+        $groupUuid = $request->request->get('groupUuid');
+        
+        // Create new Article
+        $article = new Article();
+        $article->setTitle($title)
+                ->setSlug($slug)
+                ->setContent($contentNoEscape)
+                ->setExcerpt($excerpt)
+                ->setActive($active)
+                ->setImage($image)
+                ->setPrice($price)
+                ->setQuantity($quantity)
+                ->setMetaDescription($metaDescription)
+                ->setOgTitle($ogTitle)
+                ->setOgDescription($ogDescription)
+                ->setOgUrl($ogUrl)
+                ->setUuid($uuid)
+                ->setType('product')
+                ->setAuthor("administrator")
+                ->setGroupUuid($groupUuid)
+                ->setCreatedAt(new \DateTimeImmutable())
+                ->setModifiedAt(new \DateTimeImmutable());
+
+        // Persist Article
+        $this->entityManager->persist($article);
+        $this->entityManager->flush();
+
+        // Link Categories to Article
+        $categoryIds = $request->request->get('categories');
+        if ($categoryIds) {
+            $idsArray = array_map('trim', explode(',', $categoryIds));
+            foreach ($idsArray as $id) {
+                $category = $this->entityManager->getRepository(Category::class)->find($id);
+                if ($category) {
+                    $articleCategory = new ArticleCategory();
+                    $articleCategory->setArticle($article)
+                                    ->setCategory($category)
+                                    ->setType('product');
+                    $this->entityManager->persist($articleCategory);
+                }
+            }
+        }
+
+        // Link Tags to Article
+        $tagIds = $request->request->get('tags');
+        if ($tagIds) {
+            $idsArray = array_map('trim', explode(',', $tagIds));
+            foreach ($idsArray as $id) {
+                $tag = $this->entityManager->getRepository(Tag::class)->find($id);
+                if ($tag) {
+                    $articleTag = new ArticleTag();
+                    $articleTag->setArticle($article)
+                               ->setTag($tag)
+                               ->setType('product');
+                    $this->entityManager->persist($articleTag);
+                }
+            }
+        }
+
+
+//     // Link Attributes to Article
+//     $attributes = $request->request->get('attributes'); 
+//     if ($attributes) {
+//         $decodedData = json_decode($attributes, true);
+//         foreach ($decodedData as $key => $value) {
+//             $attribute = new Attribute();
+//             $attribute->setArticleId($article->getId())
+//                       ->setKey($key)
+//                       ->setValue($value);
+//             $this->entityManager->persist($attribute);
+//         }
+//     }
+//
+
+        // Save all changes
+        $this->entityManager->flush();
+
+        return $this->json([
+            'error' => false,
+            'message' => 'Article created successfully',
+            'article_id' => $article->getId(),
+        ], 201);
+    }
+
+  
+
+
+
+
 
     
     public function updatePost(Request $request): Response

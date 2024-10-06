@@ -62,7 +62,32 @@ class DashboardController extends AbstractController
         ]);
     }
        
-
+       
+    public function createProduct(Request $request): Response
+    {
+        $session = $request->getSession();	
+        
+        $components = $this->renderView('dashboard/components/select-image.html.twig', [
+            'rootUrl' => $this->utilityHelper->getRootUrl(), 
+        ]);
+        
+		$articles = $this->renderView('dashboard/product-create.html.twig', [
+			'rootUrl' => $this->utilityHelper->getRootUrl(),
+			'imagesUrl' => $this->utilityHelper->getRootUrl() .'/uploads/images'  ,
+            'controller_name' => 'DashboardController',
+            'uuid' => $this->utilityHelper->generateUuid(),
+            'groupUuid' => $this->utilityHelper->generateUuid(),
+            'components' => $components,
+        ]);
+		
+        return $this->render('dashboard/main.html.twig', [
+            'userId' => $session->get('userId'),  
+			'rootUrl' => $this->utilityHelper->getRootUrl(),
+            'body' => $articles,
+        ]);
+    }     
+       
+       
     public function orders(Request $request): Response
     {
         $session = $request->getSession();	
@@ -146,8 +171,38 @@ class DashboardController extends AbstractController
     }
   
   
-    
+    public function productCategories(Request $request): Response
+    {
+        $session = $request->getSession();	
+		$articles = $this->renderView('dashboard/product-category-list.html.twig', [
+			'rootUrl' => $this->utilityHelper->getRootUrl(),
+            'controller_name' => 'DashboardController',
+        ]);
+		
+        return $this->render('dashboard/main.html.twig', [
+            'userId' => $session->get('userId'), 
+			'rootUrl' => $this->utilityHelper->getRootUrl(),
+            'body' => $articles,
+        ]);
+    }
   
+
+    public function productTags(Request $request): Response
+    {
+        $session = $request->getSession();	
+		$articles = $this->renderView('dashboard/product-tag-list.html.twig', [
+			'rootUrl' => $this->utilityHelper->getRootUrl(),
+            'controller_name' => 'DashboardController',
+        ]);
+		
+        return $this->render('dashboard/main.html.twig', [
+            'userId' => $session->get('userId'), 
+			'rootUrl' => $this->utilityHelper->getRootUrl(),
+            'body' => $articles,
+        ]);
+    }
+  
+
     public function categories(Request $request): Response
     {
         $session = $request->getSession();	
@@ -223,7 +278,6 @@ class DashboardController extends AbstractController
         ]);
     }
   
-  
     public function createTag(Request $request): Response
     {
         $session = $request->getSession();	
@@ -241,6 +295,35 @@ class DashboardController extends AbstractController
     }
   
   
+    public function createProductCategory(Request $request): Response
+    {
+		$articles = $this->renderView('dashboard/product-category-create.html.twig', [
+			'rootUrl' => $this->utilityHelper->getRootUrl(),
+            'controller_name' => 'DashboardController',
+        ]);
+		
+        return $this->render('dashboard/main.html.twig', [
+			'rootUrl' => $this->utilityHelper->getRootUrl(),
+            'body' => $articles,
+        ]);
+    }
+  
+  
+    public function createProductTag(Request $request): Response
+    {
+        $session = $request->getSession();	
+        
+		$articles = $this->renderView('dashboard/product-tag-create.html.twig', [
+			'rootUrl' => $this->utilityHelper->getRootUrl(),
+            'controller_name' => 'DashboardController',
+        ]);
+		
+        return $this->render('dashboard/main.html.twig', [
+			'rootUrl' => $this->utilityHelper->getRootUrl(),
+            'userId' => $session->get('userId'),  
+            'body' => $articles,
+        ]);
+    }
     
 
     public function editCategory(Request $request, $id): Response

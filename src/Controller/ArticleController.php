@@ -429,7 +429,7 @@ class ArticleController extends AbstractController
 
     
 
- public function deleteByIdsPostNew(Request $request): Response
+    public function deleteByIdsPostNew(Request $request): Response
     {
         $ids = $request->request->get('ids');
 

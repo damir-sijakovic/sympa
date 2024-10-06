@@ -33,6 +33,70 @@ class TagController extends AbstractController
     public function get(Request $request): Response
     {
         try {
+            $perPage = $request->query->getInt('per-page', 0); 
+            $page = $request->query->getInt('page', 1);
+            $sort = $request->query->get('sort', 'desc'); 
+            $search = $request->query->get('search'); 
+            $type = $request->query->get('type', 'article'); 
+            $offset = ($page - 1) * $perPage;
+
+            if ($sort === 'id-asc') {
+                $order = ['id' => 'ASC'];
+            } elseif ($sort === 'id-desc') {
+                $order = ['id' => 'DESC'];
+            } else {
+                $order = ($sort === 'asc') ? ['name' => 'ASC'] : ['name' => 'DESC'];
+            }
+
+            $tagRepository = $this->entityManager->getRepository(Tag::class);
+
+            $queryBuilder = $tagRepository->createQueryBuilder('t');
+
+            if (!empty($search)) {
+                $queryBuilder->andWhere('t.name LIKE :search OR t.slug LIKE :search')
+                             ->setParameter('search', '%' . $search . '%');
+            }
+
+            $queryBuilder->andWhere('t.type = :type')
+                         ->setParameter('type', $type);
+
+            $totalQuery = clone $queryBuilder;
+            $totalTags = count($totalQuery->getQuery()->getResult());
+
+            if ($perPage > 0) {
+                $queryBuilder->orderBy('t.' . key($order), current($order))
+                             ->setFirstResult($offset)
+                             ->setMaxResults($perPage);
+            } else {
+                $queryBuilder->orderBy('t.' . key($order), current($order));
+            }
+
+            $tags = $queryBuilder->getQuery()->getResult();
+
+            $tagData = [];
+            foreach ($tags as $tag) {
+                $tagData[] = [
+                    'id' => $tag->getId(),
+                    'name' => $tag->getName(),
+                    'slug' => $tag->getSlug()                   
+                ];
+            }
+
+            $paginateData = ($perPage > 0)
+                ? $this->utilityHelper->paginate($totalTags, $perPage, $page, 3)
+                : null; 
+
+            return $this->json(['total' => $totalTags, 'tags' => $tagData, 'paginateData' => $paginateData]);
+        } catch (\Exception $e) {
+            return $this->json(['error' => $e->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }
+
+
+
+    public function getOld(Request $request): Response
+    {
+        try {
             $perPage = $request->query->getInt('per-page', 10);
             $page = $request->query->getInt('page', 1);
             $sort = $request->query->get('sort', 'desc'); // Default sort order is descending
@@ -89,6 +153,7 @@ class TagController extends AbstractController
         }
     }
 
+
     public function edit(Request $request): Response
     {
        $id = $request->request->get('id');
@@ -130,7 +195,8 @@ class TagController extends AbstractController
     public function create(Request $request, EntityManagerInterface $entityManager): Response
     {
         $name = $request->request->get('name');
-
+        $type = $request->request->get('type', 'article');
+        
         if (!$name) {
             return $this->json([
                 'error' => true,
@@ -144,7 +210,7 @@ class TagController extends AbstractController
         
         $tag->setName($name);
         $tag->setSlug($slug);
-        $tag->setType("article");
+        $tag->setType($type);
 
         $entityManager->persist($tag);
         $entityManager->flush();

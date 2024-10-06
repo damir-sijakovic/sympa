@@ -44,14 +44,14 @@
 <hr>
 
 <div class="btn-group" role="group" aria-label="Basic example">
-  <a target="_blank" href="/dashboard/article-create" class="btn btn-primary btn-sm"><i class="bi bi-plus-circle mx-1"></i>Create</a>
+  <a target="_blank" href="/dashboard/product-create" class="btn btn-primary btn-sm"><i class="bi bi-plus-circle mx-1"></i>Create</a>
   <button type="button" class="btn btn-outline-primary btn-sm" onclick="sympa_reset()"> Reset query</button>
 </div>
 
 <br><br>
 
 <div id="sympa-no-article-list" class="alert alert-primary" role="alert" style="display:none">
-  There is no articles!
+  There is no products!
 </div>
 
 <ul id="sympa-article-list" class="list-group mb-3">
@@ -795,7 +795,7 @@ async function sympa_getArticlesNew()
     const sympaValue = localStorage.getItem("sympa-article-list-value"); 
     const sympaSort = localStorage.getItem("sympa-article-list-sort"); 
     
-    let url = '/article-get-all?';  
+    let url = '/product-get-all?';  
     
     if (sympaViewMode === 'normal'){
         url += 'page=' + sympaCurrentPage + '&per-page=' + sympaPerPage;         

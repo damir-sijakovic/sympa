@@ -1,3 +1,11 @@
+<!-- 
+SELECT IMAGE COMPONENT
+localStorage keys:
+    * sympa-select-image-name
+    * sympa-select-image-group
+    * sympa-select-image-dir
+-->
+
 <style>
 .popover{
     box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
@@ -40,7 +48,7 @@
       </div>
       
       <div class="modal-footer">
-        <button type="button" class="btn btn-primary" onclick="sympa_imageSelectorSelectButton()">Select</button>
+        <button id="sympa-image-selector-select-button" type="button" class="btn btn-primary">Select</button>
       </div>
 
 	<div class="alert alert-warning alert-dismissible fade show" role="alert" style="display:none; margin-bottom: 0;">
@@ -72,7 +80,9 @@ function sympa_toggleSelectedImage(that){
     that.classList.toggle("active");
 
     const name = that.getAttribute('image-url');
+    const imageDir = that.getAttribute('image-dir');
     localStorage.setItem("sympa-select-image-name", name);
+    localStorage.setItem("sympa-select-image-dir", imageDir);
 }
 
 async function sympa_getImages(groupSlug){
@@ -110,6 +120,8 @@ async function sympa_getImageGroups(){
 
 async function sympa_imageSelectorDropdownAction(groupSlug){
     
+    localStorage.setItem("sympa-select-image-group", groupSlug);
+    
     const _applyPopup = function(element, url){
         let t = new bootstrap.Popover(element, {
             html: true,
@@ -130,7 +142,7 @@ async function sympa_imageSelectorDropdownAction(groupSlug){
         return element;
     } 
     
-    const _createLiElement = function(textContent, url){
+    const _createLiElement = function(textContent, url, imageDir){
   
         var liElement = document.createElement("li");
         liElement.classList.add("sympa-image-selector-modal-li", "list-group-item", "d-flex", "justify-content-between");
@@ -150,6 +162,7 @@ async function sympa_imageSelectorDropdownAction(groupSlug){
         
         
         liElement.setAttribute('image-url', url + '/original.webp');
+        liElement.setAttribute('image-dir', imageDir);
         
         // Assign the function as a reference for the click event, wrapping it in an anonymous function
         liElement.onclick = function() {
@@ -167,7 +180,7 @@ async function sympa_imageSelectorDropdownAction(groupSlug){
     for (let i=0; i<jsonObj.data.count; i++){
         console.log(">> ", jsonObj.data.images[i]);        
         //target.innerHTML += '<li class="sympa-image-selector-modal-li list-group-item">'+ jsonObj.data.images[i].name +'</li>';
-        let li = _createLiElement(jsonObj.data.images[i].name, jsonObj.data.images[i].url);         
+        let li = _createLiElement(jsonObj.data.images[i].name, jsonObj.data.images[i].url, jsonObj.data.images[i].dir);         
         // _applyPopup(li, jsonObj.data.images[i].url + '/200.webp'); 
         target.appendChild(li); 
     }
@@ -206,17 +219,27 @@ async function sympa_imageSelectorOpen(){
         const slug = jsonObj.data.groups[i].dir;
         const description = jsonObj.data.groups[i].description;
         _createDropdownItem(name, slug, description);
-    } 
-    
-
-    
+    }       
 }
+
 
 function sympa_imageSelectorSelectButton(){    
     const name = localStorage.getItem("sympa-select-image-name");
-    document.getElementById('sympa-category-image-string-input').value = name;
+   // document.getElementById('sympa-category-image-string-input').value = name;
     document.getElementById('sympa-image-selector-modal').style.display = 'none';   
 }
+
+
+//EVENTS 
+document.getElementById('sympa-image-selector-select-button').addEventListener('click', function() {
+    sympa_imageSelectorSelectButton();
+});
+
+
+//INIT
+localStorage.removeItem("sympa-select-image-name");
+localStorage.removeItem("sympa-select-image-group");
+localStorage.removeItem("sympa-select-image-dir");
 
 
 </script>

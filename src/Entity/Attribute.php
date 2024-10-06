@@ -18,7 +18,7 @@ class Attribute
     #[ORM\Column(type: 'integer')]
     private int $articleId;
 
-    #[ORM\Column(type: 'string', length: 256)]
+    #[ORM\Column(name: '`key`', type: 'string', length: 256)]
     private string $key;
 
     #[ORM\Column(type: 'text')]

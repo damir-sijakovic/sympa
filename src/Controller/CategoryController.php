@@ -35,8 +35,9 @@ class CategoryController extends AbstractController
         $name = $request->request->get('name');
         $parent = $request->request->get('parent');
         $description = $request->request->get('description');
-        $image = $request->request->get('image');
+        $image = $request->request->get('image', '');
         $visible = $request->request->get('visible');
+        $type = $request->request->get('type', 'article');
 
         // Check if the required fields are provided
         if (!$name) {
@@ -46,7 +47,7 @@ class CategoryController extends AbstractController
         // Create new Category entity
         $category = new Category();
         $category->setName($name);
-        $category->setType('article');
+        $category->setType($type);
         $category->setParent($parent ? (int)$parent : null);
         $category->setDescription($description);
         $category->setImage($image);
@@ -124,8 +125,78 @@ class CategoryController extends AbstractController
         return new Response('Article removed from Category successfully');
     }
     
-
+    
     public function get(Request $request): Response
+    { 
+        try {
+            $perPage = $request->query->getInt('per-page', 0); 
+            $page = $request->query->getInt('page', 1);
+            $sort = $request->query->get('sort', 'desc'); 
+            $search = $request->query->get('search'); 
+            $type = $request->query->get('type', 'article'); 
+            $offset = ($page - 1) * $perPage;
+
+            if ($sort === 'id-asc') {
+                $order = ['id' => 'ASC'];
+            } elseif ($sort === 'id-desc') {
+                $order = ['id' => 'DESC'];
+            } else {
+                $order = ($sort === 'asc') ? ['name' => 'ASC'] : ['name' => 'DESC'];
+            }
+
+            $categoryRepository = $this->entityManager->getRepository(Category::class);
+
+            $queryBuilder = $categoryRepository->createQueryBuilder('t');
+
+            if (!empty($search)) {
+                $queryBuilder->andWhere('t.name LIKE :search OR t.slug LIKE :search')
+                             ->setParameter('search', '%' . $search . '%');
+            }
+
+            $queryBuilder->andWhere('t.type = :type')
+                         ->setParameter('type', $type);
+
+            $totalQuery = clone $queryBuilder;
+            $totalCategories = count($totalQuery->getQuery()->getResult());
+
+            if ($perPage > 0) {
+                $queryBuilder->orderBy('t.' . key($order), current($order))
+                             ->setFirstResult($offset)
+                             ->setMaxResults($perPage);
+            } else {
+                $queryBuilder->orderBy('t.' . key($order), current($order));
+            }
+
+            $categories = $queryBuilder->getQuery()->getResult();
+
+            $categoryData = [];
+            foreach ($categories as $category) {
+                $categoryData[] = [
+                    'id' => $category->getId(),
+                    'name' => $category->getName(),
+                    'slug' => $category->getSlug(),
+                    'type' => $category->getType(),
+                    'parent' => $category->getParent(),
+                    'description' => $category->getDescription(),
+                    'image' => $category->getImage(),
+                    'visible' => $category->getVisible(),
+                    'created_at' => $category->getCreatedAt()->format('Y-m-d H:i:s'),
+                    'modified_at' => $category->getModifiedAt() ? $category->getModifiedAt()->format('Y-m-d H:i:s') : null,            
+                ];
+            }
+
+            $paginateData = ($perPage > 0)
+                ? $this->utilityHelper->paginate($totalCategories, $perPage, $page, 3)
+                : null; 
+
+            return $this->json(['total' => $totalCategories, 'categories' => $categoryData, 'paginateData' => $paginateData]);
+        } catch (\Exception $e) {
+            return $this->json(['error' => $e->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }
+
+
+    public function getOld(Request $request): Response
     {
         try {
             $perPage = $request->query->getInt('per-page', 10);
@@ -146,6 +217,81 @@ class CategoryController extends AbstractController
             }
 
             $categoryRepository = $this->entityManager->getRepository(Category::class);
+
+            $queryBuilder = $categoryRepository->createQueryBuilder('c');
+
+            if ($active === '1') {
+                $queryBuilder->andWhere('c.visible = :visible')->setParameter('visible', true);
+            } elseif ($active === '0') {
+                $queryBuilder->andWhere('c.visible = :visible')->setParameter('visible', false);
+            }
+
+
+            if (!empty($search)) {
+                $queryBuilder->andWhere('c.name LIKE :search OR c.description LIKE :search')
+                             ->setParameter('search', '%' . $search . '%');
+            }
+
+            $totalQuery = clone $queryBuilder;
+            $totalCategories = count($totalQuery->getQuery()->getResult());
+
+            $queryBuilder->orderBy('c.' . key($order), current($order))
+                         ->setFirstResult($offset)
+                         ->setMaxResults($perPage);
+
+            $categories = $queryBuilder->getQuery()->getResult();
+
+            $categoryData = [];
+            foreach ($categories as $category) {
+                $categoryData[] = [
+                    'id' => $category->getId(),
+                    'name' => $category->getName(),
+                    'slug' => $category->getSlug(),
+                    'type' => $category->getType(),
+                    'parent' => $category->getParent(),
+                    'description' => $category->getDescription(),
+                    'image' => $category->getImage(),
+                    'visible' => $category->getVisible(),
+                    'created_at' => $category->getCreatedAt()->format('Y-m-d H:i:s'),
+                    'modified_at' => $category->getModifiedAt() ? $category->getModifiedAt()->format('Y-m-d H:i:s') : null,
+                ];
+            }
+
+            $paginateData = $this->utilityHelper->paginate($totalCategories, $perPage, $page, 3); // 3 = visible pages
+
+            return $this->json(['total' => $totalCategories, 'categories' => $categoryData, 'paginateData' => $paginateData]);
+        } catch (\Exception $e) {
+            return $this->json(['error' => $e->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    public function getProducts(Request $request): Response
+    {
+        try {
+            $perPage = $request->query->getInt('per-page', 10);
+            $page = $request->query->getInt('page', 1);
+            $sort = $request->query->get('sort', 'desc'); // Default sort order is descending
+            $active = $request->query->get('active'); // Get the active parameter
+            $search = $request->query->get('search'); // Get the search parameter
+            $offset = ($page - 1) * $perPage;
+
+            // Determine the sorting order based on the "sort" parameter
+            if ($sort === 'id-asc') {
+                $order = ['id' => 'ASC'];
+            } elseif ($sort === 'id-desc') {
+                $order = ['id' => 'DESC'];
+            } else {
+                // Default to sorting by createdAt
+                $order = ($sort === 'asc') ? ['createdAt' => 'ASC'] : ['createdAt' => 'DESC'];
+            }
+
+            $categoryRepository = $this->entityManager->getRepository(Category::class);
+
+            //ADDED ?
+            $queryBuilder = $categoryRepository->createQueryBuilder('a')
+                ->where('a.type = :type')
+                ->setParameter('type', 'product');
+
 
             $queryBuilder = $categoryRepository->createQueryBuilder('c');
 

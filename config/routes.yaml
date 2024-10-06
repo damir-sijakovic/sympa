@@ -101,17 +101,7 @@ dashboard_articles:
     path: /dashboard/articles
     controller: App\Controller\DashboardController::articles
     methods: ['GET']
-
-dashboard_products:
-    path: /dashboard/products
-    controller: App\Controller\DashboardController::products
-    methods: ['GET']
     
-dashboard_orders:
-    path: /dashboard/orders
-    controller: App\Controller\DashboardController::orders
-    methods: ['GET']
-
 dashboard_article_create: 
     path: /dashboard/article-create
     controller: App\Controller\DashboardController::createArticle 
@@ -120,6 +110,11 @@ dashboard_article_create:
 dashboard_article_edit: 
     path: /dashboard/article-edit/{id}
     controller: App\Controller\DashboardController::editArticle 
+    methods: ['GET']
+
+dashboard_product_create:
+    path: /dashboard/product-create
+    controller: App\Controller\DashboardController::createProduct
     methods: ['GET']
 
 dashboard_categories: 
@@ -136,7 +131,12 @@ dashboard_tag_create:
     path: /dashboard/tag-create
     controller: App\Controller\DashboardController::createTag
     methods: ['GET']
-
+    
+dashboard_product_tag_create: 
+    path: /dashboard/product-tag-create
+    controller: App\Controller\DashboardController::createProductTag
+    methods: ['GET']
+    
 dashboard_tag_edit: 
     path: /dashboard/tag-edit/{id}
     controller: App\Controller\DashboardController::editTag 
@@ -172,10 +172,36 @@ dashboard_category_create:
     controller: App\Controller\DashboardController::createCategory 
     methods: ['GET']
     
+dashboard_product_category_create: 
+    path: /dashboard/product-category-create
+    controller: App\Controller\DashboardController::createProductCategory 
+    methods: ['GET']  
+     
 dashboard_docs: 
     path: /dashboard/docs
     controller: App\Controller\DashboardController::docs 
     methods: ['GET']
+  
+dashboard_orders:
+    path: /dashboard/orders
+    controller: App\Controller\DashboardController::orders
+    methods: ['GET']
+  
+dashboard_products:
+    path: /dashboard/products
+    controller: App\Controller\DashboardController::products
+    methods: ['GET']
+   
+dashboard_product_categories:
+    path: /dashboard/product-categories
+    controller: App\Controller\DashboardController::productCategories
+    methods: ['GET']
+   
+dashboard_product_tags:
+    path: /dashboard/product-tags
+    controller: App\Controller\DashboardController::productTags
+    methods: ['GET']
+   
     
 category_create:
     path: /category-create
@@ -193,7 +219,15 @@ category_get_all:
     controller: App\Controller\CategoryController::get 
     methods: ['GET']
     # queryparams: page, per_page, sort: id-asc, id-desc, asc, desc
-      
+
+
+category_get_all_products: 
+    path: /product-category-get-all
+    controller: App\Controller\CategoryController::getProducts 
+    methods: ['GET']
+    # queryparams: page, per_page, sort: id-asc, id-desc, asc, desc
+
+
 category_get_by_ids: 
     path: /category-get-by-ids
     controller: App\Controller\CategoryController::getCategoriesByIds 
@@ -306,3 +340,25 @@ file_bulk_image:
     controller: App\Controller\FilesController::deleteBulkFile
     methods: ['POST']    
     
+product_create: 
+    path: /product-create
+    controller: App\Controller\ProductController::createPost 
+    methods: ['POST']
+
+
+product_get_all: 
+    path: /product-get-all
+    controller: App\Controller\ProductController::getProductsPost 
+    methods: ['GET']
+    # queryparams: page, per_page, sort: id-asc, id-desc, asc, desc
+
+utils_generate_uuid:   
+    path: /utils/generate-uuid
+    controller: App\Controller\UtilsController::getUuid 
+    methods: ['GET']
+
+
+attribute_get_all: 
+    path: /attribute-get-all
+    controller: App\Controller\AttributeController::get 
+    methods: ['GET']
