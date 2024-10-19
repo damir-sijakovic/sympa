@@ -399,8 +399,68 @@ class CategoryController extends AbstractController
                 'message' => 'Category saved successfully',            
             ]);
     }
+      
        
+    public function editProduct(Request $request): Response
+    {
+        $id = $request->request->get('id');
+        $name = $request->request->get('name');
+        $parent = $request->request->get('parent');
+        $description = $request->request->get('description');
+        $active = $request->request->get('active');
+        $image = $request->request->get('image');
+
+        if (!$id) 
+        {
+            return $this->json([ 'error' => true, 'data' => null, 'message' => "Catgeory 'id' is required." ], Response::HTTP_BAD_REQUEST);
+        }
+
+        if (!$name) 
+        {
+            return $this->json([ 'error' => true, 'data' => null, 'message' => "Catgeory 'name' is required." ], Response::HTTP_BAD_REQUEST);
+        }
+
+        if (!$description) 
+        {
+            return $this->json([ 'error' => true, 'data' => null, 'message' => "Catgeory 'description' is required." ], Response::HTTP_BAD_REQUEST);
+        }
+
+        if (!$active) 
+        {
+            return $this->json([ 'error' => true, 'data' => null, 'message' => "Catgeory 'active' is required." ], Response::HTTP_BAD_REQUEST);
+        }
+/*
+        if (!$image) 
+        {
+            return $this->json([ 'error' => true, 'data' => null, 'message' => "Catgeory 'image' is required." ], Response::HTTP_BAD_REQUEST);
+        }
+*/
+        $categoryRepository = $this->entityManager->getRepository(Category::class);
+        $category = $id ? $categoryRepository->find($id) : new Category();
+
+        if (!$category) {
+            return $this->json([
+                'error' => true,
+                'data' => null,
+                'message' => 'Category not found',            
+            ], Response::HTTP_NOT_FOUND);
+        }
+
+        $slug = strtolower($this->slugger->slug($name)->toString());
+        $category->setName($name);        
+        $category->setSlug($slug);        
+        
+        $this->entityManager->persist($category);
+        $this->entityManager->flush();
+
+        return $this->json([
+                'error' => false,
+                'data' => null,
+                'message' => 'Category saved successfully',            
+            ]);
+    }
        
+          
        
        
     public function getCategoriesByIds(Request $request): Response

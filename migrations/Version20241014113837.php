@@ -10,7 +10,7 @@ use Doctrine\Migrations\AbstractMigration;
 /**
  * Auto-generated Migration: Please modify to your needs!
  */
-final class Version20241006193216 extends AbstractMigration
+final class Version20241014113837 extends AbstractMigration
 {
     public function getDescription(): string
     {
@@ -25,6 +25,7 @@ final class Version20241006193216 extends AbstractMigration
         $this->addSql('CREATE TABLE article_tag (id INT AUTO_INCREMENT NOT NULL, type VARCHAR(32) NOT NULL, tag_id INT DEFAULT NULL, article_id INT DEFAULT NULL, INDEX IDX_919694F9BAD26311 (tag_id), INDEX IDX_919694F97294869C (article_id), PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci`');
         $this->addSql('CREATE TABLE attribute (id INT AUTO_INCREMENT NOT NULL, article_id INT NOT NULL, `key` VARCHAR(256) NOT NULL, value LONGTEXT NOT NULL, PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci`');
         $this->addSql('CREATE TABLE category (id INT AUTO_INCREMENT NOT NULL, name VARCHAR(255) NOT NULL, slug LONGTEXT DEFAULT NULL, type VARCHAR(32) NOT NULL, parent INT NOT NULL, description VARCHAR(255) NOT NULL, image VARCHAR(255) NOT NULL, visible TINYINT(1) NOT NULL, created_at DATETIME NOT NULL, modified_at DATETIME DEFAULT NULL, UNIQUE INDEX UNIQ_64C19C15E237E06 (name), PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci`');
+        $this->addSql('CREATE TABLE `order` (id INT AUTO_INCREMENT NOT NULL, first_name VARCHAR(255) NOT NULL, last_name VARCHAR(255) NOT NULL, email VARCHAR(255) NOT NULL, address VARCHAR(255) NOT NULL, address2 VARCHAR(255) DEFAULT NULL, phone VARCHAR(20) NOT NULL, country VARCHAR(100) NOT NULL, state VARCHAR(100) NOT NULL, zip VARCHAR(10) NOT NULL, delivery_note LONGTEXT DEFAULT NULL, PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci`');
         $this->addSql('CREATE TABLE tag (id INT AUTO_INCREMENT NOT NULL, name VARCHAR(255) NOT NULL, slug LONGTEXT DEFAULT NULL, type VARCHAR(32) NOT NULL, UNIQUE INDEX UNIQ_389B7835E237E06 (name), PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci`');
         $this->addSql('CREATE TABLE user (id INT AUTO_INCREMENT NOT NULL, nickname VARCHAR(255) DEFAULT NULL, role VARCHAR(48) DEFAULT NULL, email VARCHAR(320) NOT NULL, created_at DATETIME NOT NULL, modified_at DATETIME DEFAULT NULL, password VARCHAR(320) NOT NULL, active TINYINT(1) NOT NULL, UNIQUE INDEX UNIQ_8D93D649A188FE64 (nickname), UNIQUE INDEX UNIQ_8D93D64957698A6A (role), UNIQUE INDEX UNIQ_8D93D649E7927C74 (email), PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci`');
         $this->addSql('ALTER TABLE article_category ADD CONSTRAINT FK_53A4EDAA12469DE2 FOREIGN KEY (category_id) REFERENCES category (id)');
@@ -45,6 +46,7 @@ final class Version20241006193216 extends AbstractMigration
         $this->addSql('DROP TABLE article_tag');
         $this->addSql('DROP TABLE attribute');
         $this->addSql('DROP TABLE category');
+        $this->addSql('DROP TABLE `order`');
         $this->addSql('DROP TABLE tag');
         $this->addSql('DROP TABLE user');
     }

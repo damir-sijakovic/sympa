@@ -27,12 +27,12 @@ class Attribute
     // Getters and Setters
     public function getId(): ?int
     {
-        return $id;
+        return $this->id;
     }
 
     public function getArticleId(): int
     {
-        return $articleId;
+        return $this->articleId;
     }
 
     public function setArticleId(int $articleId): self
@@ -43,7 +43,7 @@ class Attribute
 
     public function getKey(): string
     {
-        return $key;
+        return $this->key;
     }
 
     public function setKey(string $key): self
@@ -54,7 +54,7 @@ class Attribute
 
     public function getValue(): string
     {
-        return $value;
+        return $this->value;
     }
 
     public function setValue(string $value): self

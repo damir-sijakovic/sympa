@@ -1,30 +1,766 @@
+<style>
+.sympa-bulk-actions, .sympa-list-options{
+    display:flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column; 
+    flex-direction: row;
+    white-space: nowrap;
+}
+
+#sympa-list-titlebar, #sympa-list-bottom-bar{
+    font-size: 12px !important;
+     font-weight: 500;
+     background: #eeeeee;
+}
+
+
+.sympa-toolbar-font{
+    font-size: 12px !important;
+}
+
+.sympa-list-font{
+    font-size: 12px !important;
+    font-weight: 500;
+}
+
+.sympa-modal{
+    background: #3e3e3ed1;
+}
+
+
+</style>
+
+
+
 <h2>Orders</h2>
+
 <hr>
 
+<div class="btn-group" role="group" aria-label="Basic example">
+  <a target="_blank" href="/dashboard/tag-create" class="btn btn-primary btn-sm"><i class="bi bi-plus-circle mx-1"></i>Create</a>
+  <button type="button" class="btn btn-outline-primary btn-sm" onclick="sympa_reset()"> Reset query</button>
+</div>
 
-Not working yet!
+<br><br>
 
-<table class="table">
-  <thead>
-    <tr>
-      <th scope="col">Id</th>
-      <th scope="col">Code</th>
-      <th scope="col">Date</th>
-      <th scope="col">Action</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th scope="row">1</th>
-      <td>345345</td>
-      <td>23-10-24</td>
-      <td><button type="button" class="btn btn-primary btn-sm">Small button</button></td>
-    </tr>
-    <tr>
-      <th scope="row">2</th>
-      <td>34534534</td>
-      <td>23-10-24</td>
-      <td><button type="button" class="btn btn-primary btn-sm">Small button</button></td>
-    </tr>
-  </tbody>
-</table>
+<div id="sympa-no-category-list" class="alert alert-primary" role="alert" style="display:none">
+  There is no categories!
+</div>
+
+<ul id="sympa-tag-list" class="list-group mb-3">
+          
+          <!--
+        <li class=
+          "list-group-item d-flex justify-content-between">
+            <div href="button" class="btn btn-primary btn-sm">Small button</div>
+            <strong>20</strong>
+          </li>
+  
+          
+          <li class="list-group-item d-flex justify-content-between bg-body-tertiary">
+            <div class="">
+              <h6 class="my-0">Promo code</h6>
+              <small>EXAMPLECODE</small>
+            </div>            
+            <span class="text-success">
+                <div class="btn-group" role="group" aria-label="Basic outlined example">
+                  <button type="button" class="btn btn-primary btn-sm">Edit</button>
+                  <button type="button" class="btn btn-outline-primary btn-sm">Delete</button>
+                </div>            
+            </span>
+          </li>
+          
+                    
+          <li class=
+          "list-group-item d-flex justify-content-between">
+            <span>Total:</span>
+            <strong id="sympa-total-articles"></strong>
+          </li>
+          
+          -->   
+          
+         <li class="list-group-item d-flex justify-content-between">
+            
+        </li> 
+ </ul>
+
+<nav aria-label="Page navigation example" id="sympa-pagination">
+<!--
+  <ul class="pagination">
+    <li class="page-item">
+      <a class="page-link" href="#" aria-label="Previous">
+        <span aria-hidden="true">&laquo;</span>
+      </a>
+    </li>
+    <li class="page-item"><a class="page-link active" href="#">1</a></li>
+    <li class="page-item"><a class="page-link" href="#">2</a></li>
+    <li class="page-item"><a class="page-link" href="#">3</a></li>
+    <li class="page-item">
+      <a class="page-link" href="#" aria-label="Next">
+        <span aria-hidden="true">&raquo;</span>
+      </a>
+    </li>
+  </ul>
+-->
+</nav>
+
+<!-- MODALS -->
+
+<div class="modal sympa-modal" id="sympa-delete-single-modal" style="display:none;">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Warning!</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" onclick="document.getElementById('sympa-delete-single-modal').style.display='none'"></button>
+      </div>
+      <div class="modal-body">
+        <p>Do you want to delete post?</p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" onclick="document.getElementById('sympa-delete-single-modal').style.display='none'">Cancel</button>
+        <button type="button" class="btn btn-danger" onclick="sympa_deleteArticleModalAction()">Delete</button>
+      </div>
+
+	<div class="alert alert-warning alert-dismissible fade show" role="alert" style="display:none; margin-bottom: 0;">
+	   <span id="sympa-bulk-delete-modal-message"> Hello</span> 
+	  <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close" ></button>
+	</div>
+
+    </div>
+  </div>
+</div>
+
+<div class="modal sympa-modal" id="sympa-list-value-modal" style="display:none;">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Enter value</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" onclick="document.getElementById('sympa-list-value-modal').style.display='none'"></button>
+      </div>
+      <div class="modal-body">
+        
+      <div class="mb-3">
+        <p>Enter search term:</p>
+        <input type="text" class="form-control" id="sympa-list-value-modal-input" aria-describedby="">
+      </div>
+
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" onclick="document.getElementById('sympa-list-value-modal').style.display='none'">Cancel</button>
+        <button type="button" class="btn btn-primary" onclick="sympa_setListValueAction()">Accept</button>
+      </div>
+
+	<div class="alert alert-warning alert-dismissible fade show" role="alert" style="display:none; margin-bottom: 0;">
+	   <span id="sympa-bulk-delete-modal-message"> Hello</span> 
+	  <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close" ></button>
+	</div>
+
+    </div>
+  </div>
+</div>
+
+
+
+<script>
+
+
+function sympa_tableCheck(checked){
+    if (checked){
+        const elements = document.querySelectorAll('.sympa-bulk-checkbox');
+        elements.forEach(function(element) {
+            console.log(element);
+            element.checked = true;
+        });
+    }
+    else{
+        const elements = document.querySelectorAll('.sympa-bulk-checkbox');
+        elements.forEach(function(element) {
+            console.log(element);
+            element.checked = false;
+        });
+    }    
+}
+
+
+function sympa_applyBulk(){
+    console.log("BULK");
+}
+
+
+function sympa_deleteArticleModal(id){
+    let targetElement = document.getElementById("sympa-delete-single-modal");
+    targetElement.style.display = "block";
+    targetElement.setAttribute("data-id", id);
+}
+
+
+async function sympa_deleteArticleModalAction()
+{   
+    let targetElement = document.getElementById("sympa-delete-single-modal");
+    const id = targetElement.getAttribute("data-id"); 
+    
+    let postData = new FormData();  
+    postData.append('id', id);
+
+    const response = await fetch('/article-delete', {
+        method: 'POST', 
+        body: postData,
+    });
+
+    const jsonData = await response.json();
+	if (response.status != 200) {		
+		return null;
+	}
+    else{
+        sympa_message("Article deleted!", "success");
+        setTimeout(function () {
+            window.location.reload();
+		}, 2000);
+    }
+           
+    return;
+}
+
+
+function sympa_drawList(data)
+{      
+    let _createItem = function(x){
+       
+        let id = x.id;
+        let name = x.name;
+        let slug = x.slug;
+        
+        return `
+        <li class="list-group-item d-flex justify-content-between bg-body-tertiary" title="ID: ${id}" data-id="${id}">
+            <div class="d-flex gap-3">                
+                <input class="form-check-input sympa-bulk-checkbox" type="checkbox">
+                <div>
+                    <!--
+                    <div style="display: flex;"> <span style="font-size: smaller; margin-right: 5px;">(${id})</span> <h6 class="my-0">${name}</h6></div>
+                    -->
+                    <div style="display: flex;"> <h6 class="my-0"><span style="color:#666; font-size:12px;">${id}.</span> ${name}</h6></div> 
+                    
+                    <small>${slug}</small>
+                </div>
+            </div>            
+            <span class="text-success">
+                <div class="btn-group" role="group" aria-label="Basic outlined example">
+                 <!--
+                  <div onclick="sympa_viewCategory(${id})" class="btn btn-primary btn-sm sympa-list-font" target="_blank">View</div>
+                  -->
+                  <a href="/dashboard/tag-edit/${id}" class="btn btn-primary btn-sm sympa-list-font" target="_blank">Edit</a>
+                  <div onclick="sympa_deleteArticleModal(${id})" class="btn btn-outline-primary btn-sm sympa-list-font">Delete</div>
+                </div>            
+            </span>
+          </li>
+        `;        
+    }
+    
+    let htmlData = `
+        <li id="sympa-list-titlebar" class="list-group-item d-flex justify-content-between">             
+			<div>
+                <div class="sympa-bulk-actions">
+                    <div>
+                    <input style="margin-right: 1rem;" class="form-check-input" type="checkbox" onclick="sympa_tableCheck(this.checked)">
+                    </div>     
+                    <select class="form-select sympa-toolbar-font" aria-label="Default select example">
+                      <option value="-1" selected>Bulk actions...</option>
+                      <option value="1">Delete items</option>
+                    </select>
+                    <div onclick="sympa_applyBulk()" class="btn btn-light btn-sm sympa-toolbar-font">Apply</div>
+                </div>                
+                
+            </div>
+			<div class="d-flex">
+            
+                <button data="" style="display:none" onclick="sympa_openSetListValueModal()" id="sympa-list-value-button" type="button" class="btn btn-light btn-sm sympa-toolbar-font">Enter value...</button>
+            
+                <div class="sympa-list-options">                    
+                    <select id="sympa-select-right-mode" class="form-select sympa-toolbar-font" aria-label="Default select example">
+                      <option value="normal" selected onclick="sympa_changeListMode(this)">Normal Mode</option>
+                      <option value="search" onclick="sympa_changeListMode(this)">Search Mode</option>                       
+                    </select>
+                </div>
+                
+                <div class="sympa-list-options mx-1">                    
+                    <select id="sympa-select-right-sort" class="form-select sympa-toolbar-font" aria-label="Default select example">
+                      <option selected onclick="sympa_changeListSort(this)" value="newest">Newest</option>
+                      <option onclick="sympa_changeListMode(this)" value="oldest">Oldest</option>
+                      <option onclick="sympa_changeListSort(this)" value="id-ascending">ID ascending</option>
+                      <option onclick="sympa_changeListSort(this)" value="id-descending">ID descending</option>
+                    </select>
+                </div>
+            
+            	<div class="sympa-list-options">
+                    <select id="sympa-select-right-per-page" class="form-select sympa-toolbar-font" aria-label="Default select example">
+                      <option onclick="sympa_changeListPerPage(this)" selected value="10">10 items</option>
+                      <option onclick="sympa_changeListPerPage(this)" value="25">25 items</option>
+                      <option onclick="sympa_changeListPerPage(this)" value="50">50 items</option>
+                    </select>
+                    <button onclick="sympa_goAction()" type="button" class="btn btn-light btn-sm sympa-toolbar-font">Go</button>
+                </div>  
+                              
+            </div>
+        </li>   
+    `;
+    
+    let listElement = document.getElementById("sympa-tag-list");     
+    
+    for (const key in data.tags) {
+        htmlData += _createItem(data.tags[key]);
+    }
+    
+    htmlData += `
+        <li class="list-group-item d-flex justify-content-between" id="sympa-list-bottom-bar">
+            <div>Total: <span id="sympa-total-articles"></span> </div>
+            <div id="sympa-bottom-right-message">::</div>
+        </li> 
+    `;
+    
+    listElement.innerHTML = htmlData;
+    
+    let totalArticlesElement = document.getElementById("sympa-total-articles");
+    totalArticlesElement.innerHTML = data.total + ' items(s)';   
+}
+
+
+function sympa_paginate(data){    
+    const {
+		currentPage,
+		firstPage,
+		indexOffset,
+		indexRowCount,
+		itemNumber,
+		lastPage,
+		nextPage,
+		numberOfPages,
+		perPage,
+		prevPage,
+		visibleEndPage,
+		visibleStartPage
+	} = data;
+    
+    console.log("debug paginate data: ", data);
+    
+    let htmlData = `
+        <ul class="pagination">    
+    `;         
+        
+	if (currentPage === 1){
+		htmlData += `
+            <li class="page-item disabled">
+            <a class="page-link" href="#" aria-label="Previous">
+                <span aria-hidden="true">&laquo;</span>
+            </a>
+            </li> 
+        `;
+	}
+	else{
+		let prevPage = currentPage-1;
+		htmlData += `
+            <li class="page-item">
+            <a class="page-link" onclick="sympa_repaginate(${prevPage}, ${perPage})" aria-label="Previous">
+                <span aria-hidden="true">&laquo;</span>
+            </a>
+            </li> 
+        `; 
+	}
+	               
+         
+   for (let i=visibleStartPage; i<visibleEndPage+1; i++){
+		let targetPage = i;
+		
+		if (i === currentPage){	
+			htmlData += `<li class="page-item active"><a class="page-link" onclick="sympa_repaginate(${i}, ${perPage})" >${i}</a></li>`;
+		}
+		else
+		{
+			htmlData += `<li class="page-item"><a class="page-link" onclick="sympa_repaginate(${i}, ${perPage})" >${i}</a></li>`;
+		}
+		
+	}     
+         
+    if (visibleEndPage > currentPage){
+		let nextPage = currentPage+1;
+		htmlData += `<li class="page-item"><div class="page-link" onclick="sympa_repaginate(${nextPage}, ${perPage})" aria-label=""><span aria-hidden="true">&raquo;</span></div></li>`;
+	}
+	else{
+		htmlData += `<li class="page-item disabled"><div class="page-link" onclick="" aria-label=""><span aria-hidden="true">&raquo;</span></div></li>`;
+	}
+   
+
+         
+    htmlData += `
+        </ul>    
+    `;
+    
+    document.getElementById("sympa-pagination").innerHTML = htmlData;
+    
+}
+
+
+async function sympa_getArticles(page=1, perPage=3, sort='desc')
+{      
+    const response = await fetch('/category-get-all?page=' + page + '&per-page=' + perPage + '&sort=' + sort); // /article-get-all
+	const jsonData = await response.json();
+	if (response.status != 200) {
+		console.log('ERROR!');
+		return null;
+	}
+    
+    if (!jsonData.articles){
+        throw new Error("Missing 'articles' object. Bad json format!");
+    }
+    
+    // console.log( jsonData );    
+    // sympa-no-categories-found
+    
+    return jsonData;
+}
+
+
+
+async function sympa_repaginate(page, perPage){       
+    localStorage.setItem('sympa-tag-list-per-page', perPage);
+    localStorage.setItem('sympa-tag-list-current-page', page);
+     
+    const data = await sympa_getCategoriesNew();
+    if (data.total === 0){
+        document.getElementById("sympa-tag-list").style.display = 'none';  
+        document.getElementById("sympa-no-category-list").style.display = 'block'; 
+        return;         
+    }
+    
+    sympa_drawList(data);	
+    sympa_paginate(data.paginateData);
+    
+    /*
+   	const data = await sympa_getArticles(page, perPage, sort);
+    
+    if (data.total === 0){
+        document.getElementById("sympa-tag-list").style.display = 'none';  
+        document.getElementById("sympa-no-category-list").style.display = 'block'; 
+        return;         
+    }
+            
+	sympa_drawList(data);	
+    sympa_paginate(data.paginateData);
+    */
+}
+
+
+async function sympa_repaginateOld(page=1, perPage=10){       
+    localStorage.setItem('sympa-tag-list-per-page', perPage);
+    localStorage.setItem('sympa-tag-list-current-page', page);
+     
+    const data = await sympa_getCategoriesNew();
+    if (data.total === 0){
+        document.getElementById("sympa-tag-list").style.display = 'none';  
+        document.getElementById("sympa-no-category-list").style.display = 'block'; 
+        return;         
+    }
+    
+    sympa_drawList(data);	
+    sympa_paginate(data.paginateData);
+    
+    /*
+   	const data = await sympa_getArticles(page, perPage, sort);
+    
+    if (data.total === 0){
+        document.getElementById("sympa-tag-list").style.display = 'none';  
+        document.getElementById("sympa-no-category-list").style.display = 'block'; 
+        return;         
+    }
+            
+	sympa_drawList(data);	
+    sympa_paginate(data.paginateData);
+    */
+}
+
+
+
+
+async function sympa_getCategoriesNew()
+{      
+    const sympaPerPage     = localStorage.getItem("sympa-tag-list-per-page"); 
+    const sympaCurrentPage = localStorage.getItem("sympa-tag-list-current-page");   
+    const sympaValue = localStorage.getItem("sympa-tag-list-value"); 
+    const sympaSort = localStorage.getItem("sympa-tag-list-sort");     
+    const sympaViewMode    = localStorage.getItem("sympa-tag-list-view-mode");    
+    const sympaSearch      = localStorage.getItem("sympa-tag-list-search");  
+    
+    /* 
+    const sympaBulkMode    = localStorage.getItem("sympa-tag-list-bulk-mode"); 
+    const sympaListMessage = localStorage.getItem("sympa-tag-list-message"); 
+    const sympaCategory  = localStorage.getItem("sympa-tag-list-category"); 
+    */
+    
+    let url = '/tag-get-all?';  
+    
+    if (sympaViewMode === 'normal'){
+        url += 'page=' + sympaCurrentPage + '&per-page=' + sympaPerPage;         
+    }      
+    else if (sympaViewMode === 'search'){
+        if (sympaValue === ""){
+            url += 'page=' + sympaCurrentPage + '&per-page=' + sympaPerPage; 
+        }
+        else{            
+            url += 'page=' + sympaCurrentPage + '&per-page=' + sympaPerPage + '&search=' + sympaValue; 
+        }
+    }    
+    
+    if (sympaSort === 'newest') url += '&sort=' + 'asc';
+    if (sympaSort === 'oldest') url += '&sort=' + 'desc';
+    if (sympaSort === 'id-ascending') url += '&sort=' + 'id-asc';
+    if (sympaSort === 'id-descending') url += '&sort=' + 'id-desc';
+        
+    const response = await fetch(url); 
+	const jsonData = await response.json();
+	if (response.status != 200){
+		console.log('ERROR!');
+		return null;
+	}
+    
+    if (!jsonData.tags){
+        throw new Error("Missing 'tags' object. Bad json format!");
+    }
+    
+    // console.log( jsonData );    
+    // sympa-no-categories-found
+    
+    if (jsonData.total === 0) localStorage.setItem('sympa-tag-empty', 'yes');
+    
+    return jsonData;
+}
+
+
+async function sympa_getArticlesByUrl(url)
+{          
+    const response = await fetch('/article-get-all?'+url); 
+	const jsonData = await response.json();
+	if (response.status != 200){
+		console.log('ERROR!');
+		return null;
+	}
+    
+    if (!jsonData.articles){
+        throw new Error("Missing 'articles' object. Bad json format!");
+    }
+    
+    return jsonData;
+}
+
+
+function sympa_setBottomRightMessage(message){
+    document.getElementById("sympa-bottom-right-message").innerHTML = message;
+}
+
+
+function sympa_setListValueAction(){
+    const value = document.getElementById("sympa-list-value-modal-input").value;
+    document.getElementById("sympa-list-value-button").innerHTML = value;
+    document.getElementById("sympa-list-value-button").setAttribute('data', value);
+    document.getElementById("sympa-list-value-modal").style.display = "none";
+    localStorage.setItem('sympa-tag-list-value', value);
+}
+
+function sympa_openSetListValueModal(){
+    document.getElementById("sympa-list-value-modal").style.display = "block";
+}
+
+
+function sympa_changeListMode(that){
+    console.log(that);
+    if (that.value === 'normal'){
+        document.getElementById("sympa-list-value-button").style.display = "none";
+        document.getElementById("sympa-list-value-button").innerHTML = "Enter value...";
+        localStorage.setItem('sympa-tag-list-view-mode', 'normal');
+    }
+    if (that.value === 'search'){
+        document.getElementById("sympa-list-value-button").style.display = "block";
+        localStorage.setItem('sympa-tag-list-view-mode', 'search');        
+    }
+}
+
+
+function sympa_changeListSort(that){
+    if (that.value === 'newest'){
+        localStorage.setItem('sympa-tag-list-sort', 'newest');
+    }
+    
+    if (that.value === 'oldest'){
+        localStorage.setItem('sympa-tag-list-sort', 'oldest');
+    }
+    
+    if (that.value === 'id-ascending'){
+        localStorage.setItem('sympa-tag-list-sort', 'id-ascending');
+    }
+    
+    if (that.value === 'id-descending'){
+        localStorage.setItem('sympa-tag-list-sort', 'id-descending');
+    } 
+}
+
+
+function sympa_changeListPerPage(that){
+    if (that.value === '10'){
+        localStorage.setItem('sympa-tag-list-per-page', '10');
+    }
+    
+    if (that.value === '25'){
+        localStorage.setItem('sympa-tag-list-per-page', '25');
+    }
+    
+    if (that.value === '50'){
+        localStorage.setItem('sympa-tag-list-per-page', '50');
+    }    
+}
+
+
+function sympa_reset(){ //removes all localStorage data starting with 'sympa-'
+    for (let i = localStorage.length - 1; i >= 0; i--) {
+        const key = localStorage.key(i);
+        if (key && key.startsWith('sympa-')) {
+            localStorage.removeItem(key); 
+        }
+    }
+    window.location.reload();
+}
+
+
+async function sympa_goAction(){
+    let perPage = localStorage.getItem('sympa-tag-list-per-page');
+    let currentPage = localStorage.getItem('sympa-tag-list-current-page');
+    await sympa_repaginate(1, perPage);
+    sympa_postUiRedraw();
+
+}
+
+function sympa_viewCategory(id){
+    localStorage.setItem("sympa-article-list-view-mode", "tag");
+    localStorage.setItem("sympa-article-list-value", id);
+   // window.location.href = '/dashboard';
+   // setTimeout(() => {
+       window.location.href = '/dashboard/articles';
+  //  }, 2000);
+}
+
+
+function sympa_postUiRedraw(){
+    
+    if (localStorage.getItem('sympa-article-empty') !== null) return; 
+
+    let value = localStorage.getItem('sympa-tag-list-per-page');
+    if (value) { 
+        document.getElementById('sympa-select-right-per-page').value = parseInt(value);
+    } 
+
+    value = localStorage.getItem('sympa-tag-list-view-mode');
+    if (value) { 
+        document.getElementById('sympa-select-right-mode').value = value;
+        
+        const button = document.getElementById("sympa-list-value-button");
+        if (value == 'category' || value == 'search') button.style.display = "block";
+        const categorySearchValue = localStorage.getItem('sympa-tag-list-value');
+        
+        if (categorySearchValue){
+            button.setAttribute('data', categorySearchValue);
+            button.innerHTML = categorySearchValue;
+        }       
+    }     
+}
+
+
+function sympa_initStorageSettings(){  
+    
+    let value = localStorage.getItem('sympa-tag-list-per-page');
+    if (value) {   
+    } else {
+        localStorage.setItem('sympa-tag-list-per-page', '10');
+    }
+
+    value = localStorage.getItem('sympa-tag-list-current-page');
+    if (!value) {        
+        localStorage.setItem('sympa-tag-list-current-page', '1');
+    }
+
+    value = localStorage.getItem('sympa-tag-list-view-mode');
+    if (!value) {        
+        localStorage.setItem('sympa-tag-list-view-mode', 'normal');
+    }
+    
+    value = localStorage.getItem('sympa-tag-list-value');
+    if (!value) {        
+        localStorage.setItem('sympa-tag-list-value', '');
+    }
+
+/*
+
+    value = localStorage.getItem('sympa-tag-list-bulk-mode');
+    if (!value) {        
+        localStorage.setItem('sympa-tag-list-bulk-mode', 'none');
+    }
+
+    value = localStorage.getItem('sympa-tag-list-message');
+    if (!value) {        
+        localStorage.setItem('sympa-tag-list-message', '');
+    }
+
+    value = localStorage.getItem('sympa-tag-list-search');
+    if (!value) {        
+        localStorage.setItem('sympa-tag-list-search', '');
+    }
+
+    value = localStorage.getItem('sympa-tag-list-category');
+    if (!value) {        
+        localStorage.setItem('sympa-tag-list-category', '');
+    }
+
+    value = localStorage.getItem('sympa-tag-list-sort');
+    if (!value) {        
+        localStorage.setItem('sympa-tag-list-sort', 'newest');
+    }
+
+    value = localStorage.getItem('sympa-tag-list-value');
+    if (!value) {        
+        localStorage.setItem('sympa-tag-list-value', '');
+    }
+        
+    value = localStorage.getItem('sympa-tag-empty');
+    if (value) {        
+        localStorage.removeItem('sympa-tag-empty');
+    } 
+    
+    */   
+}
+
+
+async function sympa_initList(){      
+    const data = await sympa_getCategoriesNew();
+    if (data.total === 0){
+        document.getElementById("sympa-tag-list").style.display = 'none';  
+        document.getElementById("sympa-no-category-list").style.display = 'block';         
+        return;         
+    }
+    
+    sympa_drawList(data);	
+    sympa_paginate(data.paginateData);
+}
+
+
+//MAIN
+window.addEventListener("load", async function(){
+    sympa_initStorageSettings();
+  // await sympa_getCategoriesNew();
+    // await sympa_getArticlesByUrl("page=1&perPage=10&category=1");
+    
+  await sympa_initList();
+  sympa_postUiRedraw();    
+});
+
+</script>
+
+
+
+

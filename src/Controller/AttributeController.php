@@ -193,9 +193,47 @@ class AttributeController extends AbstractController
         
     }
 
-
    
-    
-    
+    public function getArticlesById(int $articleId): Response
+    {
+        try {
+            // Ensure articleId is valid
+            if ($articleId === 0) {
+                return $this->json(['error' => 'Invalid article ID'], Response::HTTP_BAD_REQUEST);
+            }
+
+            $attributeRepository = $this->entityManager->getRepository(Attribute::class);
+            $queryBuilder = $attributeRepository->createQueryBuilder('a');
+
+            $queryBuilder->andWhere('a.articleId = :articleId')
+                         ->setParameter('articleId', $articleId);
+
+            $attributes = $queryBuilder->getQuery()->getResult();
+
+            $attributeData = [];
+            $count = 0;
+            foreach ($attributes as $attribute) {
+                $count++;
+                $attributeData[] = [
+                    'id' => $attribute->getId(), 
+                    'articleId' => $attribute->getArticleId(),
+                    'key' => $attribute->getKey(),
+                    'value' => $attribute->getValue(),
+                ];
+            }
+
+            return $this->json([
+                'data'=>[ 
+                    'attributes' => $attributeData, 
+                    'count' => $count ],
+                'error' => false,
+                'message' => null,
+                ]);
+                
+        } catch (\Exception $e) {
+            return $this->json(['error' => $e->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }
+        
     
 };

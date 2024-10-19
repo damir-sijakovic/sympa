@@ -1,0 +1,495 @@
+<style>
+
+
+
+.ds-quantity{
+	display: flex;  
+  }
+  
+
+.ds-quantity div[ds-data="-"] {
+  /* background: red; */
+}
+
+.ds-quantity input[type=number] {
+  -moz-appearance: textfield;
+  width: 30px;
+  height: 30px;
+  text-align: center;
+  border: 1px solid lightgray;
+  margin: 0px 2px;
+}
+
+.ds-quantity input::-webkit-outer-spin-button,
+.ds-quantity input::-webkit-inner-spin-button {
+ -webkit-appearance: none;
+ -moz-appearance: none;
+ margin: 0; 
+ }
+
+.ds-quantity-buttons{
+	display: flex;
+	align-items:center;
+	justify-content:center;
+	width: 25px;
+	background: lightgray;
+	cursor:pointer;
+	user-select: none;
+	
+}
+
+		
+@media (max-width: 420px) {
+  .product-row {
+	display: inline;
+  }
+}
+
+@media (min-width: 421px) {
+  .product-row {        
+    display: flex;
+    flex-wrap: wrap;
+    margin-right: -15px;
+    margin-left: -15px;    
+  }
+}
+		
+		
+.sympa-additional-image{
+    padding: 2px;
+}
+
+
+.sympa-additional-image img{
+    height:48px;
+    width: 48px;
+}
+
+.sympa-cursor-pointer{
+    cursor:pointer;
+}
+
+</style>
+
+
+
+
+
+  
+	  <br><br>
+
+ <div class="container" id="sympa-categories-listx">
+        
+<!--
+<p> webshop > technics > radio & tv </p>
+<span class="badge text-bg-light">Light</span>
+-->
+
+
+ </div>  
+	  
+	  
+ <div class="container">
+        
+        
+        
+        
+  <div class="product-row">
+	  
+    <div class="col">
+      <img id="sympa-main-image" src="{{image}}" style="height: 633px; width: 633px;" />
+      
+      <div id="sympa-additional-images" class="mb-4">
+      <!--
+            <button onclick="sympa_additionalImage(this)" type="button" class="sympa-additional-image btn btn-outline-secondary m-1"> <img src="http://localhost:9876/uploads/images/product-slug/6c854fed-342b-4c30-b47f-526b86056ed9/200.webp"> </button>
+            <button onclick="sympa_additionalImage(this)" type="button" class="sympa-additional-image btn btn-outline-secondary m-1"> <img src="http://localhost:9876/uploads/images/product-slug/7e12cfc3-53de-489a-850d-0a1630a262f8/200.webp"> </button>
+            <button onclick="sympa_additionalImage(this)" type="button" class="sympa-additional-image btn btn-outline-secondary m-1"> <img src="http://localhost:9876/uploads/images/product-slug/eb2a8074-59ad-4d8c-bb5c-6dd4f47e850e/200.webp"> </button>
+            <button onclick="sympa_additionalImage(this)" type="button" class="sympa-additional-image btn btn-outline-secondary m-1"> <img src="http://localhost:9876/uploads/images/product-slug/f515a287-eee5-49e9-8132-62e0885bfe30/200.webp"> </button>
+        -->
+        </div>
+      
+    </div>
+    <div class="col">
+      
+          <h3> {{title}}  </h3>
+     
+          
+      <p>
+      {{excerpt}}
+      </p>
+           
+     
+      <p>
+      <span>SKU:</span> <span>{{sku}}</span>
+      </p>
+      
+      <p class="text-primary" style="font-size: 30px;font-weight: bolder;">{{price}} €</p>
+      
+      <p class="small">*The price is valid only for purchases via the Web shop</p>
+      
+     <div id="sympa-available" class="btn btn-light d-none"> <i class="bi bi-check-circle"></i> Available </div>
+     <div id="sympa-not-available" class="btn btn-light d-none"> <i class="bi bi-check-circle"></i> Not available </div>
+      
+      <br><br>
+      
+      <p>
+        <!--button type="button" class="btn btn-primary btn-lg">Buy</button-->
+        <button type="button" class="btn btn-primary btn-lg" onclick="sympa_addToCart()">Add to cart</button>
+      </p>
+     
+     
+    <!--  
+	<div style="height:30px">
+
+	<div class="ds-quantity">
+	<div class="ds-quantity-buttons" ds-data="-" onclick="document.querySelector('.ds-quantity input[type=number]').stepDown()">-</div>
+	<input type="number" step="1" min="1" max="" value="1"  size="4" pattern="" inputmode="">
+	<div class="ds-quantity-buttons" ds-data="+" onclick="document.querySelector('.ds-quantity input[type=number]').stepUp()">+</div>
+	</div>
+	</div>   
+    
+    -->   
+      
+      <br>
+      
+      <p class="small"> 
+	  <i class="bi bi-truck"></i> We deliver already from 03.07.2024 <br>
+      <i class="bi bi-credit-card"></i> Pay with cash upon collection, Internet banking, cards once and in installments<br>
+      <i class="bi bi-clock"></i> Goods can be returned within 14 days <br>
+      </p>   
+      
+      
+         <div class="" id="sympa-categories-list">       
+<!--
+<p> webshop > technics > radio & tv </p>
+<span class="badge text-bg-secondary">Light</span>
+-->
+ </div>    
+      
+      
+    </div>
+    
+
+    
+    
+  </div>
+  
+
+ </div>
+	  
+	  
+	  
+	  
+<div class="container"> 
+	  
+<ul class="nav nav-tabs">
+  <li class="nav-item">
+    <div role="button" class="sympa-bottom-tab-button nav-link active small" aria-current="page" data-id="description" onclick="sympa_toggleDescriptionTab(this)">Description</div>
+  </li>
+  <li class="nav-item">
+    <div role="button" class="sympa-bottom-tab-button nav-link small" data-id="additional" onclick="sympa_toggleDescriptionTab(this)">Additional info</div>
+  </li>
+</ul>
+
+<div id="sympa-description-page" class="sympa-bottom-tab-page"> <p class="p-3 small"> {{content | raw}} </p> </div>
+<div id="sympa-additional-page" class="d-none sympa-bottom-tab-page"> <p class="p-3 small"> 
+
+<table class="table">
+  <thead>
+    <tr>
+      <th scope="col">Key</th>
+      <th scope="col">Value</th>
+    </tr>
+  </thead>
+  <tbody id="sympa-attribute-table">
+  
+    <!--tr>
+      <th scope="row">1</th>
+      <td>Mark</td>
+    </tr-->
+    
+  </tbody>
+</table>
+
+</p> </div>
+
+
+</div>
+
+
+<!-- components -->
+{{components|raw}}
+    
+<script>
+    window.addEventListener("load", function(){			
+        initDsCart();
+    });
+</script>
+
+
+
+<script>
+
+
+
+function sympa_toggleDescriptionTab(that){    
+    const tabPages = document.querySelectorAll('.sympa-bottom-tab-page');
+    tabPages.forEach(function(element) {
+        element.classList.add('d-none');
+    });
+    
+    const tabButtons = document.querySelectorAll('.sympa-bottom-tab-button');
+    tabButtons.forEach(function(element) {
+        element.classList.remove('active');
+    });
+    
+    const targetTab = that.getAttribute('data-id');
+        
+    const target = document.getElementById('sympa-'+ targetTab +'-page');
+    target.classList.remove('d-none');
+    that.classList.add('active');
+}
+
+
+
+function sympa_additionalImage(that){
+    const originalUrl = that.firstElementChild.src;
+    const newUrl = originalUrl.replace(/200\.webp$/, 'original.webp');
+    
+    document.getElementById('sympa-main-image').src = newUrl;    
+}
+
+
+async function sympa_getAllGroupImages(groupSlug){
+    
+    const response = await fetch('/image-get-group-images/' + groupSlug); 
+	const jsonData = await response.json();
+	if (response.status != 200){
+		console.log('ERROR!');
+		return null;
+	}
+    
+    if (!jsonData.data){
+        sympa_message("Missing 'data' object. Bad url or invalid json format!");
+        throw new Error("Missing 'data' object. Bad json format!");
+    }
+    
+    return jsonData;        
+}
+
+async function sympa_initAdditionalImages(){
+    
+    const _createItem = function(src){
+        return `
+             <button onclick="sympa_additionalImage(this)" type="button" class="sympa-additional-image btn btn-outline-secondary m-1"> <img src="${src}"> </button>
+        `;
+    }
+    
+    const targetElement = document.getElementById('sympa-additional-images');   
+    
+    const mainImageUrl = '{{image}}';
+    if (mainImageUrl){    
+        const parts = mainImageUrl.split('/');
+        const groupSlug = parts[5]; 
+        const images = await sympa_getAllGroupImages(groupSlug);
+        
+        if (images.data){
+            for (let i=0; i<images.data.count; i++){
+                targetElement.innerHTML += _createItem(images.data.images[i].url + '/original.webp');
+            }
+        }
+        
+    }
+   
+}
+
+async function sympa_getAttributes(){
+   
+    const response = await fetch('/attribute-get-by-id/{{id}}'); 
+	const jsonData = await response.json();
+	if (response.status != 200){
+		console.log('ERROR!');
+		return null;
+	}
+    
+    if (!jsonData.data){
+        sympa_message("Missing 'data' object. Bad url or invalid json format!");
+        throw new Error("Missing 'data' object. Bad json format!");
+    }
+
+    return jsonData;        
+}
+
+
+async function sympa_initAttributes(){
+    
+    const _createItem = function(key, value){
+        return `
+            <tr>
+              <td scope="row">${key}</td>
+              <td colspan="2">${value}</td>
+            </tr>
+        `;
+    }
+    
+    const targetElement = document.getElementById('sympa-attribute-table'); 
+    const attributes = await sympa_getAttributes();
+    
+    if (attributes.data){
+        for (let i=0; i<attributes.data.count; i++){
+            const key = attributes.data.attributes[i].key;
+            const value = attributes.data.attributes[i].value;
+            targetElement.innerHTML += _createItem(key, value);
+        }
+    }
+}
+
+
+async function sympa_initCategoriesAndTags(){
+       
+    const response = await fetch('/get-article-categories-and-tags/{{id|raw}}'); 
+	const jsonData = await response.json();
+    
+	if (response.status != 200) {
+		console.log('ERROR!');
+		return null;
+	}
+    
+    if (jsonData.error){
+        sympa_message(jsonData.message);
+    }
+    
+    /*
+    //TAGS
+    const tagIds = jsonData.data.tagIds;    
+    const _createTag = function(id, slug, name){
+        let target = document.getElementById("sympa-tags-list");
+        let divElements = target.querySelectorAll('button[data-id]');
+
+        for (let i = 0; i < divElements.length; i++) {
+            let dataId = divElements[i].getAttribute('data-id');		
+            if (dataId === id) {
+                return; 
+            }
+        } 
+        
+        target.innerHTML += `<button data-id="${id}" data-slug="${slug}" data-name="${name}" type="button" class="btn btn-sm btn-light sympa-pill-button mx-1"> ${name} <span class="badge bg-danger" onclick="this.parentElement.remove()">×</span></button>`; 
+    }   
+        
+    let tagPostData = new FormData();  
+    tagPostData.append('ids', tagIds);
+
+    const tagResponse = await fetch('/tag-get-by-ids', {
+        method: 'POST', 
+        body: tagPostData,
+    });
+
+    const tagJsonData = await tagResponse.json();
+    if (tagResponse.status != 200) {		
+        sympa_message("tag(s) ERROR!", "warning");
+    }
+
+    tagJsonData.tags.forEach(x => {          
+        _createTag(x.id,x.name,x.slug);
+    });
+    */
+    
+    //CATEGORY
+    const categoryIds = jsonData.data.categoryIds;
+    const _createCategory = function(id, slug, name){
+        let target = document.getElementById("sympa-categories-list");
+        let divElements = target.querySelectorAll('button[data-id]');
+
+        for (let i = 0; i < divElements.length; i++) {
+            let dataId = divElements[i].getAttribute('data-id');		
+            if (dataId === id) {
+                return; 
+            }
+        } 
+        target.innerHTML += `<div onclick="sympa_categoryAction(this)" style="margin-right:5px; cursor:pointer;" class="badge text-bg-secondary">${name}</div>`;
+    }
+
+    let categoryPostData = new FormData();  
+    categoryPostData.append('ids', categoryIds);
+
+    const categoryResponse = await fetch('/category-get-by-ids', {
+        method: 'POST', 
+        body: categoryPostData,
+    });
+
+    const categoryJsonData = await categoryResponse.json();
+    if (categoryResponse.status != 200) {		
+        sympa_message("category(s) ERROR!", "warning");
+    }
+
+    categoryJsonData.categories.forEach(x => {          
+        _createCategory(x.id,x.name,x.slug);
+    });
+}
+
+
+
+function sympa_categoryAction(that){
+    console.log(that);
+    
+}
+
+
+
+function sympa_addToCart(){
+    console.log("ADD TO CART");
+    
+    const image = `{{image}}`;
+    
+    dsCart.addItem({
+        'image':  image, 
+        'title': '{{title}}', 
+        'price': {{price}}, 
+        'quantity': 1, 
+        'sku': {{id}},
+    });   
+    
+    /*
+    dsCart.addItem = function(argObj) {
+
+            if (!argObj || typeof argObj !== 'object') {
+                console.log('argObj is not set or is not an object');
+                return false;
+            }
+*/
+            //const requiredProps = ['image', 'title', 'price', 'quantity', 'sku'];
+}
+
+
+
+//INIT
+window.addEventListener("load", async function(){
+
+    const quantity = {{quantity}};
+    if (quantity > 0) {
+        const targetElement = document.getElementById("sympa-available"); 
+        targetElement.classList.remove('d-none');
+        targetElement.setAttribute("title", quantity);
+    }
+    else{
+        document.getElementById("sympa-not-available").classList.remove('d-none');
+    }
+    
+   //document.getElementById("sympa-main-image").src = sympa_additionalImage({{image}});
+    
+    
+    await sympa_initAdditionalImages();
+    await sympa_initAttributes();
+    await sympa_initCategoriesAndTags();
+    
+    console.log("LOADED!");
+    
+});
+
+
+
+</script>
+	  
+
+
+

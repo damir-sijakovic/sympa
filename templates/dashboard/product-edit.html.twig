@@ -41,7 +41,7 @@
 </style>
 
 
-<h2>Create product</h2>
+<h2>Edit product</h2>
 
 <hr>
 <br><br>
@@ -52,16 +52,16 @@
     <div class="col-8">
 
         <h6>UUID:</h6>
-		<input class="form-control" id="sympa-article-uuid" placeholder="" style="backgroun:none;" value="{{uuid}}" readonly>
+		<input class="form-control" id="sympa-article-uuid" placeholder="" style="background:none;" value="{{uuid}}" readonly>
        
         <br />
     
     	<h6>Name:</h6>
-		<input class="form-control" id="sympa-article-title" placeholder="" >
+		<input class="form-control" id="sympa-article-title" placeholder="" value="{{title}}" >
 		
 		<br>
 		<h6>Short description:</h6>
-		<textarea class="form-control" id="sympa-article-excerpt" rows="3" maxlength="255" placeholder=""></textarea>
+		<textarea class="form-control" id="sympa-article-excerpt" rows="3" maxlength="255" placeholder="" ></textarea>
 		<br />
 		<h6>Description:</h6>
 		<div id="trumbowyg-element"></div>
@@ -69,13 +69,13 @@
      
         <br />   
         <h6>Price:</h6>
-		<input class="form-control" id="sympa-article-price" placeholder="" >
+		<input class="form-control" id="sympa-article-price" placeholder="" value="{{price}}">
         <br />
         <h6>Quantity:</h6>
-		<input class="form-control" id="sympa-article-quantity" placeholder="" >
+		<input class="form-control" id="sympa-article-quantity" placeholder="" value="{{quantity}}" >
         <br />
         <h6>SKU:</h6>
-		<input class="form-control" id="sympa-article-sku" placeholder="" >
+		<input class="form-control" id="sympa-article-sku" placeholder=""  value="{{sku}}" >
         
         <hr />              
         <br />
@@ -83,16 +83,16 @@
         <h5>SEO</h5>   
         <br />   
         <h6>Meta description:</h6>
-		<input class="form-control" id="sympa-article-meta-description" placeholder="" >
+		<input class="form-control" id="sympa-article-meta-description" placeholder="" value="{{metaDescription}}">
 		<br />
         <h6>OG title:</h6>
-		<input class="form-control" id="sympa-article-og-title" placeholder="" >
+		<input class="form-control" id="sympa-article-og-title" placeholder="" value="{{ogTitle}}" >
 		<br />
         <h6>OG description:</h6>
-		<input class="form-control" id="sympa-article-og-description" placeholder="" >
+		<input class="form-control" id="sympa-article-og-description" placeholder="" value="{{ogDescription}}">
 		<br />
         <h6>OG url:</h6>
-		<input class="form-control" id="sympa-article-og-url" placeholder="" >
+		<input class="form-control" id="sympa-article-og-url" placeholder="" value="{{ogUrl}}">
 		
 
         
@@ -138,8 +138,8 @@
       <div class="accordion-body">
 
         <div class="input-group mb-3">
-          <span class="input-group-text" onclick="document.getElementById('sympa-article-group-uuid').value = '{{groupUuid}}'">New</span>
-          <input id="sympa-article-group-uuid" type="text" class="form-control" >
+          <span class="input-group-text" onclick="document.getElementById('sympa-article-group-uuid').value = '{{newGroupUuid}}'">New</span>
+          <input id="sympa-article-group-uuid" type="text" class="form-control">
           <span class="input-group-text" onclick="document.getElementById('sympa-article-group-uuid').value = ''"><i class="bi bi-x-circle"></i></span>
         </div>
 
@@ -625,18 +625,7 @@ function sympa_getArticleData()
     data.tags = sympa_getSelectedTagIds();
         
     if (document.getElementById("sympa-product-image").style.display !== 'none'){
-        //data.image = document.getElementById("sympa-product-image").src;
-        
-        const name = localStorage.getItem('sympa-select-image-name');
-        const group = localStorage.getItem('sympa-select-image-group');
-        const dir = localStorage.getItem('sympa-select-image-dir');
-    
-        if (name){
-            data.image = '{{imagesUrl}}/' + group +'/'+ dir +'/original.webp';   
-        }
-        else{
-            data.image = "";
-        }
+        data.image = document.getElementById("sympa-product-image").src;
     }
     else{
         data.image = "";
@@ -669,10 +658,11 @@ async function sympa_save()
     postData.append('attributes', inputData.attributes);
     postData.append('categories', inputData.categories);
     postData.append('tags', inputData.tags);
+    postData.append('id', '{{id}}');
     
     postData.append('image', inputData.image);
     
-    const response = await fetch('/product-create', {
+    const response = await fetch('/product-update', {
 		method: 'POST', 
 		body: postData,
 	});
@@ -682,7 +672,7 @@ async function sympa_save()
 		sympa_message(jsonData.message, 'warning');
 	}
 	else {
-        sympa_message('Product created!', 'success'); 
+        sympa_message('Product updated!', 'success'); 
 	} 
     
   
@@ -872,6 +862,92 @@ function sympa_getSelectedCategoryIds() {
 }
 
 
+async function sympa_initCategoriesAndTags(){
+       
+    const response = await fetch('/get-article-categories-and-tags/{{id|raw}}'); 
+	const jsonData = await response.json();
+    
+	if (response.status != 200) {
+		console.log('ERROR!');
+		return null;
+	}
+    
+    if (jsonData.error){
+        sympa_message(jsonData.message);
+    }
+    
+    //TAGS
+    const tagIds = jsonData.data.tagIds;    
+    const _createTag = function(id, slug, name){
+        let target = document.getElementById("sympa-selected-tags-list");
+        let divElements = target.querySelectorAll('button[data-id]');
+
+        for (let i = 0; i < divElements.length; i++) {
+            let dataId = divElements[i].getAttribute('data-id');		
+            if (dataId === id) {
+                return; 
+            }
+        } 
+        
+        target.innerHTML += `<button data-id="${id}" data-slug="${slug}" data-name="${name}" type="button" class="btn btn-sm btn-light sympa-pill-button mx-1"> ${name} <span class="badge bg-danger" onclick="this.parentElement.remove()">×</span></button>`; 
+    }   
+        
+    let tagPostData = new FormData();  
+    tagPostData.append('ids', tagIds);
+
+    const tagResponse = await fetch('/tag-get-by-ids', {
+        method: 'POST', 
+        body: tagPostData,
+    });
+
+    const tagJsonData = await tagResponse.json();
+    if (tagResponse.status != 200) {		
+        sympa_message("tag(s) ERROR!", "warning");
+    }
+
+    tagJsonData.tags.forEach(x => {          
+        _createTag(x.id,x.name,x.slug);
+    });
+    
+    
+    //CATEGORY
+    const categoryIds = jsonData.data.categoryIds;
+    const _createCategory = function(id, slug, name){
+        let target = document.getElementById("sympa-selected-categories-list");
+        let divElements = target.querySelectorAll('button[data-id]');
+
+        for (let i = 0; i < divElements.length; i++) {
+            let dataId = divElements[i].getAttribute('data-id');		
+            if (dataId === id) {
+                return; 
+            }
+        } 
+        
+        target.innerHTML += `<button data-id="${id}" data-slug="${slug}" data-name="${name}" type="button" class="btn btn-sm btn-light sympa-pill-button mx-1"> ${name} <span class="badge bg-danger" onclick="this.parentElement.remove()">×</span></button>`; 
+    }
+
+    let categoryPostData = new FormData();  
+    categoryPostData.append('ids', categoryIds);
+
+    const categoryResponse = await fetch('/category-get-by-ids', {
+        method: 'POST', 
+        body: categoryPostData,
+    });
+
+    const categoryJsonData = await categoryResponse.json();
+    if (categoryResponse.status != 200) {		
+        sympa_message("category(s) ERROR!", "warning");
+    }
+
+    categoryJsonData.categories.forEach(x => {          
+        _createCategory(x.id,x.name,x.slug);
+    });
+}
+
+
+
+//ATTRIBUTE
+
 function sympa_openAddAttributeModal(){
     let element = document.getElementById('sympa-add-attribute-modal');
     element.style.display = 'block';
@@ -964,21 +1040,55 @@ function sympa_getAttributes() {
         const value = items[i].getAttribute('data-value');
         attributes[key] = value;        
     }
+
     
     return attributes;
 }
 
 
+async function sympa_getInitAttributes(){
+   
+    const response = await fetch('/attribute-get-by-id/{{id}}'); 
+	const jsonData = await response.json();
+	if (response.status != 200){
+		console.log('ERROR!');
+		return null;
+	}
+    
+    if (!jsonData.data){
+        sympa_message("Missing 'data' object. Bad url or invalid json format!");
+        throw new Error("Missing 'data' object. Bad json format!");
+    }
 
-function sympa_openImageSelector(){
-    /*
-    localStorage.removeItem('sympa-select-image-name');
-    localStorage.removeItem('sympa-select-image-group');
-    localStorage.removeItem('sympa-select-image-dir');
-    */
-    sympa_imageSelectorOpen();
+    return jsonData;        
 }
 
+
+function sympa_initAddAttributeModal(data) {
+    const _createitem = function (key, value) {        
+        return `<div class="btn-group m-1" role="group">
+                    <button type="button" class="btn btn-outline-secondary btn-sm sympa-attribute-list-item" data-value="${value}" onclick="sympa_editAddAttributeModal(this)">${key}</button>
+                    <button type="button" class="btn btn-danger btn-sm" onclick="this.parentNode.parentNode.removeChild(this.parentNode)"><i class="bi bi-x-lg"></i></button>
+        </div>`;
+    };
+        
+    const targetElement = document.getElementById("accordion-attribute-list");    
+    data.forEach(x => {          
+        targetElement.innerHTML += _createitem(x.key,x.value);
+    });    
+}
+
+
+async function sympa_initAttributes(){    
+    const attributes = await sympa_getInitAttributes();   
+    sympa_initAddAttributeModal(attributes.data.attributes);
+    
+}
+
+
+function sympa_openImageSelector(){
+    sympa_imageSelectorOpen();
+}
 
 
 async function sympa_getAllGroupImages(){
@@ -1001,7 +1111,6 @@ async function sympa_getAllGroupImages(){
 
 
 
-
 async function sympa_rebuildGroupImages(){      
     
     const _extractImageUuidFromUrl = function(url) { 
@@ -1021,10 +1130,7 @@ async function sympa_rebuildGroupImages(){
     const imageName = localStorage.getItem('sympa-select-image-name');
     const imageUuid = _extractImageUuidFromUrl(imageName);
     
-    console.log("imageUuid", imageUuid);
-    
     for (let i=0; i<serverJson.data.count; i++){
-        console.log("NEW: ", serverJson.data.images[i]);
         targetElement.innerHTML += _createitem(serverJson.data.images[i].url);
     }
  
@@ -1040,6 +1146,28 @@ function sympa_removeProductImages(){
 }
 
 
+async function sympa_initImage(){       
+    localStorage.setItem('sympa-select-image-name', '{{image}}'); 
+    localStorage.setItem('sympa-select-image-group', '{{imageGroup}}'); 
+    localStorage.setItem('sympa-select-image-dir', '{{imageDir}}'); 
+    
+    const name = localStorage.getItem('sympa-select-image-name');
+    const group = localStorage.getItem('sympa-select-image-group');
+    const dir = localStorage.getItem('sympa-select-image-dir');
+        
+    if (name){       
+        document.getElementById("sympa-additional-images").innerHTML = "";
+        const mainImage = '{{imagesUrl}}/' + group +'/'+ dir +'/200.webp';         
+        document.getElementById('sympa-product-image').src = mainImage;
+       
+        document.getElementById('sympa-product-image-drop').classList.remove('d-flex');
+        document.getElementById('sympa-product-image-drop').classList.add('d-none');
+        document.getElementById('sympa-product-image').style.display = "block";
+              
+        await sympa_rebuildGroupImages();
+    } 
+
+}
 
 
 //EVENTS 
@@ -1063,8 +1191,17 @@ document.getElementById('sympa-image-selector-select-button').addEventListener('
 });
 
 
+
 //MAIN
 window.addEventListener("load", async function(){
+    document.getElementById("sympa-article-excerpt").value = "{{excerpt}}";
+    document.getElementById("sympa-article-group-uuid").value = "{{groupUuid}}";
+    document.getElementById("sympa-meta-json-textarea").value = `{{metaData|raw}}`;
+    
+    await sympa_initImage();
+    await sympa_initCategoriesAndTags();
+    await sympa_initAttributes();
+    
     console.log("LOADED!");
 });
 

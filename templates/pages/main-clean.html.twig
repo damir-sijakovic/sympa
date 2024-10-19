@@ -98,7 +98,7 @@
    
 
   </head>    
-  <body class="body-page">
+  <body>
   
   
     <header class="container">
@@ -115,8 +115,10 @@
         <a class="py-2 link-body-emphasis text-decoration-none" href="/user/login">Login</a>
       </nav>
       
-     <ul style="list-style-type:none; margin:0">
-        <a class="py-2 link-body-emphasis text-decoration-none" href="/product-list">Store</a>
+      <ul style="list-style-type:none; margin:0">
+        <li class="nav-item" onclick="dsCart.show()">
+          <i class="bi bi-cart" style="font-size: 20px;"></i>
+        </li>
     </ul>
       
     </div>
@@ -170,6 +172,5 @@
 
     </body>
 </html>
-
 
   <script src="{{rootUrl}}/assets/vendor/bootstrap-5.3.3-dist/js/bootstrap.bundle.min.js"></script>	

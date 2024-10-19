@@ -44,6 +44,83 @@ class PageController extends AbstractController
         ]);
     }
     
+    
+    public function viewProductById(Request $request, $id): Response
+    {        
+        
+        $articleRepository = $this->entityManager->getRepository(Article::class);
+        $article = $articleRepository->findOneBy(['id' => $id]);
+		
+		if (!$article) {
+			throw new NotFoundHttpException('The product was not found.');
+		}
+        
+        $quantity = $article->getQuantity();
+        if (!$quantity) $quantity = -1;
+        
+        $component = $this->renderView('/store/components/shopping-cart.html.twig', [
+            'rootUrl' => $this->utilityHelper->getRootUrl(),
+        ]);  
+        
+        $htmlTemplate = $this->renderView('/pages/product.html.twig', [
+            'rootUrl' => $this->utilityHelper->getRootUrl(),
+            'id' => $id,
+            'title' => $article->getTitle(),
+            'excerpt' => $article->getExcerpt(),
+            'content' => $article->getContent(),
+            'sku' => $article->getSku(),
+            'price' => $article->getPrice(),
+            'image' => $article->getImage(),
+            'quantity' => $quantity,
+            'components' => $component,
+        ]);
+
+        $response = $this->render('/pages/main-clean.html.twig', [
+            'rootUrl' => $this->utilityHelper->getRootUrl(),
+            'body' => $htmlTemplate,
+        ]);
+
+        $response->headers->set('Content-Type', 'text/html');
+
+        return $response;
+    }
+    
+    public function viewProductBySlug(Request $request, $slug): Response
+    {
+        
+        $articleRepository = $this->entityManager->getRepository(Article::class);
+        $article = $articleRepository->findOneBy(['slug' => $slug]);
+		
+		if (!$article) {
+			throw new NotFoundHttpException('The product was not found.');
+		}
+        
+        $quantity = $article->getQuantity();
+        if (!$quantity) $quantity = -1;
+        
+        $htmlTemplate = $this->renderView('/pages/product.html.twig', [
+            'rootUrl' => $this->utilityHelper->getRootUrl(),
+            'id' => $article->getId(),
+            'title' => $article->getTitle(),
+            'excerpt' => $article->getExcerpt(),
+            'content' => $article->getContent(),
+            'sku' => $article->getSku(),
+            'price' => $article->getPrice(),
+            'image' => $article->getImage(),
+            'quantity' => $quantity,
+        ]);
+
+        $response = $this->render('/pages/main-clean.html.twig', [
+            'rootUrl' => $this->utilityHelper->getRootUrl(),
+            'body' => $htmlTemplate,
+        ]);
+
+        $response->headers->set('Content-Type', 'text/html');
+
+        return $response;
+    }
+    
+    
     public function viewArticle(Request $request, $id): Response
     {
         /*
@@ -104,6 +181,65 @@ class PageController extends AbstractController
     }
 
 
+    public function demoProduct(Request $request): Response
+    {
+        $htmlTemplate = $this->renderView('/pages/product-demo.html.twig', [
+            'rootUrl' => $this->utilityHelper->getRootUrl(),
+        ]);
+       
+        return $this->render('/pages/main-clean.html.twig', [
+            'rootUrl' => $this->utilityHelper->getRootUrl(),
+            'body' => $htmlTemplate,
+        ]);
+    }
+
+
+    public function demoProductList(Request $request): Response
+    {
+        $htmlTemplate = $this->renderView('/pages/product-list-demo.html.twig', [
+            'rootUrl' => $this->utilityHelper->getRootUrl(),
+        ]);
+       
+        return $this->render('/pages/main-clean.html.twig', [
+            'rootUrl' => $this->utilityHelper->getRootUrl(),
+            'body' => $htmlTemplate,
+        ]);
+    }
+
+
+    public function demoProductCheckout(Request $request): Response
+    {
+        $htmlTemplate = $this->renderView('/pages/product-checkout-demo.html.twig', [
+            'rootUrl' => $this->utilityHelper->getRootUrl(),
+        ]);
+       
+        return $this->render('/pages/main-clean.html.twig', [
+            'rootUrl' => $this->utilityHelper->getRootUrl(),
+            'body' => $htmlTemplate,
+        ]);
+    }
+
+
+
+    public function demoShoppingCart(Request $request): Response
+    {
+        $component = $this->renderView('/store/components/shopping-cart.html.twig', [
+            'rootUrl' => $this->utilityHelper->getRootUrl(),
+        ]);        
+        
+        $htmlTemplate = $this->renderView('/pages/product-shopping-cart-demo.html.twig', [
+            'rootUrl' => $this->utilityHelper->getRootUrl(),
+            'component' => $component,
+        ]);
+       
+        return $this->render('/pages/main-clean.html.twig', [
+            'rootUrl' => $this->utilityHelper->getRootUrl(),
+            'body' => $htmlTemplate,
+        ]);
+    }
+
+
+
     public function about(Request $request): Response
     {
         $htmlTemplate = $this->renderView('/pages/about.html.twig', [
@@ -117,6 +253,25 @@ class PageController extends AbstractController
     }
 
 
+    public function checkout(Request $request): Response
+    {
+        $component = $this->renderView('/store/components/shopping-cart.html.twig', [
+            'rootUrl' => $this->utilityHelper->getRootUrl(),
+        ]);    
+        
+        $htmlTemplate = $this->renderView('/pages/product-checkout.html.twig', [
+            'rootUrl' => $this->utilityHelper->getRootUrl(),
+            'components' => $component,
+        ]);
+       
+        return $this->render('/pages/main-clean.html.twig', [
+            'rootUrl' => $this->utilityHelper->getRootUrl(),
+            'body' => $htmlTemplate,            
+        ]);
+    }
+
+
+
 /*
     public function home(Request $request): Response
     {
@@ -126,6 +281,23 @@ class PageController extends AbstractController
         ]);
     }
 */
+
+    public function productList(Request $request): Response
+    {
+        $component = $this->renderView('/store/components/shopping-cart.html.twig', [
+            'rootUrl' => $this->utilityHelper->getRootUrl(),
+        ]);    
+        
+        $htmlTemplate = $this->renderView('/pages/product-list.html.twig', [
+            'rootUrl' => $this->utilityHelper->getRootUrl(),
+            'components' => $component,
+        ]);
+       
+        return $this->render('/pages/main-clean.html.twig', [
+            'rootUrl' => $this->utilityHelper->getRootUrl(),
+            'body' => $htmlTemplate,            
+        ]);
+    }
 
 
 	

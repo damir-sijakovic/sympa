@@ -1,0 +1,134 @@
+<style>
+
+	.ds-categories-between{
+		display:flex; 
+		justify-content:space-between;
+		align-items: baseline;
+	}
+	
+	h6{
+		font-size: 13px;
+	}
+	
+	.ds-selected-table-item{
+		background: #0d6efd !important;
+		color: white !important;
+	}
+	
+	.ds-error{
+		border: 1px red solid !important;
+	}
+	
+	.trumbowyg-textarea{
+		font-size: 16px;
+		font-family: 'Consolas', 'Courier New', Courier, monospace;
+		line-height: 22px;
+	}
+	
+</style>
+
+
+<h2>Edit product tag</h2>
+
+<hr>
+
+
+    <div class="col-8">
+    
+		<h6>ID:</h6>
+	    <input style="background: none;" class="form-control" id="sympa-tag-id-input" placeholder="{{id}}" readonly >        
+        
+        <br>
+        <h6>Name:</h6>
+		<input class="form-control" id="sympa-tag-name-input" value="{{name}}" >    
+    
+        <br>
+        <h6>Slug:</h6>
+		<input style="background: none;" class="form-control" id="sympa-tag-slug-input" value="{{slug}}" readonly >    
+    
+    
+				
+        <br />
+        <div onclick="sympa_save()" class="btn btn-primary btn-lg" >Save</div>   
+       
+    </div>
+
+<script src="{{rootUrl}}/assets/vendor/jquery-3.6.0/jquery-3.6.0.min.js"></script>
+<script src="{{rootUrl}}/assets/vendor/slugify/slugify.min.js"></script> 
+<script src="{{rootUrl}}/assets/vendor/slugify/speakingurl.min.js"></script> 
+
+<script>
+
+
+
+async function sympa_save(){
+
+    const id = "{{id}}";
+    const name = document.getElementById("sympa-tag-name-input").value;
+
+    if (name.length >= 3 && name.length <= 255) {} 
+    else {
+        sympa_message("String 'name' must be from 3 to 255 chars long.");
+        return;
+    }    
+    
+	let postData = new FormData();  
+	postData.append('id', id);
+	postData.append('name', name);
+    
+    const response = await fetch('/tag-edit', {
+		method: 'POST', 
+		body: postData,
+	});
+    
+    const jsonData = await response.json();
+	
+	if (jsonData.error) {
+		sympa_message(jsonData.message, 'warning');
+	}
+	else {
+		sympa_message('Tag updated!', 'success');
+		//setTimeout(function () {
+		//	window.location.reload();
+		//}, 2000);
+	}
+    
+
+}
+
+
+/*
+	let postData = new FormData();  
+	postData.append('id', data.title);
+	postData.append('name', data.excerpt);
+
+	const response = await fetch('/article-create', {
+		method: 'POST', 
+		body: postData,
+	});
+	
+	const jsonData = await response.json();
+	
+	if (jsonData.error) {
+		sympa_message(jsonData.message, 'warning');
+	}
+	else {
+		sympa_message('Tag updated!', 'success');
+		//setTimeout(function () {
+		//	window.location.reload();
+		//}, 2000);
+	}
+ */
+
+
+
+/*
+window.addEventListener('load', async function() {
+
+});
+*/
+
+
+
+
+</script>

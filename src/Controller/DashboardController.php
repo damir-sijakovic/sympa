@@ -63,29 +63,7 @@ class DashboardController extends AbstractController
     }
        
        
-    public function createProduct(Request $request): Response
-    {
-        $session = $request->getSession();	
-        
-        $components = $this->renderView('dashboard/components/select-image.html.twig', [
-            'rootUrl' => $this->utilityHelper->getRootUrl(), 
-        ]);
-        
-		$articles = $this->renderView('dashboard/product-create.html.twig', [
-			'rootUrl' => $this->utilityHelper->getRootUrl(),
-			'imagesUrl' => $this->utilityHelper->getRootUrl() .'/uploads/images'  ,
-            'controller_name' => 'DashboardController',
-            'uuid' => $this->utilityHelper->generateUuid(),
-            'groupUuid' => $this->utilityHelper->generateUuid(),
-            'components' => $components,
-        ]);
-		
-        return $this->render('dashboard/main.html.twig', [
-            'userId' => $session->get('userId'),  
-			'rootUrl' => $this->utilityHelper->getRootUrl(),
-            'body' => $articles,
-        ]);
-    }     
+    
        
        
     public function orders(Request $request): Response
@@ -361,6 +339,41 @@ class DashboardController extends AbstractController
     }
   
 
+    public function editProductCategory(Request $request, $id): Response
+    {
+        $session = $request->getSession();	
+        $categoryRepository = $this->entityManager->getRepository(Category::class);
+        $category = $categoryRepository->findOneBy(['id' => $id]);
+
+        if (!$category) {
+            throw new NotFoundHttpException('The category was not found.');
+        }
+
+        $components = $this->renderView('dashboard/components/select-image.html.twig', [
+            'rootUrl' => $this->utilityHelper->getRootUrl(), 
+        ]);
+
+        $categories = $this->renderView('dashboard/product-category-edit.html.twig', [
+            'id' => $id,
+            'components' => $components, 
+            'rootUrl' => $this->utilityHelper->getRootUrl(), 
+            'name' => $category->getName(),   
+            'slug' => $category->getSlug(), 
+            'parent' => $category->getParent(),
+            'description' => $category->getDescription(),
+            'image' => $category->getImage(),
+            'type' => $category->getType(),
+            'visible' => $category->getVisible() ? 'yes' : 'no',
+        ]);
+
+        return $this->render('dashboard/main.html.twig', [ 
+            'userId' => $session->get('userId'),           
+            'rootUrl' => $this->utilityHelper->getRootUrl(),
+            'body' => $categories,
+        ]);
+    }
+  
+
     
     public function editTag(Request $request, $id): Response
     {
@@ -374,9 +387,10 @@ class DashboardController extends AbstractController
 
         $tags = $this->renderView('dashboard/tag-edit.html.twig', [
             'rootUrl' => $this->utilityHelper->getRootUrl(), 
+            'id' => $id,   
             'name' => $tag->getName(),   
             'slug' => $tag->getSlug(), 
-            'description' => $tag->getDescription(), 
+           // 'description' => $tag->getDescription(), 
             
             
         /*
@@ -399,6 +413,44 @@ class DashboardController extends AbstractController
         ]);
     }
   
+  
+    public function editProductTag(Request $request, $id): Response
+    {
+        $session = $request->getSession();	
+        $tagRepository = $this->entityManager->getRepository(Tag::class);
+        $tag = $tagRepository->findOneBy(['id' => $id]);
+
+        if (!$tag) {
+            throw new NotFoundHttpException('The tag was not found.');
+        }
+
+        $tags = $this->renderView('dashboard/product-tag-edit.html.twig', [
+            'rootUrl' => $this->utilityHelper->getRootUrl(), 
+            'id' => $id,   
+            'name' => $tag->getName(),   
+            'slug' => $tag->getSlug(), 
+           // 'description' => $tag->getDescription(), 
+            
+            
+        /*
+            'rootUrl' => $this->utilityHelper->getRootUrl(),    
+            'title' => $category->getTitle(),
+            'slug' => $category->getSlug(),
+            'excerpt' => $category->getExcerpt(),
+            'content' => $category->getContent(),
+            'image' => $category->getImage(),
+            'type' => $category->getType(),
+            'active' => $category->isActive() ? 'yes' : 'no',
+            'id' => $id
+            */
+        ]);
+
+        return $this->render('dashboard/main.html.twig', [ 
+            'userId' => $session->get('userId'),           
+            'rootUrl' => $this->utilityHelper->getRootUrl(),
+            'body' => $tags,
+        ]);
+    }
 
 
     public function editImages(Request $request, $slug): Response
@@ -456,7 +508,113 @@ class DashboardController extends AbstractController
     }
   
 
+    public function createProduct(Request $request): Response
+    {
+        $session = $request->getSession();	
+        
+        $components = $this->renderView('dashboard/components/select-image.html.twig', [
+            'rootUrl' => $this->utilityHelper->getRootUrl(), 
+        ]);
+        
+		$articles = $this->renderView('dashboard/product-create.html.twig', [
+			'rootUrl' => $this->utilityHelper->getRootUrl(),
+			'imagesUrl' => $this->utilityHelper->getRootUrl() .'/uploads/images'  ,
+            'controller_name' => 'DashboardController',
+            'uuid' => $this->utilityHelper->generateUuid(),
+            'groupUuid' => $this->utilityHelper->generateUuid(),
+            'components' => $components,
+        ]);
+		
+        return $this->render('dashboard/main.html.twig', [
+            'userId' => $session->get('userId'),  
+			'rootUrl' => $this->utilityHelper->getRootUrl(),
+            'body' => $articles,
+        ]);
+    } 
+
+
+    public function editProduct(Request $request, $id): Response
+    {
+        $session = $request->getSession();	
+        $articleRepository = $this->entityManager->getRepository(Article::class);
+        $article = $articleRepository->findOneBy(['id' => $id]);
+
+        $extractGroupSlug = function($url) {
+            $path = parse_url($url, PHP_URL_PATH);
+            $segments = explode('/', trim($path, '/'));
+            
+           // error_log(  print_r($segments, true) );
+            
+            return $segments[2];
+        };
+        
+        $extractImageSlug = function($url) {
+            $path = parse_url($url, PHP_URL_PATH);
+            $segments = explode('/', trim($path, '/'));
+            
+           // error_log(  print_r($segments, true) );
+            
+            return $segments[3];
+        };
+        
+
+        if (!$article) {
+            throw new NotFoundHttpException('The article was not found.');
+        }
+        
+        $components = $this->renderView('dashboard/components/select-image.html.twig', [
+            'rootUrl' => $this->utilityHelper->getRootUrl(), 
+        ]);
+                       
+        $jsonMeta = $article->getMetadata();    
+       // if ($jsonMeta)
+       // {
+            $jsonMeta = json_encode($jsonMeta, true);
+       // } 
+                 
+        $imageDir = "";
+        $imageGroup = "";
+        if ($article->getImage()){
+            $imageDir = $extractImageSlug($article->getImage());
+            $imageGroup = $extractGroupSlug($article->getImage());
+        }
+ 
+        error_log("IMAGE: " . print_r(  $jsonMeta ,true) );                   
+            
+		$articles = $this->renderView('dashboard/product-edit.html.twig', [
+			'rootUrl' => $this->utilityHelper->getRootUrl(),
+            'imagesUrl' => $this->utilityHelper->getRootUrl() .'/uploads/images',            
+            'groupUuid' => $article->getGroupUuid(),
+            'newGroupUuid' => $this->utilityHelper->generateUuid(),
+            'uuid' => $article->getUuid(),
+            'title' => $article->getTitle(),
+            'slug' => $article->getSlug(),
+            'excerpt' => $article->getExcerpt(),
+            'content' => $article->getContent(),
+            'image' => $article->getImage(),
+            'imageDir' => $imageDir,
+            'imageGroup' => $imageGroup,
+            'type' => $article->getType(),
+            'active' => $article->isActive() ? 'true' : 'false',
+            'id' => $id,
+            'components' => $components,    
+            'metaData' => $jsonMeta,            
+            'price' => $article->getPrice(),
+            'quantity' => $article->getQuantity(),
+            'sku' => $article->getSku(),
+            'metaDescription' => $article->getMetaDescription(),
+            'ogTitle' => $article->getOgTitle(),
+            'ogUrl' => $article->getOgUrl(),
+            'ogDescription' => $article->getOgDescription()        
+        ]);
+		
+        return $this->render('dashboard/main.html.twig', [ 
+            'userId' => $session->get('userId'),           
+			'rootUrl' => $this->utilityHelper->getRootUrl(),
+            'body' => $articles,
+        ]);
+    }
     
-    
+    //  http://localhost:9876/uploads/images/product-slug/7e12cfc3-53de-489a-850d-0a1630a262f8/200.webp
     
 };
