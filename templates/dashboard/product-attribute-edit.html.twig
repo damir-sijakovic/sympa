@@ -1,0 +1,346 @@
+<style>
+
+	.ds-categories-between{
+		display:flex; 
+		justify-content:space-between;
+		align-items: baseline;
+	}
+	
+	h6{
+		font-size: 13px;
+	}
+	
+	.ds-selected-table-item{
+		background: #0d6efd !important;
+		color: white !important;
+	}
+	
+	.ds-error{
+		border: 1px red solid !important;
+	}
+	
+	.trumbowyg-textarea{
+		font-size: 16px;
+		font-family: 'Consolas', 'Courier New', Courier, monospace;
+		line-height: 22px;
+	}
+	
+    .sympa-modal{
+    background: #3e3e3ed1;
+}
+
+    
+</style>
+
+
+<h2>Edit product attributes</h2>
+<p class="lead"> Atributes for product with id: <a href="/product-id/{{id}}" target="_blank">{{id}}</a> </p>
+<hr>
+
+    <div class="col-8">    		   
+        <div onclick="sympa_openAttributeModalAction()" class="btn btn-outline-primary btn-lg"> New </div>          
+        <div onclick="sympa_save()" class="btn btn-primary btn-lg"> Save </div>          
+    </div>
+
+    <br />
+
+<div class="accordion" id="sympa-attributes-accordion">
+
+<!--
+  <div class="accordion-item">
+    <h2 class="accordion-header">
+      <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#panelsStayOpen-collapseOne" aria-expanded="true" aria-controls="panelsStayOpen-collapseOne">
+        <span onclick="console.log(321)" class="badge text-bg-danger mx-2"><i class="bi bi-x"></i></span> Key
+      </button>
+    </h2>
+    <div id="panelsStayOpen-collapseOne" class="accordion-collapse collapse show">
+      <div class="accordion-body">
+
+       <div class="mb-3">
+          <label for="exampleFormControlTextarea1" class="form-label">Value:</label>
+          <textarea class="form-control" id="exampleFormControlTextarea1" rows="3"></textarea>
+        </div>
+
+      </div>
+    </div>
+  </div>
+ --> 
+  
+</div>
+
+
+
+
+
+<!-- MODALS -->
+
+<div class="modal sympa-modal" id="sympa-create-attribute-modal" style="display:none;">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Create attribute</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" onclick="document.getElementById('sympa-create-attribute-modal').style.display='none'"></button>
+      </div>
+      <div class="modal-body">
+        
+        <div class="mb-3">
+          <label class="form-label">Key:</label>
+          <input type="email" class="form-control" id="sympa-create-attribute-modal-key" placeholder="">
+        </div>
+        
+        <div class="mb-3">
+          <label class="form-label">Value:</label>
+          <textarea class="form-control" id="sympa-create-attribute-modal-value" rows="3"></textarea>
+        </div>
+        
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary" onclick="sympa_createAttributeModalAction()">Create</button>
+      </div>
+
+	<div class="alert alert-warning alert-dismissible fade show" role="alert" style="display:none; margin-bottom: 0;">
+	   <span id="sympa-bulk-delete-modal-message"> Hello</span> 
+	  <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close" ></button>
+	</div>
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+
+
+<script src="{{rootUrl}}/assets/vendor/jquery-3.6.0/jquery-3.6.0.min.js"></script>
+<script src="{{rootUrl}}/assets/vendor/slugify/slugify.min.js"></script> 
+<script src="{{rootUrl}}/assets/vendor/slugify/speakingurl.min.js"></script> 
+
+<script>
+
+
+
+async function sympa_save(){
+
+    const id = "{{id}}";
+    const name = document.getElementById("sympa-tag-name-input").value;
+
+    if (name.length >= 3 && name.length <= 255) {} 
+    else {
+        sympa_message("String 'name' must be from 3 to 255 chars long.");
+        return;
+    }    
+    
+	let postData = new FormData();  
+	postData.append('id', id);
+	postData.append('name', name);
+    
+    const response = await fetch('/tag-edit', {
+		method: 'POST', 
+		body: postData,
+	});
+    
+    const jsonData = await response.json();
+	
+	if (jsonData.error) {
+		sympa_message(jsonData.message, 'warning');
+	}
+	else {
+		sympa_message('Tag updated!', 'success');
+		//setTimeout(function () {
+		//	window.location.reload();
+		//}, 2000);
+	}
+    
+
+}
+
+
+/*
+	let postData = new FormData();  
+	postData.append('id', data.title);
+	postData.append('name', data.excerpt);
+
+	const response = await fetch('/article-create', {
+		method: 'POST', 
+		body: postData,
+	});
+	
+	const jsonData = await response.json();
+	
+	if (jsonData.error) {
+		sympa_message(jsonData.message, 'warning');
+	}
+	else {
+		sympa_message('Tag updated!', 'success');
+		//setTimeout(function () {
+		//	window.location.reload();
+		//}, 2000);
+	}
+ */
+
+
+
+/*
+window.addEventListener('load', async function() {
+
+});
+*/
+
+function generateRandomString(length) {
+    const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+    let result = '';
+    for (let i = 0; i < length; i++) {
+        const randomIndex = Math.floor(Math.random() * characters.length);
+        result += characters[randomIndex];
+    }
+    return result;
+}
+
+
+function sympa_createAccordion(key, value, articleId=null, attributeId=null, slug=null){
+            
+    const elementId = "sympa-attributes-accordion-" + generateRandomString(10);
+    
+    document.getElementById("sympa-attributes-accordion").innerHTML += `
+    <div class="accordion-item sympa-accordion-item" title="ID: ${attributeId}\nProduct ID: ${articleId}\nSlug: ${slug}">
+        <h2 class="accordion-header">
+          <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#${elementId}" aria-expanded="true" aria-controls="panelsStayOpen-collapseOne">
+            <span onclick="sympa_removeItem(this)" class="badge text-bg-danger mx-2"><i class="bi bi-x"></i></span> <span   class="sympa-key"> ${key} </span>
+          </button>
+        </h2>
+        <div id="${elementId}" class="accordion-collapse collapse show">
+          <div class="accordion-body">
+
+           <div class="mb-3">
+              <label class="form-label">Value:</label>
+              <textarea class="form-control sympa-value" rows="3">${value}</textarea>
+            </div>
+
+          </div>
+        </div>
+      </div>
+    `;
+}
+
+
+function sympa_removeItem(that){
+    const element = that.parentElement.parentElement.parentElement;
+    element.parentNode.removeChild(element);
+    //element.parentNode.removeChild(element);
+}
+
+
+async function sympa_getAttributes(){
+   
+    const response = await fetch('/attribute-get-by-article-id/{{id}}'); 
+	const jsonData = await response.json();
+	if (response.status != 200){
+		console.log('ERROR!');
+		return null;
+	}
+    
+    if (!jsonData.data){
+        sympa_message("Missing 'data' object. Bad url or invalid json format!");
+        throw new Error("Missing 'data' object. Bad json format!");
+    }
+
+    return jsonData;        
+}
+
+function sympa_createAttributeModalAction(){   
+    const key = document.getElementById("sympa-create-attribute-modal-key").value;
+    const value = document.getElementById("sympa-create-attribute-modal-value").value;
+
+    sympa_createAccordion(key, value); 
+    document.getElementById("sympa-create-attribute-modal").style.display = 'none';
+}
+
+function sympa_openAttributeModalAction(){   
+    document.getElementById("sympa-create-attribute-modal-key").value = "";
+    document.getElementById("sympa-create-attribute-modal-value").value = "";
+    document.getElementById("sympa-create-attribute-modal").style.display = 'block';
+}
+
+async function sympa_init(){
+    console.log("INIT");
+    
+    const items = await sympa_getAttributes();
+    
+    if (!items.data.attributes){
+        sympa_message("Missing 'attributes' object. Bad url or invalid json format!");
+        throw new Error("Missing 'attributes' object. Bad json format!");
+    }
+    
+    for (let i=0; i<items.data.count; i++){
+       // console.log("++ ", items.data.attributes[i]);   
+        const key = items.data.attributes[i].key;    
+        const value = items.data.attributes[i].value;    
+        const articleId = items.data.attributes[i].articleId;    
+        const attributeId = items.data.attributes[i].id;    
+        const slug = items.data.attributes[i].slug;    
+        sympa_createAccordion(key, value, articleId, attributeId, slug);
+    }
+    
+   // sympa_createAccordion("key one", "hello 1");
+}
+
+async function sympa_save() {
+
+    const accordionItems = document.querySelectorAll(".sympa-accordion-item");
+
+    let itemsObj = {
+        articleID: {{ id }},
+        items: []
+    };
+
+    for (let i = 0; i < accordionItems.length; i++) {
+        const item = accordionItems[i];
+        const key = item.querySelector(".sympa-key").innerHTML.trim();
+        const value = item.querySelector(".sympa-value").value.trim();
+        itemsObj.items.push([key, value]); 
+    }
+
+    let postData = new FormData();
+    postData.append('data', JSON.stringify(itemsObj));
+
+    const response = await fetch('/attribute-create-multi', {
+        method: 'POST',
+        body: postData,
+    });
+
+	const jsonData = await response.json();
+	
+	if (jsonData.error) {
+		sympa_message(jsonData.message, 'warning');
+        return false;
+	}
+	else {
+        sympa_message("Data saved successfully.", "success");  
+        setTimeout(function () {
+            window.location.reload();
+		}, 2000);
+        
+		return true;
+	}  
+}
+
+
+/*
+{
+    "articleID": 32,
+    "items": [
+        ["key1":"sdsada"],
+        ["key2":"sdsadadsfsd"]
+    ]
+}
+*/
+
+
+window.addEventListener('load', async function() {
+    await sympa_init();
+});
+
+
+</script>

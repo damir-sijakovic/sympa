@@ -62,7 +62,16 @@ page_product_list:
     path: /product-list
     controller: App\Controller\PageController::productList
     methods: ['GET']
-      
+   
+#page_product_category_url_list:
+#    path: /products/{path}
+#    controller: App\Controller\PageController::productList
+#    methods: ['GET']
+#    requirements:
+#        path: "[a-zA-Z0-9\-/]+"
+# this one is for /products/my-cat-one/my-cat-two/my-cat-three
+# $segments = explode('/', $path);
+   
 page_about:
     path: /about
     controller: App\Controller\PageController::about
@@ -254,11 +263,31 @@ dashboard_product_tags:
     controller: App\Controller\DashboardController::productTags
     methods: ['GET']
    
+dashboard_product_attributes:
+    path: /dashboard/product-attributes
+    controller: App\Controller\DashboardController::productAttributes
+    methods: ['GET']
+   
+dashboard_product_attributes_edit: 
+    path: /dashboard/product-attributes-edit/{id}
+    controller: App\Controller\DashboardController::editProductAttributes
+    methods: ['GET']
+
+dashboard_product_attribute_create: 
+    path: /dashboard/product-attribute-create
+    controller: App\Controller\DashboardController::createProductAttribute
+    methods: ['GET']
+   
 dashboard_product_tag_edit: 
     path: /dashboard/product-tag-edit/{id}
-    controller: App\Controller\DashboardController::editProductTag 
+    controller: App\Controller\DashboardController::editProductTag
     methods: ['GET']
     
+dashboard_category_tree:
+    path: /dashboard/product-category-tree
+    controller: App\Controller\DashboardController::productCategoryTree 
+    methods: ['GET']
+
 category_create:
     path: /category-create
     controller: App\Controller\CategoryController::create
@@ -408,7 +437,7 @@ product_update:
 
 product_get_all: 
     path: /product-get-all
-    controller: App\Controller\ProductController::getProductsPost 
+    controller: App\Controller\ProductController::getProducts
     methods: ['GET']
     # queryparams: page, per_page, sort: id-asc, id-desc, asc, desc
 
@@ -429,10 +458,32 @@ attribute_get_all:
     controller: App\Controller\AttributeController::get 
     methods: ['GET']
 
-attribute_get_by_id: 
-    path: /attribute-get-by-id/{articleId}
-    controller: App\Controller\AttributeController::getArticlesById
+attribute_get_by_article_id: 
+    path: /attribute-get-by-article-id/{articleId}
+    controller: App\Controller\AttributeController::getByArticleId
     methods: ['GET']
     
-    
+attribute_get_by_id: 
+    path: /attribute-get-by-id/{id}
+    controller: App\Controller\AttributeController::getById
+    methods: ['GET'] 
+      
+attribute_create: 
+    path: /attribute-create-multi
+    controller: App\Controller\AttributeController::createMulti
+    methods: ['POST']
+      
+attribute_get_by_slug:
+    path: /attribute-get-by-slug/{slug}
+    controller: App\Controller\AttributeController::getAttributesBySlug
+    methods: ['GET']
 
+orders_get_all: 
+    path: /order-get-all
+    controller: App\Controller\OrdersController::getAll
+    methods: ['GET']
+    
+json_store_tree_data:
+    path: /json-store-tree-data
+    controller: App\Controller\JsonHandlerController::saveTreeData
+    methods: ['POST']

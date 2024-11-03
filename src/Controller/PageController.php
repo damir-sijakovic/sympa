@@ -28,6 +28,17 @@ class PageController extends AbstractController
                 
 	}
     
+    public function _getArticleInfo(Article $article)
+    {           
+        return [
+            'title' => $article->getTitle(),
+            'excerpt' => $article->getExcerpt(),
+            'content' => $article->getContent(),
+            'sku' => $article->getSku(),
+            'price' => $article->getPrice(),
+            'image' => $article->getImage(),
+        ];
+    }
 
     public function home(Request $request): Response
     {        
@@ -47,7 +58,7 @@ class PageController extends AbstractController
     
     public function viewProductById(Request $request, $id): Response
     {        
-        
+
         $articleRepository = $this->entityManager->getRepository(Article::class);
         $article = $articleRepository->findOneBy(['id' => $id]);
 		
@@ -58,11 +69,40 @@ class PageController extends AbstractController
         $quantity = $article->getQuantity();
         if (!$quantity) $quantity = -1;
         
+        
+        if($request->query->getInt('get-info'))
+        {
+            $articleInfo = $this->_getArticleInfo($article);
+            return $this->json([
+                'data'=> $articleInfo,                    
+                'error' => false,
+                'message' => null,
+            ]);  
+            /*
+            return $this->json([
+                'data'=>[
+                    'rootUrl' => $this->utilityHelper->getRootUrl(),
+                    'id' => $id,
+                    'title' => $article->getTitle(),
+                    'excerpt' => $article->getExcerpt(),
+                    'content' => $article->getContent(),
+                    'sku' => $article->getSku(),
+                    'price' => $article->getPrice(),
+                    'image' => $article->getImage(),
+                    'quantity' => $quantity,
+                ],
+                'error' => false,
+                'message' => null,
+            ]);  
+            */
+        } 
+        
+        
         $component = $this->renderView('/store/components/shopping-cart.html.twig', [
             'rootUrl' => $this->utilityHelper->getRootUrl(),
         ]);  
         
-        $htmlTemplate = $this->renderView('/pages/product.html.twig', [
+        $htmlTemplate = $this->renderView('/pages/product-id.html.twig', [
             'rootUrl' => $this->utilityHelper->getRootUrl(),
             'id' => $id,
             'title' => $article->getTitle(),

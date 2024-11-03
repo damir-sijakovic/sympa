@@ -305,7 +305,7 @@ async function sympa_initAdditionalImages(){
 
 async function sympa_getAttributes(){
    
-    const response = await fetch('/attribute-get-by-id/{{id}}'); 
+    const response = await fetch('/attribute-get-by-article-id/{{id}}'); 
 	const jsonData = await response.json();
 	if (response.status != 200){
 		console.log('ERROR!');
@@ -437,8 +437,8 @@ function sympa_categoryAction(that){
 
 
 function sympa_addToCart(){
-    console.log("ADD TO CART");
-    
+
+    dsCart.show();
     const image = `{{image}}`;
     
     dsCart.addItem({

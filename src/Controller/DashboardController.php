@@ -180,6 +180,37 @@ class DashboardController extends AbstractController
         ]);
     }
   
+    public function productAttributes(Request $request): Response
+    {
+        $session = $request->getSession();	
+		$articles = $this->renderView('dashboard/product-attribute-list.html.twig', [
+			'rootUrl' => $this->utilityHelper->getRootUrl(),
+            'controller_name' => 'DashboardController',
+        ]);
+		
+        return $this->render('dashboard/main.html.twig', [
+            'userId' => $session->get('userId'), 
+			'rootUrl' => $this->utilityHelper->getRootUrl(),
+            'body' => $articles,
+        ]);
+    }
+  
+
+	public function createProductAttribute(Request $request): Response
+    {
+        $session = $request->getSession();	
+		$articles = $this->renderView('dashboard/product-attribute-create.html.twig', [
+			'rootUrl' => $this->utilityHelper->getRootUrl(),
+            'controller_name' => 'DashboardController',
+        ]);
+		
+        return $this->render('dashboard/main.html.twig', [
+            'userId' => $session->get('userId'), 
+			'rootUrl' => $this->utilityHelper->getRootUrl(),
+            'body' => $articles,
+        ]);
+    }
+
 
     public function categories(Request $request): Response
     {
@@ -285,6 +316,21 @@ class DashboardController extends AbstractController
             'body' => $articles,
         ]);
     }
+  
+  
+    public function productCategoryTree(Request $request): Response
+    {
+		$articles = $this->renderView('dashboard/product-category-tree.twig', [
+			'rootUrl' => $this->utilityHelper->getRootUrl(),
+            'controller_name' => 'DashboardController',
+        ]);
+		
+        return $this->render('dashboard/main.html.twig', [
+			'rootUrl' => $this->utilityHelper->getRootUrl(),
+            'body' => $articles,
+        ]);
+    }
+  
   
   
     public function createProductTag(Request $request): Response
@@ -412,8 +458,50 @@ class DashboardController extends AbstractController
             'body' => $tags,
         ]);
     }
+   
   
-  
+    public function editProductAttributes(Request $request, $id): Response
+    {
+        $session = $request->getSession();	
+
+        $tags = $this->renderView('dashboard/product-attribute-edit.html.twig', [
+            'rootUrl' => $this->utilityHelper->getRootUrl(), 
+            'id' => $id,   
+        ]);
+
+        return $this->render('dashboard/main.html.twig', [ 
+            'userId' => $session->get('userId'),           
+            'rootUrl' => $this->utilityHelper->getRootUrl(),
+            'body' => $tags,
+        ]);
+        
+        /*
+        $session = $request->getSession();	
+        $tagRepository = $this->entityManager->getRepository(Tag::class);
+        $tag = $tagRepository->findOneBy(['id' => $id]);
+
+        if (!$tag) {
+            throw new NotFoundHttpException('The tag was not found.');
+        }
+
+        $tags = $this->renderView('dashboard/product-attribute-edit.html.twig', [
+            'rootUrl' => $this->utilityHelper->getRootUrl(), 
+            'id' => $id,   
+            'name' => $tag->getName(),   
+            'slug' => $tag->getSlug(), 
+           // 'description' => $tag->getDescription(), 
+            
+   
+        ]);
+
+        return $this->render('dashboard/main.html.twig', [ 
+            'userId' => $session->get('userId'),           
+            'rootUrl' => $this->utilityHelper->getRootUrl(),
+            'body' => $tags,
+        ]);
+        */        
+    }
+    
     public function editProductTag(Request $request, $id): Response
     {
         $session = $request->getSession();	

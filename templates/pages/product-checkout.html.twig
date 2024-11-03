@@ -13,30 +13,24 @@
       <div class="col-md-5 col-lg-4 order-md-last">
         <h4 class="d-flex justify-content-between align-items-center mb-3">
           <span class="text-primary">Your cart</span>
-          <span class="badge bg-primary rounded-pill">3</span>
+          <span id="sympa-number-of-items" class="badge bg-primary rounded-pill">0</span>
         </h4>
-        <ul class="list-group mb-3">
+        <ul id="sympa-item-list" class="list-group mb-3" >
+        
+        <!--
           <li class="list-group-item d-flex justify-content-between lh-sm">
-            <div>
-              <h6 class="my-0">Product name</h6>
-              <small class="text-body-secondary">Brief description</small>
+            <div class="d-flex align-items-center">
+              <img style="height:64px; width:64px;" src="http://localhost:9876/uploads/images/product-406/3018b324-1430-467d-a200-925ca43298ab/200.webp" />
+              <div>
+                <h6 class="my-0">Product name</h6>
+                <small class="text-body-secondary">Brief description</small>
+              </div>
             </div>
             <span class="text-body-secondary">$12</span>
           </li>
-          <li class="list-group-item d-flex justify-content-between lh-sm">
-            <div>
-              <h6 class="my-0">Second product</h6>
-              <small class="text-body-secondary">Brief description</small>
-            </div>
-            <span class="text-body-secondary">$8</span>
-          </li>
-          <li class="list-group-item d-flex justify-content-between lh-sm">
-            <div>
-              <h6 class="my-0">Third item</h6>
-              <small class="text-body-secondary">Brief description</small>
-            </div>
-            <span class="text-body-secondary">$5</span>
-          </li>
+          
+
+          
           <li class="list-group-item d-flex justify-content-between bg-body-tertiary">
             <div class="text-success">
               <h6 class="my-0">Promo code</h6>
@@ -44,18 +38,22 @@
             </div>
             <span class="text-success">−$5</span>
           </li>
+          -->
+          
           <li class="list-group-item d-flex justify-content-between">
-            <span>Total (USD)</span>
+            <span>Total</span>
             <strong>$20</strong>
           </li>
+                    
         </ul>
 
-        <form class="card p-2">
+        <!--form class="card p-2">
           <div class="input-group">
             <input type="text" class="form-control" placeholder="Promo code">
             <button type="submit" class="btn btn-secondary">Redeem</button>
           </div>
-        </form>
+        </form-->
+        
       </div>
       <div class="col-md-7 col-lg-8">
         <h4 class="mb-3">Billing address</h4>
@@ -142,6 +140,11 @@
             </div>
           </div>
 
+        <div class="mb-3 mt-3">
+            <label for="exampleFormControlTextarea1" class="form-label">Delivery note</label>
+            <textarea class="form-control" id="exampleFormControlTextarea1" rows="3"></textarea>
+        </div>
+
           <hr class="my-4">
 
           <div class="form-check">
@@ -153,6 +156,7 @@
             <input type="checkbox" class="form-check-input" id="save-info">
             <label class="form-check-label" for="save-info">Save this information for next time</label>
           </div>
+          
 
           <hr class="my-4">
 
@@ -210,7 +214,7 @@
 
           <hr class="my-4">
 
-          <button class="w-100 btn btn-primary btn-lg" type="submit">Continue to checkout</button>
+          <div class="w-100 btn btn-primary btn-lg" onclick="sympa_order()">Order</div>
         </form>
       </div>
     </div>
@@ -228,7 +232,75 @@
 {{components|raw}}
     
 <script>
-    window.addEventListener("load", function(){			
-        initDsCart();
-    });
+
+function sympa_order(){
+    console.log("ORDER");
+}
+
+function sympa_initItemList(){
+    
+    const _formatEuroPrice = function(amount) {
+        return amount.toFixed(2).replace('.', ',');
+    }
+    
+    const _createItem = function(object){
+        
+        const id = object.sku;
+        const image = object.image;
+        const price = _formatEuroPrice(object.price);
+        const title = object.title;
+        const quantity = object.quantity;
+        
+        return `
+            <li class="list-group-item d-flex justify-content-between lh-sm">
+                <div class="d-flex align-items-center">
+                
+                    <img onclick="window.open('/product-id/${id}', '_blank');" style="height:64px; width:64px;" src="${image}" />
+                <div>
+                    <h6 class="my-0">${title}</h6>
+                    <small class="text-body-secondary">Quantity: <span class="badge text-bg-secondary">x${quantity}</span></small>
+                </div>
+                
+            </div>
+                <span class="text-body-secondary">${price} €</span>
+            </li>
+        `;
+    }
+    
+    const dsCartData = localStorage.getItem("dsCartData");
+    
+    if (dsCartData){   
+        const t = JSON.parse(dsCartData);
+        const sessionKeys = Object.keys(t);        
+          
+        const targetElement = document.getElementById("sympa-item-list");
+        targetElement.innerHTML = "";
+        
+        let allAmount = 0;
+        let count = 0;
+        for (let i = 0; i < sessionKeys.length; i++) {
+            const currentKeyObj = t[sessionKeys[i]];
+            allAmount += currentKeyObj.price * currentKeyObj.quantity;
+            targetElement.innerHTML += _createItem(currentKeyObj);
+            count++;
+        }        
+
+        document.getElementById("sympa-number-of-items").innerHTML = count;
+        
+        const totalPrice = _formatEuroPrice(allAmount);
+                
+        targetElement.innerHTML += `<li class="list-group-item d-flex justify-content-between">
+            <span>Total:</span>
+            <strong>${totalPrice} €</strong>
+            </li>`; 
+    }
+
+}
+
+
+window.addEventListener("load", function(){			
+    initDsCart();
+    sympa_initItemList();
+});
+        
 </script>

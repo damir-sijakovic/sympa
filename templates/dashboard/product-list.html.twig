@@ -550,6 +550,7 @@ function sympa_drawList(data)
         let id = x.id;
         let title = x.title;
         let excerpt = x.excerpt;
+        let price = x.price;
         let createdAt = x.created_at;
         let modifiedAt = x.modified_at;
         
@@ -752,7 +753,7 @@ async function sympa_repaginate(page, perPage){
     localStorage.setItem('sympa-article-list-per-page', perPage);
     localStorage.setItem('sympa-article-list-current-page', page);
      
-    const data = await sympa_getArticlesNew();
+    const data = await sympa_getProductsNew();
     if (data.total === 0){
         document.getElementById("sympa-article-list").style.display = 'none';  
         document.getElementById("sympa-no-article-list").style.display = 'block'; 
@@ -770,7 +771,7 @@ async function sympa_repaginateOld(page=1, perPage=10){
     localStorage.setItem('sympa-article-list-per-page', perPage);
     localStorage.setItem('sympa-article-list-current-page', page);
      
-    const data = await sympa_getArticlesNew();
+    const data = await sympa_getProductsNew();
     if (data.total === 0){
         document.getElementById("sympa-article-list").style.display = 'none';  
         document.getElementById("sympa-no-article-list").style.display = 'block'; 
@@ -785,7 +786,7 @@ async function sympa_repaginateOld(page=1, perPage=10){
 
 
 
-async function sympa_getArticlesNew()
+async function sympa_getProductsNew()
 {      
     const sympaViewMode    = localStorage.getItem("sympa-article-list-view-mode"); 
     const sympaPerPage     = localStorage.getItem("sympa-article-list-per-page"); 
@@ -907,7 +908,7 @@ function sympa_postUiRedraw(){
 async function sympa_initList(){      
     //await sympa_repaginate(1, 10);
 
-    const data = await sympa_getArticlesNew();
+    const data = await sympa_getProductsNew();
     if (data.total === 0){
         document.getElementById("sympa-article-list").style.display = 'none';  
         document.getElementById("sympa-no-article-list").style.display = 'block';         
@@ -1070,7 +1071,7 @@ function sympa_initStorageSettings(){
 //MAIN
 window.addEventListener("load", async function(){
     sympa_initStorageSettings();
-    // await sympa_getArticlesNew();
+    // await sympa_getProductsNew();
     // await sympa_getArticlesByUrl("page=1&perPage=10&category=1");
     await sympa_initList();
     sympa_postUiRedraw();    

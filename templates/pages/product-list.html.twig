@@ -174,7 +174,8 @@
     </div>
     <div class="col-9">
     
-  
+ 
+ <!-- 
 <ul class="nav nav-pills m-1">
   <li class="nav-item">
     <a class="nav-link active" aria-current="page" href="#">Active</a>
@@ -189,9 +190,13 @@
     <a class="nav-link disabled" aria-disabled="true">Disabled</a>
   </li>
 </ul>
-  
+  -->
   
   <div id="sympa-product-list">
+
+<!--
+
+
 
   <div class="card-group">	
   <div class="card">
@@ -375,34 +380,13 @@
   
   
   
-  
-<!--
-  <div class="card">
-	  <div class="sympa-products-card-container">
-		  <div class="sympa-products-inside-right"><i class="bi bi-heart"></i> <i class="bi bi-shuffle"></i></div>
-	 </div>
-	<img src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEjOAoVavw0VAhU7HXb4JKsBv1FHOh41r7yQqPn935m0hmmoIMYMtmVC7fxAyCyFpkojbkOvgVRDADIE1cwKhpxQzIDomDu-Kb7Piiga2buQu-3i3Dk23qw4xF4LlFBxIgYv1a5hLHIhWcAODGm57gPTsK0slKUMyXnwojOo8ATC4JEnOXaCTAwSWFlBbySC/s1000/toster-preklopni-vox-sm-217.jpg" class="card-img-top" alt="...">
-    <div class="card-body sympa-card-body">
-      <h5 class="card-title">Daljinski upravljač za klimu univerzalni</h5>
-      <p class="card-text"><i class="bi bi-check-circle"></i> Na zalihi</p>
-      <div class="d-grid gap-2">
-		<div class="btn btn-outline-primary">Dodaj u košaricu</div>		
-      </div> 
-    </div>    
-    
-    <div class="card-footer">
-      <small class="text-body-secondary">Šifra: 51706</small>
-    </div>		 
-  </div>
- --> 
-  
- 
-  
-  
     
     
     </div>
     
+
+
+  -->
     
     </div>
     
@@ -543,29 +527,52 @@ function updateSliderRange(minValue, maxValue) {
 
 function sympa_drawList(data)
 {      
-    let _createItem = function(x){
+    const _formatEuroPrice = function(amount) {
+        return amount.toFixed(2).replace('.', ',');
+    }
+    
+    const _createItem = function(x){
        
         let id = x.id;
         let title = x.title;
         let excerpt = x.excerpt;
+        let image = x.image;
+        let sku = x.sku;
+        let uuid = x.uuid;
+        let groupUuid = x.groupUuid;
+        let quantity = x.quantity;
+        let price = x.price;
+        let priceMoney = _formatEuroPrice(x.price);
+        
         let createdAt = x.created_at;
         let modifiedAt = x.modified_at;
         
+        let quantityElement = null;
+        if (quantity > 0) {
+            quantityElement = `<div style="color: #666;"><i class="bi bi-check-circle"></i> <small>Avaliable</small></div>`;
+        }
+        else{
+            quantityElement = `<div style="color: #999;"><i class="bi bi-x-circle"></i> <small>Not available</small></div>`;
+        }
+           
+        // sympa_addToCart(id, title, image, price){   
+           
         return `
 		<div class="card">
            <div class="sympa-products-card-container">
               <div class="sympa-products-inside-right"><i class="bi bi-heart"></i> <i class="bi bi-shuffle"></i></div>
            </div>
-           <img src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEgBVkf9Uc1AfO7i4VLeHm2lCYEhglMg03RKfE2tt_mnE7JEkp6AEXHfKICO7fyd9Jq7TZQy2i-vEKRV-5xs2eqIXtFNCytRQw0z4g4rdXckYMdhBauHuJGyXtr6mDdFswxaNNBkQwc4FNO2djRjVYSgzW-h5VVTARnEzetbx7bK4J2wcqMzKW0My7W9d_8d/s1000/radio-budilica-muse-m-16-cr.jpgg" class="card-img-top" alt="...">
+           <img style="cursor:pointer" onclick="window.open('/product-id/${id}', '_blank')" src="${image}" class="card-img-top" alt="...">
            <div class="card-body sympa-card-body">
-              <h5 class="card-title">Daljinski upravljač za klimu univerzalni</h5>
-              <p class="card-text"><i class="bi bi-x-circle"></i> Nema na zalihi</p>
+              <h5 class="card-title">${title}</h5>
+              <p class="card-text">${quantityElement}</p>
+              <div data-price="${price}"><b>${priceMoney} €</b></div>
               <div class="d-grid gap-2">
-                 <div class="btn btn-outline-primary">Dodaj u košaricu</div>
+                 <div class="btn btn-outline-primary" onclick="sympa_addToCart(${id},'${title}','${image}',${price})">Add to cart</div>
               </div>
            </div>
            <div class="card-footer">
-              <small class="text-body-secondary">Šifra: 51706</small>
+              <small class="text-body-secondary" title="ID: ${id} \nUUID: ${uuid}\nGroup Uuid: ${groupUuid}">SKU: ${sku}</small>
            </div>
         </div>
         `;        
@@ -574,20 +581,46 @@ function sympa_drawList(data)
     let _createEmptyItem = function(){
         
         return `
-        <div class="card">
+        <div class="card" style="background: #eee;">
         </div>
         `;        
     }
-        
+    
+    //<div class="card-group"> </div>
+
     
     let htmlData = ``;    
     let listElement = document.getElementById("sympa-product-list");    
     
     let counter = 0;
     for (const key in data.products) {
-        counter++;
+        
+        //htmlData += _createItem(data.products[key]);
+        //htmlData += ""
+        if (counter == 0) htmlData += `<div class="card-group">`;         
+        // htmlData += counter + "<br> ";
         htmlData += _createItem(data.products[key]);
+        if (counter == 3) htmlData += "</div>";
+                
+        counter++;
+        if (counter == 4) counter = 0;
     }
+    
+    counter--;
+    
+    if (counter < 3){
+        let i = counter+1;
+        for (; i<4; i++){
+            // htmlData += `fill empty = ` + i + "<br>";
+            htmlData += _createEmptyItem();
+        }
+        
+        counter = i-1;
+    }
+    
+    if (counter == 3){
+        htmlData += "</div>";
+    }    
     
     htmlData += ``;
     
@@ -595,6 +628,22 @@ function sympa_drawList(data)
     
     // let totalArticlesElement = document.getElementById("sympa-total-articles");
    // totalArticlesElement.innerHTML = data.total + ' items(s)';   
+}
+
+
+
+function sympa_addToCart(id, title, image, price){
+
+    dsCart.show();
+    
+    dsCart.addItem({
+        'image':  image, 
+        'title': title, 
+        'price': price, 
+        'quantity': 1, 
+        'sku': id,
+    });   
+
 }
 
 
@@ -623,7 +672,7 @@ async function sympa_initList(){
     
     const data = await sympa_getProductsByUrl(queryParams);
     sympa_drawList(data);    
-    console.log(url.search, "----"); 
+    //console.log(url.search, "----"); 
 }
 
 

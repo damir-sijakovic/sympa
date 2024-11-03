@@ -140,4 +140,18 @@ INSERT INTO `user` (`id`, `nickname`, `role`, `email`, `created_at`, `modified_a
 
 
 
+INSERT INTO `shop_orders` (first_name, last_name, email, address, address2, phone, country, state, zip, delivery_note, product_list, `created_at`, `status`)
+VALUES 
+('John', 'Doe', 'john.doe@example.com', '123 Elm St', 'Apt 2', '555-1234', 'USA', 'California', '90210', 'Leave at the front door', '[[41,3],[42,1],[43,3]]','2023-09-21 06:00:00', 'new'),
+('Jane', 'Smith', 'jane.smith@example.com', '456 Oak St', 'Suite 100', '555-5678', 'USA', 'Texas', '73301', 'Ring the doorbell', '[[41,3],[42,1],[43,3]]','2023-09-21 06:00:00', 'new'),
+('Bob', 'Johnson', 'bob.johnson@example.com', '789 Pine St', '', '555-8765', 'USA', 'Florida', '33101', 'Call when arriving', '[[41,3],[42,1],[43,3]]','2023-09-21 06:00:00', 'new'),
+('Alice', 'Williams', 'alice.williams@example.com', '321 Maple St', 'Apt 4B', '555-4321', 'USA', 'New York', '10001', 'Leave with the neighbor', '[[41,3],[42,1],[43,3]]','2023-09-21 06:00:00', 'new'),
+('Tom', 'Brown', 'tom.brown@example.com', '654 Cedar St', '', '555-5674', 'USA', 'Nevada', '89101', 'Hand to recipient only', '[[41,3],[42,1],[43,3]]','2023-09-21 06:00:00', 'new'),
+('Sara', 'Davis', 'sara.davis@example.com', '987 Birch St', 'Floor 3', '555-8976', 'USA', 'Illinois', '60601', 'Leave in the mailbox', '[[41,3],[42,1],[43,3]]','2023-09-21 06:00:00', 'new'),
+('Mike', 'Miller', 'mike.miller@example.com', '159 Spruce St', 'Unit 12', '555-2345', 'USA', 'Washington', '98101', 'Leave at side gate', '[[41,3],[42,1],[43,3]]','2023-09-21 06:00:00', 'new'),
+('Emma', 'Wilson', 'emma.wilson@example.com', '753 Walnut St', '', '555-6789', 'USA', 'Oregon', '97201', 'Leave at the back door', '[[41,3],[42,1],[43,3]]','2023-09-21 06:00:00', 'new'),
+('David', 'Taylor', 'david.taylor@example.com', '951 Ash St', 'Apt 5C', '555-3456', 'USA', 'Arizona', '85001', 'Ring twice', '[[41,3],[42,1],[43,3]]','2023-09-21 06:00:00', 'new'),
+('Laura', 'Martinez', 'laura.martinez@example.com', '357 Cherry St', '', '555-6543', 'USA', 'Colorado', '80201', 'Call upon delivery', '[[41,3],[42,1],[43,3]]','2023-09-21 06:00:00', 'new');
+
+
 

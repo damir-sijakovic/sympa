@@ -1,0 +1,684 @@
+<link rel="stylesheet" href="{{rootUrl}}/assets/vendor/jstree-3.3.15/style.min.css">
+<style>
+    #jstree-element {
+        text-align: left;
+    }
+    
+    #sympa-toolbar{
+        background-color: var(--bs-secondary-bg);
+    }
+    
+    #ds-tree-options{
+        text-align: left;
+    }
+    
+        .sympa-modal{
+    background: #3e3e3ed1;
+}
+    
+.jstree li > a > .jstree-icon {  display:none !important; } 
+    
+#jstree-element{
+    background: white;
+    border: 1px solid #ddd;
+}
+
+#sympa-toolbar{
+    box-shadow: rgba(0, 0, 0, 0.05) 0px 0px 0px 1px, rgb(209, 213, 219) 0px 0px 0px 1px inset;
+}  
+
+</style>
+
+
+<h2>Category Tree</h2>
+
+<hr>
+
+
+    <div id="sympa-toolbar" class="container p-2 d-flex gap-1 mb-2">
+        <i class="bi bi-plus-circle" onclick="sympa_openCreateItemModal()"></i>
+        <i class="bi bi-trash" onclick="sympa_deleteTreeItem()"></i>        
+        <div style="border-right:1px solid #666; height: 22px; margin: 0 5px;"></div>
+        <i class="bi bi-eye" onclick="sympa_showJson()"></i>
+    
+    </div>
+
+    <div class="container text-center">
+        <div class="row">
+            <div class="col mb-2" id="jstree-element"></div>
+            
+            <div id="ds-tree-options" class="col">
+
+            <small>Path</small>
+            <div class="mb-3">
+                <input id="ds-tree-path-input" type="text" class="form-control" placeholder="">
+            </div>
+            
+            <small>Category</small>
+            <div class="mb-3">              
+              <input id="ds-tree-category-input" type="text" class="form-control" placeholder="">
+            </div>
+            
+            <small>Name</small>
+            <div class="mb-3">
+              <input id="ds-tree-name-input" type="text" class="form-control" placeholder="">
+            </div>
+
+
+<!--
+            <small>Type</small> 
+            <div class="input-group mb-3">         
+                <select id="" class="form-select">
+                  <option value="group" selected>Group</option>
+                  <option value="category">Category</option>
+                </select>  
+            </div>   
+                        
+            <small>Category</small>
+            <div class="input-group mb-3">
+              <span class="input-group-text" id="" style="cursor:pointer" onclick="sympa_openCategoryModal()">Select</span>
+              <input type="text" class="form-control" placeholder="">
+            </div>
+
+            
+            
+            <div class="mb-3">
+              <small>Data</small>
+              <textarea class="form-control" id="" rows="3"></textarea>
+            </div>
+
+         <div class="btn btn-primary" onclick="tree_getSelected()">Save</div>
+-->
+
+         
+            </div>
+            
+        </div>
+    </div>
+
+
+
+
+
+
+
+
+
+
+<!-- modals -->
+
+<div class="modal sympa-modal" id="sympa-category-modal" style="display:none;">
+  <div class="modal-dialog" >
+    <div class="modal-content" >
+      <div class="modal-header">
+        <h5 class="modal-title">Select category</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" onclick="document.getElementById('sympa-category-modal').style.display='none'"></button>
+      </div>
+      <div class="modal-body" style="height: calc(100vh - 200px) !important; overflow:scroll;">
+        
+        <div id="sympa-category-loading-modal" class="d-flex justify-content-center align-items-center h-100">
+            <div class="spinner-border" role="status">
+              <span class="visually-hidden">Loading...</span>
+            </div>
+       </div>
+      
+        <ul id="sympa-category-ul-modal" class="list-group" style="display:none;">
+          <li class="sympa-category-select-list list-group-item">Empty list</li>
+        </ul>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" onclick="document.getElementById('sympa-category-modal').style.display='none'">Cancel</button>
+        <button type="button" class="btn btn-primary" onclick="sympa_selectCategoryItemAction()">Select</button>
+      </div>
+
+	<div class="alert alert-warning alert-dismissible fade show" role="alert" style="display:none; margin-bottom: 0;">
+	   <span id="sympa-bulk-delete-modal-message"> Hello</span> 
+	  <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close" ></button>
+	</div>
+
+    </div>
+  </div>
+</div>
+
+
+<div class="modal sympa-modal" id="sympa-create-item-modal" style="display:none;">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Create item</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" onclick="document.getElementById('sympa-create-item-modal').style.display='none'"></button>
+      </div>
+      <div class="modal-body">
+        
+        <div class="mb-3">
+          <small>Name:</small>
+          <input class="form-control" id="sympa-create-item-modal-name" placeholder="">
+        </div>
+        
+        <div class="mb-3">
+            <small>Select Category:</small>
+            <select class="form-select" id="sympa-create-item-modal-select-category">
+                <option selected>Loading...</option>
+                <!--
+                <option selected>Open this select menu</option>
+                <option value="1">One</option>
+                <option value="2">Two</option>
+                <option value="3">Three</option>
+                -->
+            </select>
+        </div>
+        
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary" onclick="sympa_createItemModalAction()">Create</button>
+      </div>
+
+	<div class="alert alert-warning alert-dismissible fade show" role="alert" style="display:none; margin-bottom: 0;">
+	   <span id="sympa-bulk-delete-modal-message"> Hello</span> 
+	  <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close" ></button>
+	</div>
+
+    </div>
+  </div>
+  
+
+  
+</div>
+
+  
+   <div class="btn btn-primary" onclick="sympa_save()">Save</div>
+
+
+
+
+
+
+
+
+
+<script src="{{rootUrl}}/assets/vendor/jquery-3.6.0/jquery-3.6.0.min.js"></script>
+<script src="{{rootUrl}}/assets/vendor/slugify/slugify.min.js"></script> 
+<script src="{{rootUrl}}/assets/vendor/slugify/speakingurl.min.js"></script> 
+<script src="{{rootUrl}}/assets/vendor/jstree-3.3.15/jstree.min.js"></script> 
+<script>
+
+function sympa_showJson(){
+    window.open('/uploads/jsons/filePath.json', '_blank');    
+}
+
+async function sympa_save(){
+    const treeData = JSON.stringify(treeDataObject);    
+    
+	let postData = new FormData();  
+	postData.append('treeData', treeData);
+
+	const response = await fetch('/json-store-tree-data', {
+		method: 'POST', 
+		body: postData,
+	});
+	
+	const returnData = await response.json();
+	
+	if (returnData.error) {
+		sympa_message(returnData.message, 'warning');
+	}
+	else {
+		sympa_message('Category tree saved!', 'success');
+		setTimeout(function () {
+		//	window.location.reload();
+		}, 2000);
+	}
+    
+}
+
+
+async function sympa_initTreeData(){
+    
+    const response = await fetch('/uploads/jsons/filePath.json', {
+		method: 'GET', 
+	});
+    
+    if (!response.ok) {
+            throw new Error(`HTTP error! Status: ${response.status}`);
+    }
+    
+    const data = await response.json();    
+    console.log(data);
+    treeDataObject = data;
+    
+    tree_refresh();
+}
+
+function sympa_insertInputValues(){
+    const path = document.getElementById("ds-tree-path-input").value;
+    const category = document.getElementById("ds-tree-category-input").value;
+    const name = document.getElementById("ds-tree-name-input").value;
+    
+    console.log(path +" "+ category +" "+ name);
+}
+    
+    
+function sympa_onTreeClickEvent(treeData){
+    
+    if (!treeData){
+        sympa_message("Bad tree data!");
+        return null;
+    }
+    
+    const path = tree_getSelected();
+    
+    document.getElementById("ds-tree-path-input").value = path;
+    document.getElementById("ds-tree-name-input").value = treeData.customData;
+    document.getElementById("ds-tree-category-input").value = treeData.text;    
+    console.log(treeData);
+}
+    
+async function sympa_createItemModalAction()
+{ 
+    const _isValidString = function(str){
+        if (str.length < 2 || str.length > 255){
+            return false;
+        }
+
+        const alphanumericPattern = /^[a-zA-Z0-9 ]+$/;
+        if (!alphanumericPattern.test(str)){
+            return false;
+        }
+
+        return true;
+    }
+    
+    // sympa-create-item-modal-name
+    // sympa-create-item-modal-select-category    
+    const name = document.getElementById("sympa-create-item-modal-name").value;  
+    const select = document.getElementById("sympa-create-item-modal-select-category").value;  
+    
+    if (!_isValidString(name)){
+        sympa_message("Bad 'name' string! Must be alphanumeric and from 2-255 chars long!");
+        return;
+    }
+    
+    let path = localStorage.getItem('sympa-product-category-tree-selected-tree-item'); 
+    
+    //tree_create(type, path, customData);
+    
+    console.log(path);  
+    const newPath = path.replace("root/", "");
+    
+    tree_create("folder", newPath+select, name);
+    
+    console.log(name +" : "+ select);   
+    
+    tree_refresh();
+    
+    localStorage.removeItem('sympa-product-category-tree-selected-tree-item');
+    
+    document.getElementById("sympa-create-item-modal").style.display = 'none';    
+}
+    
+async function sympa_openCreateItemModal()
+{
+    const selectedTreeItem = tree_getSelected();
+        
+    if (!selectedTreeItem){
+        sympa_message("Please select tree item!");
+        return;
+    }
+
+    localStorage.setItem('sympa-product-category-tree-selected-tree-item', selectedTreeItem);    
+    
+    const _createItem = function(a){
+        
+        const name = a.name;
+        const slug = a.slug;
+        
+        return `
+            <option value="${slug}">${slug}</option>
+        `;
+    }
+        
+    const categoryItems = await sympa_getCategories();    
+    
+    if (categoryItems.total == 0){
+        sympa_message("No categories found!");
+        return;
+    }
+    
+    if (!categoryItems.categories){
+        sympa_message("Can't get json response!");
+        return;
+    }
+    
+    let htmlData = "";
+    for (const key in categoryItems.categories) {
+        htmlData += _createItem(categoryItems.categories[key]);
+    }
+    
+    document.getElementById("sympa-create-item-modal").style.display = 'block';   
+    document.getElementById("sympa-create-item-modal-select-category").innerHTML = htmlData;    
+    
+}
+
+
+function sympa_deleteTreeItem(){
+    const selectedTreeItem = tree_getSelected();        
+    if (!selectedTreeItem){
+        sympa_message("Please select tree item!");
+        return;
+    }
+    
+    const path = selectedTreeItem.replace("root/", "").slice(0, -1);
+    
+    //let path = localStorage.getItem('sympa-product-category-tree-selected-tree-item');     
+    tree_remove(path);
+    tree_refresh();
+}
+
+
+function sympa_getTreeItemInfo(){
+    console.log(treeDataObject, ">>------>");
+        
+}
+    
+    
+function sympa_toggleSelectedCategory(that){
+    document.querySelectorAll('.sympa-category-select-list').forEach(element => element.classList.remove('active'));
+    that.classList.toggle("active");
+    console.log(that);
+    const id = that.getAttribute("data-id");
+    const name = that.getAttribute("data-name");
+    
+    localStorage.setItem("sympa-create-article-category-item-name", name);
+    localStorage.setItem("sympa-create-article-category-item-id", id);
+}
+
+    
+    
+async function sympa_selectCategoryItemAction(){        
+    console.log("sympa_selectCategoryItemAction");
+    
+
+    
+    /*
+    const createItem = function(id, slug, name){
+        return `<button data-id="${id}" data-slug="${slug}" data-name="${name}" type="button" class="btn btn-sm btn-light sympa-pill-button mx-1"> ${name} <span class="badge bg-danger" onclick="this.parentElement.remove()">×</span></button>	`;
+    }        
+
+    document.getElementById("sympa-category-modal").style.display = "none";  
+    let id = localStorage.getItem("sympa-create-article-category-item-id");
+    let name = localStorage.getItem("sympa-create-article-category-item-name");    
+    let slug = localStorage.getItem("sympa-create-article-category-item-slug");
+    
+    let target = document.getElementById("sympa-selected-categories-list");
+	let divElements = target.querySelectorAll('button[data-id]');
+
+	for (let i = 0; i < divElements.length; i++) {
+		let dataId = divElements[i].getAttribute('data-id');		
+		if (dataId === id) {
+			return; 
+		}
+	}
+    
+    target.innerHTML += createItem(id, slug, name);    
+    */
+}
+
+async function sympa_getCategories()
+{          
+    const response = await fetch('/category-get-all?type=product'); 
+    const jsonData = await response.json();
+    if (response.status != 200){
+        console.log('ERROR!');
+        return null;
+    }
+    
+    if (!jsonData.categories){
+        throw new Error("Missing 'category' object. Bad json format!");
+    }
+    
+    return jsonData;
+}
+        
+     
+async function sympa_openCategoryModal(){    
+    const _createItem = function(item){
+        const name = item.name;
+        const id = item.id;
+        const slug = item.slug;
+
+        return `<li onclick="sympa_toggleSelectedCategory(this)" 
+            class="sympa-category-select-list list-group-item" 
+            title="ID: ${id}\nSlug: ${slug}"
+            data-id="${id}" data-name="${name}" data-slug="${slug}"
+            >${name}</li>`;
+    }
+    
+    document.getElementById("sympa-category-modal").style.display = "block";   
+    
+    //const response = await fetch('/category-get-all?per-page=1000&page=1');
+    const response = await fetch('/category-get-all?type=product');
+    const jsonData = await response.json();
+    
+    if (jsonData.error) {
+        sympa_message(jsonData.message, 'warning');
+    }
+    
+    if (jsonData.total > 0){        
+        document.getElementById("sympa-category-loading-modal").classList.add("d-none");
+        document.getElementById("sympa-category-ul-modal").style.display = "block";
+        let htmlData = "";
+        for (const key in jsonData.categories) {
+            htmlData += _createItem(jsonData.categories[key]);
+        }
+        document.getElementById("sympa-category-ul-modal").innerHTML = htmlData;
+    }
+    else if (jsonData.total == 0){
+        document.getElementById("sympa-category-loading-modal").classList.add("d-none");
+        document.getElementById("sympa-category-ul-modal").style.display = "block";
+    }   
+      
+} 
+     
+/* JS TREE */
+
+var treeDataObject = [
+    {
+        "id": "node1",
+        "text": "root",
+        "customData": "Root node",
+        "children": []
+    }
+];
+
+// Finds a node by path (e.g., "dir1/dir2")
+function tree_findNodeByPath(path, nodes) {
+    const parts = path.split('/');
+    let currentNode = nodes.find(node => node.text === parts[0]);
+    for (let i = 1; i < parts.length; i++) {
+        if (!currentNode || !currentNode.children) return null;
+        currentNode = currentNode.children.find(node => node.text === parts[i]);
+    }
+    return currentNode;
+}
+
+function tree_edit(path, newText, newCustomData) {
+    const node = tree_findNodeByPath(path, treeDataObject[0].children);
+    
+    if (!node) {
+        console.log(`Node ${path} does not exist.`);
+        return;
+    }
+
+    if (newText) node.text = newText;
+    if (newCustomData) node.customData = newCustomData;
+
+    console.log(`Node ${path} edited.`);
+}
+
+
+// Creates a file or folder in the tree structure
+function tree_create(type, path, customData) {
+    const parts = path.split('/');
+    const fileName = parts.pop();
+    let currentNode = treeDataObject[0]; // root node
+
+    // Traverse or create intermediate folders as needed
+    for (const part of parts) {
+        let nextNode = currentNode.children.find(node => node.text === part);
+        if (!nextNode) {
+            if (type === "file") {
+                console.log(`Directory ${parts.join('/')} does not exist.`);
+                return;
+            }
+            // Create a folder if it doesn't exist
+            nextNode = { id: part, text: part, icon: "jstree-folder", children: [] };
+            currentNode.children.push(nextNode);
+        }
+        currentNode = nextNode;
+    }
+
+    // Prevent duplicate nodes
+    if (currentNode.children.find(node => node.text === fileName)) {
+        console.log(`${type === "file" ? "File" : "Directory"} ${fileName} already exists.`);
+        return;
+    }
+
+    // Add the new node
+    const newNode = {
+        id: fileName,
+        text: fileName,
+        icon: type === "file" ? "jstree-file" : "jstree-folder",
+        customData: customData
+    };
+    if (type === "folder") newNode.children = [];
+    currentNode.children.push(newNode);
+
+    console.log(`${type === "file" ? "File" : "Directory"} ${path} created.`);
+}
+
+// Removes a node by path
+function tree_remove(path) {
+    const parts = path.split('/');
+    const fileName = parts.pop();
+    const parentPath = parts.join('/');
+    const parentNode = parentPath ? tree_findNodeByPath(parentPath, treeDataObject[0].children) : treeDataObject[0];
+
+    if (!parentNode || !parentNode.children) {
+        console.log(`Path ${path} does not exist.`);
+        return;
+    }
+
+    const index = parentNode.children.findIndex(node => node.text === fileName);
+    if (index === -1) {
+        console.log(`Node ${fileName} does not exist.`);
+        return;
+    }
+
+    parentNode.children.splice(index, 1);
+    console.log(`Node ${path} removed.`);
+}
+
+// Gets the selected node path
+function tree_getSelected() {
+    const selectedNode = $('#jstree-element').jstree('get_selected', true)[0];
+    if (!selectedNode) {
+        console.log("No node is selected.");
+        return null;
+    }
+
+    // Initialize path with selected node text
+    let path = selectedNode.text || '';
+    let parentNode = $('#jstree-element').jstree('get_parent', selectedNode);
+
+    // Traverse up to build the path
+    while (parentNode) {
+        const parentNodeObj = $('#jstree-element').jstree('get_node', parentNode);
+        if (parentNodeObj && parentNodeObj.text) {
+            path = `${parentNodeObj.text}/${path}`;
+        }
+        parentNode = $('#jstree-element').jstree('get_parent', parentNode);
+    }
+
+    if (path) path += '/'; // Add trailing slash
+    console.log("Selected path:", path);
+    return path;
+}
+
+// Initialize jsTree with given data
+function tree_initialize(data) {
+    $('#jstree-element').jstree({
+        core: {
+            data: data,
+            icons: false
+        },
+        
+          types: {
+            default: {
+              icon: false,
+            },
+          },
+        
+        /*
+        plugins: ["sort", "types", "wholerow"],        
+        types: {
+            file: { icon: "jstree-file" },
+            folder: { icon: "jstree-folder" }
+        }
+        */
+    }).on("select_node.jstree", function (e, data) {
+       // const customData = data.node.original.customData;
+        const customData = data.node.original;
+        sympa_onTreeClickEvent(customData);
+    });
+}
+
+// Reset the tree structure to its initial state
+function tree_reset() {
+    treeDataObject[0].children = [];
+    $('#jstree-element').jstree(true).settings.core.data = treeDataObject;
+    $('#jstree-element').jstree(true).refresh();
+    console.log("Tree has been reset.");
+}
+
+// Refresh the tree with updated data
+function tree_refresh() {
+    $('#jstree-element').jstree(true).settings.core.data = treeDataObject;
+    $('#jstree-element').jstree(true).refresh();
+    console.log("Tree has been refreshed.");
+}
+
+
+
+
+// Assuming you have three input elements with IDs 'input1', 'input2', 'input3'
+
+function onEditComplete(event) {
+    console.log(`Editing completed for ${event.target.id}: ${event.target.value}`);
+    // Your custom logic here
+}
+
+function setupInputListeners() {
+    ['ds-tree-path-input', 'ds-tree-category-input', 'ds-tree-name-input'].forEach(id => {
+        const input = document.getElementById(id);
+        input.addEventListener('change', (e)=>{
+            console.log(`Editing completed for ${event.target.id}: ${event.target.value}`);
+            sympa_insertInputValues();
+        }); 
+    });
+}
+
+
+
+
+//MAIN
+window.addEventListener("load", async function(){
+    /* Example usage */
+    //tree_create("folder", "dir1", "Custom data for dir1");
+    //tree_edit(path, newText, newCustomData) 
+    tree_initialize(treeDataObject);
+    setupInputListeners();
+    sympa_initTreeData();
+});
+
+
+</script>

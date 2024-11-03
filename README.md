@@ -2,7 +2,7 @@
 
 ![Logo](logo.png)
 
-Sympa is my project built with **Symfony PHP 6.4** and **Bootstrap 5.3**, featuring a dynamic webpage that includes a blog and an dashboard.
+Sympa is my hobby project built with **Symfony PHP 6.4** and **Bootstrap 5.3**, featuring a dynamic webpage that includes a blog, webshop and an dashboard.
 
 ## Install
 
@@ -20,6 +20,7 @@ See /development/DEVLOG file.
 
 1) https://www.youtube.com/watch?v=OVPcdOmnYG0
 2) https://www.youtube.com/watch?v=JE0UsqImY8M
+3) https://www.youtube.com/watch?v=WfWM4c_xIhM
 
 ## Note
 The project is in the early stages of development but is still functional and usable.

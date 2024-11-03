@@ -1087,7 +1087,7 @@ async function sympa_initAttributes(){
 
 
 function sympa_openImageSelector(){
-    sympa_imageSelectorOpen();
+    sympa_imageSelectorOpen(); //component
 }
 
 
@@ -1178,7 +1178,7 @@ document.getElementById('sympa-image-selector-select-button').addEventListener('
     
     if (name){
         document.getElementById("sympa-additional-images").innerHTML = "";
-        const mainImage = '{{imagesUrl}}/' + group +'/'+ dir +'/200.webp';         
+        const mainImage = '{{imagesUrl}}/' + group +'/'+ dir +'/original.webp';         
         document.getElementById('sympa-product-image').src = mainImage;
        
         document.getElementById('sympa-product-image-drop').classList.remove('d-flex');

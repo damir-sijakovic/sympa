@@ -1,0 +1,192 @@
+<style>
+	#trumbowyg-element{
+		background: #ffffff;
+	}
+
+	.ds-categories-between{
+		display:flex; 
+		justify-content:space-between;
+		align-items: baseline;
+	}
+	
+	h6{
+		font-size: 13px;
+	}
+	
+	.ds-selected-table-item{
+		background: #0d6efd !important;
+		color: white !important;
+	}
+	
+	.ds-error{
+		border: 1px red solid !important;
+	}
+	
+	.trumbowyg-textarea{
+		font-size: 16px;
+		font-family: 'Consolas', 'Courier New', Courier, monospace;
+		line-height: 22px;
+	}
+	
+</style>
+
+
+<h2>Create attribute</h2>
+
+<hr>
+<br><br>
+
+
+<div class="d-flex">
+
+    <div class="col-8">
+    
+    
+<div class="mb-3">
+  <label for="exampleFormControlInput1" class="form-label">Product ID</label>
+  <input type="email" class="form-control" id="exampleFormControlInput1" placeholder="">
+</div>
+
+<div class="mb-3">
+  <label for="exampleFormControlInput1" class="form-label">Key</label>
+  <input type="email" class="form-control" id="exampleFormControlInput1" placeholder="">
+</div>
+
+<div class="mb-3">
+  <label for="exampleFormControlTextarea1" class="form-label">Value</label>
+  <textarea class="form-control" id="exampleFormControlTextarea1" rows="3"></textarea>
+</div>
+    
+    
+       <br />
+       <div onclick="ds_publish()" class="btn btn-primary btn-lg" >Save</div>     
+		
+    </div>
+
+
+
+
+
+
+
+<div class="col-4">
+
+<!-- div class="accordion mx-2 mt-4" id="accordionExample">
+  <div class="accordion-item">
+    <h2 class="accordion-header">
+      <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+        Publish
+      </button>
+    </h2>
+    <div id="collapseOne" class="accordion-collapse collapse show" data-bs-parent="#accordionExample">
+      <div class="accordion-body">
+        <strong>This is the first item's accordion body.</strong> It is shown by default, until the collapse plugin adds the appropriate classes that we use to style each element. These classes control the overall appearance, as well as the showing and hiding via CSS transitions. You can modify any of this with custom CSS or overriding our default variables. It's also worth noting that just about any HTML can go within the <code>.accordion-body</code>, though the transition does limit overflow.
+      </div>
+    </div>
+  </div>
+  <div class="accordion-item">
+    <h2 class="accordion-header">
+      <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
+        Categories
+      </button>
+    </h2>
+    <div id="collapseTwo" class="accordion-collapse collapse" data-bs-parent="#accordionExample">
+      <div class="accordion-body">
+        <strong>This is the second item's accordion body.</strong> It is hidden by default, until the collapse plugin adds the appropriate classes that we use to style each element. These classes control the overall appearance, as well as the showing and hiding via CSS transitions. You can modify any of this with custom CSS or overriding our default variables. It's also worth noting that just about any HTML can go within the <code>.accordion-body</code>, though the transition does limit overflow.
+      </div>
+    </div>
+  </div>
+  <div class="accordion-item">
+    <h2 class="accordion-header">
+      <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
+        Images
+      </button>
+    </h2>
+    <div id="collapseThree" class="accordion-collapse collapse" data-bs-parent="#accordionExample">
+      <div class="accordion-body">
+        <strong>This is the third item's accordion body.</strong> It is hidden by default, until the collapse plugin adds the appropriate classes that we use to style each element. These classes control the overall appearance, as well as the showing and hiding via CSS transitions. You can modify any of this with custom CSS or overriding our default variables. It's also worth noting that just about any HTML can go within the <code>.accordion-body</code>, though the transition does limit overflow.
+      </div>
+    </div>
+  </div>
+</div -->
+
+</div>
+
+
+
+
+
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<script src="{{rootUrl}}/assets/vendor/jquery-3.6.0/jquery-3.6.0.min.js"></script>
+<script src="{{rootUrl}}/assets/vendor/slugify/slugify.min.js"></script> 
+<script src="{{rootUrl}}/assets/vendor/slugify/speakingurl.min.js"></script> 
+
+<script>
+
+
+function ds_getArticleData()
+{    
+    let articleTitle = document.getElementById("ds-article-title").value;
+    let articleExcerpt = document.getElementById("ds-article-excerpt").value;
+    let content = trumboEditor.html();
+    let active = document.getElementById("ds-article-active").checked;
+
+    let data = {};
+    data.title = articleTitle;
+	data.content = content;
+	data.excerpt = articleExcerpt;
+	data.active = active;
+    
+    return data;
+}
+
+
+async function ds_publish()
+{
+	const name = document.getElementById("sympa-tag-name").value;
+
+    if (name.length >= 3 && name.length <= 255) {} 
+    else {
+        sympa_message("String 'name' must be from 3 to 255 chars long.");
+        return;
+    }  
+    
+	let postData = new FormData();  
+	postData.append('name', name);
+
+	const response = await fetch('/tag-create', {
+		method: 'POST', 
+		body: postData,
+	});
+	
+	const jsonData = await response.json();
+	
+	if (jsonData.error) {
+		sympa_message(jsonData.message, 'warning');
+	}
+	else {
+		sympa_message('Article created!', 'success');
+		setTimeout(function () {
+		//	window.location.reload();
+		}, 2000);
+	}
+}
+
+
+
+
+
+</script>

@@ -1,0 +1,691 @@
+<link rel="stylesheet" href="{{rootUrl}}/assets/vendor/noUiSlider-15.8.1/nouislider.min.css">
+
+<style>
+
+.sympa-body-container{
+	margin: 0 20%;
+}
+
+.sympa-products-card-container{
+	position: absolute;
+	width: 100%;
+}
+
+.sympa-products-onsale{
+	position: inherit;
+	background: yellow;
+	height: 50px;
+	width: 50px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	border-radius: 50%;
+	top: 10px;
+	left: 10px;
+	font-size: 14px;
+	font-weight: bold;
+	box-shadow: rgba(0, 0, 0, 0.15) 1.95px 1.95px 2.6px;
+}
+
+.sympa-products-inside-right{
+	position: inherit;
+	background: white;
+	height: 71px;
+	width: 40px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	border-radius: 4px;
+	top: 10px;
+	right: 10px;
+	font-size: 19px;
+	font-weight: bold;
+	box-shadow: rgba(50, 50, 93, 0.25) 0px 2px 5px -1px, rgba(0, 0, 0, 0.3) 0px 1px 3px -1px;
+	flex-direction: column;
+}
+
+.sympa-card-body{
+	align-content: end;
+}
+
+
+        
+.noUi-connect {
+    background: #0d6efd; 
+}
+	
+.sympa-price-filter {   
+    background: #cfe2ff;
+    border-radius: 4px;
+    padding: 5px;
+}
+    
+</style>
+
+
+
+
+<br><br>
+
+ <div class="container">
+        
+        
+        
+        
+<div class="container text-center">
+  <div class="row">
+    <div class="col-3">
+    
+    <div class="sympa-price-filter mb-2">
+    Filter by price:
+    <br><br><br>
+    <div style="height:50px; padding:0 20px">
+     <div id="values-slider"></div>   
+    </div>
+   
+   <div class="d-flex justify-content-between align-items-center">
+   <div> Price: <span id="range-slider-start">0</span> - <span id="range-slider-end">100</span>€</div>
+    
+    <button type="button" class="ml-3 btn btn-primary">Filter</button>
+    </div>
+    
+    </div>
+    
+    <div class="accordion" id="accordionExample">
+  <div class="accordion-item">
+    <h2 class="accordion-header">
+      <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+        Brand
+      </button>
+    </h2>
+    <div id="collapseOne" class="accordion-collapse collapse show" data-bs-parent="#accordionExample">
+      <div class="accordion-body">
+      
+<div class="form-check d-flex">
+    <div>
+        <input class="form-check-input" type="checkbox" value="" id="">
+    </div>
+    <span> Alpha </span>  
+</div>
+
+<div class="form-check d-flex">
+    <div>        
+        <input class="form-check-input" type="checkbox" value="" id="">
+    </div>
+    <span> Beta </span>  
+</div>
+      
+      </div>
+    </div>
+  </div>
+  <div class="accordion-item">
+    <h2 class="accordion-header">
+      <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
+        Attribute one
+      </button>
+    </h2>
+    <div id="collapseTwo" class="accordion-collapse collapse" data-bs-parent="#accordionExample">
+      <div class="accordion-body">
+
+<div class="form-check d-flex">
+    <div>
+        <input class="form-check-input" type="checkbox" value="" id="">
+    </div>
+    <span> Alpha </span>  
+</div>
+
+<div class="form-check d-flex">
+    <div>        
+        <input class="form-check-input" type="checkbox" value="" id="">
+    </div>
+    <span> Beta </span>  
+</div>
+
+      </div>
+    </div>
+  </div>
+  <div class="accordion-item">
+    <h2 class="accordion-header">
+      <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
+        Attribute Two
+      </button>
+    </h2>
+    <div id="collapseThree" class="accordion-collapse collapse" data-bs-parent="#accordionExample">
+      <div class="accordion-body">
+
+<div class="form-check d-flex">
+    <div>
+        <input class="form-check-input" type="checkbox" value="" id="">
+    </div>
+    <span> Alpha <span class="badge text-bg-secondary">11</span></span>  
+</div>
+
+<div class="form-check d-flex">
+    <div>        
+        <input class="form-check-input" type="checkbox" value="" id="">
+    </div>
+    <span> Beta <span class="badge text-bg-secondary">11</span></span>  
+</div>
+
+      </div>
+    </div>
+  </div>
+</div>    
+    </div>
+    <div class="col-9">
+    
+  
+<ul class="nav nav-pills m-1">
+  <li class="nav-item">
+    <a class="nav-link active" aria-current="page" href="#">Active</a>
+  </li>
+  <li class="nav-item">
+    <a class="nav-link" href="#">Link</a>
+  </li>
+  <li class="nav-item">
+    <a class="nav-link" href="#">Link</a>
+  </li>
+  <li class="nav-item">
+    <a class="nav-link disabled" aria-disabled="true">Disabled</a>
+  </li>
+</ul>
+  
+  
+  <div id="sympa-product-list">
+
+<!--
+
+
+
+  <div class="card-group">	
+  <div class="card">
+	  <div class="sympa-products-card-container">
+
+		  <div class="sympa-products-inside-right"><i class="bi bi-heart"></i> <i class="bi bi-shuffle"></i></div>
+	 </div>
+	<img src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEigFyIhZSUZN_3RF2ZtYvnox81rdNAuihagtlxnehV0IDogJFwQKFpwtZ0CZglN0hwlskaEmzDDJZ_j5nnEem4V95LCm8ql9Dlk13iXOOUoF9qB5YIMremdgB2v9QOiZIk11j0zMeMBmKElAOt0J8s66DIR9Pxgsjc1xTTuie0cPLRZhpvs1K2Ja7jhMFvx/s1000/mikrovalna-gorenje-mo17e1s.jpg" class="card-img-top" alt="...">
+    <div class="card-body sympa-card-body">
+      <h5 class="card-title">Daljinski upravljač za klimu univerzalni</h5>
+      <p class="card-text"><i class="bi bi-check-circle"></i> Na zalihi</p>
+      <div class="d-grid gap-2">
+		<div class="btn btn-outline-primary">Dodaj u košaricu</div>		
+      </div> 
+    </div>    
+    
+    <div class="card-footer">
+      <small class="text-body-secondary">Šifra: 51706</small>
+    </div>		 
+  </div>
+  
+  
+  <div class="card">
+	  <div class="sympa-products-card-container">
+		  <div class="sympa-products-onsale">-25%</div>
+		  <div class="sympa-products-inside-right"><i class="bi bi-heart"></i> <i class="bi bi-shuffle"></i></div>
+	 </div>
+	<img src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEhFzDEdKpCeS4X7G9Ot3hE8Y_TtpYc26Pwp8dSHLNoC_mZyavUQ-k6T_tnkANOM6vdcFXm8nPxK-SWSz4ZsjiBWv7Ycu6A05YD9i-bUg00fKOozCNnIqeH5JW-7PFWoO-LUXYdPljR0cQ3NlX1lh7SHmBFMgtnTuZ7qRIk5EPtWYB0dTKF6UazID7hgZLeb/s1400/ok.jpg" class="card-img-top" alt="...">
+    <div class="card-body sympa-card-body">
+      <h5 class="card-title">Daljinski upravljač za klimu univerzalni</h5>
+      <p class="card-text"><i class="bi bi-check-circle"></i> Na zalihi</p>
+      <div class="d-grid gap-2">
+		<div class="btn btn-outline-primary">Dodaj u košaricu</div>		
+      </div> 
+    </div>    
+    
+    <div class="card-footer">
+      <small class="text-body-secondary">Šifra: 51706</small>
+    </div>		 
+  </div>
+  
+  
+  <div class="card">
+	  <div class="sympa-products-card-container">
+
+		  <div class="sympa-products-inside-right"><i class="bi bi-heart"></i> <i class="bi bi-shuffle"></i></div>
+	 </div>
+	<img src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEgBVkf9Uc1AfO7i4VLeHm2lCYEhglMg03RKfE2tt_mnE7JEkp6AEXHfKICO7fyd9Jq7TZQy2i-vEKRV-5xs2eqIXtFNCytRQw0z4g4rdXckYMdhBauHuJGyXtr6mDdFswxaNNBkQwc4FNO2djRjVYSgzW-h5VVTARnEzetbx7bK4J2wcqMzKW0My7W9d_8d/s1000/radio-budilica-muse-m-16-cr.jpgg" class="card-img-top" alt="...">
+    <div class="card-body sympa-card-body">
+      <h5 class="card-title">Daljinski upravljač za klimu univerzalni</h5>
+      <p class="card-text"><i class="bi bi-x-circle"></i> Nema na zalihi</p>
+      <div class="d-grid gap-2">
+		<div class="btn btn-outline-primary">Dodaj u košaricu</div>		
+      </div> 
+    </div>    
+    
+    <div class="card-footer">
+      <small class="text-body-secondary">Šifra: 51706</small>
+    </div>		 
+  </div>
+  
+  
+  
+  
+  
+  
+  <div class="card">
+	  <div class="sympa-products-card-container">
+
+		  <div class="sympa-products-inside-right"><i class="bi bi-heart"></i> <i class="bi bi-shuffle"></i></div>
+	 </div>
+	<img src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEjOAoVavw0VAhU7HXb4JKsBv1FHOh41r7yQqPn935m0hmmoIMYMtmVC7fxAyCyFpkojbkOvgVRDADIE1cwKhpxQzIDomDu-Kb7Piiga2buQu-3i3Dk23qw4xF4LlFBxIgYv1a5hLHIhWcAODGm57gPTsK0slKUMyXnwojOo8ATC4JEnOXaCTAwSWFlBbySC/s1000/toster-preklopni-vox-sm-217.jpg" class="card-img-top" alt="...">
+    <div class="card-body sympa-card-body">
+      <h5 class="card-title">Daljinski upravljač za klimu univerzalni</h5>
+      <p class="card-text"><i class="bi bi-check-circle"></i> Na zalihi</p>
+      <div class="d-grid gap-2">
+		<div class="btn btn-outline-primary">Dodaj u košaricu</div>		
+      </div> 
+    </div>    
+    
+    <div class="card-footer">
+      <small class="text-body-secondary">Šifra: 51706</small>
+    </div>		 
+  </div>
+   
+</div>	
+
+
+
+
+
+
+
+
+
+  
+<div class="card-group">	
+  <div class="card">
+	  <div class="sympa-products-card-container">
+
+		  <div class="sympa-products-inside-right"><i class="bi bi-heart"></i> <i class="bi bi-shuffle"></i></div>
+	 </div>
+	<img src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEigFyIhZSUZN_3RF2ZtYvnox81rdNAuihagtlxnehV0IDogJFwQKFpwtZ0CZglN0hwlskaEmzDDJZ_j5nnEem4V95LCm8ql9Dlk13iXOOUoF9qB5YIMremdgB2v9QOiZIk11j0zMeMBmKElAOt0J8s66DIR9Pxgsjc1xTTuie0cPLRZhpvs1K2Ja7jhMFvx/s1000/mikrovalna-gorenje-mo17e1s.jpg" class="card-img-top" alt="...">
+    <div class="card-body sympa-card-body">
+      <h5 class="card-title">Daljinski upravljač za klimu univerzalni</h5>
+      <p class="card-text"><i class="bi bi-check-circle"></i> Na zalihi</p>
+      <div class="d-grid gap-2">
+		<div class="btn btn-outline-primary">Dodaj u košaricu</div>		
+      </div> 
+    </div>    
+    
+    <div class="card-footer">
+      <small class="text-body-secondary">Šifra: 51706</small>
+    </div>		 
+  </div>
+  
+  
+  <div class="card">
+	  <div class="sympa-products-card-container">
+		  <div class="sympa-products-onsale">-25%</div>
+		  <div class="sympa-products-inside-right"><i class="bi bi-heart"></i> <i class="bi bi-shuffle"></i></div>
+	 </div>
+	<img src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEhFzDEdKpCeS4X7G9Ot3hE8Y_TtpYc26Pwp8dSHLNoC_mZyavUQ-k6T_tnkANOM6vdcFXm8nPxK-SWSz4ZsjiBWv7Ycu6A05YD9i-bUg00fKOozCNnIqeH5JW-7PFWoO-LUXYdPljR0cQ3NlX1lh7SHmBFMgtnTuZ7qRIk5EPtWYB0dTKF6UazID7hgZLeb/s1400/ok.jpg" class="card-img-top" alt="...">
+    <div class="card-body sympa-card-body">
+      <h5 class="card-title">Daljinski upravljač za klimu univerzalni</h5>
+      <p class="card-text"><i class="bi bi-check-circle"></i> Na zalihi</p>
+      <div class="d-grid gap-2">
+		<div class="btn btn-outline-primary">Dodaj u košaricu</div>		
+      </div> 
+    </div>    
+    
+    <div class="card-footer">
+      <small class="text-body-secondary">Šifra: 51706</small>
+    </div>		 
+  </div>
+  
+  
+  <div class="card">
+	  <div class="sympa-products-card-container">
+
+		  <div class="sympa-products-inside-right"><i class="bi bi-heart"></i> <i class="bi bi-shuffle"></i></div>
+	 </div>
+	<img src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEgBVkf9Uc1AfO7i4VLeHm2lCYEhglMg03RKfE2tt_mnE7JEkp6AEXHfKICO7fyd9Jq7TZQy2i-vEKRV-5xs2eqIXtFNCytRQw0z4g4rdXckYMdhBauHuJGyXtr6mDdFswxaNNBkQwc4FNO2djRjVYSgzW-h5VVTARnEzetbx7bK4J2wcqMzKW0My7W9d_8d/s1000/radio-budilica-muse-m-16-cr.jpgg" class="card-img-top" alt="...">
+    <div class="card-body sympa-card-body">
+      <h5 class="card-title">Daljinski upravljač za klimu univerzalni</h5>
+      <p class="card-text"><i class="bi bi-x-circle"></i> Nema na zalihi</p>
+      <div class="d-grid gap-2">
+		<div class="btn btn-outline-primary">Dodaj u košaricu</div>		
+      </div> 
+    </div>    
+    
+    <div class="card-footer">
+      <small class="text-body-secondary">Šifra: 51706</small>
+    </div>		 
+  </div>
+  
+  
+  
+  
+  
+  
+  <div class="card">
+	  <div class="sympa-products-card-container">
+		  <div class="sympa-products-inside-right"><i class="bi bi-heart"></i> <i class="bi bi-shuffle"></i></div>
+	 </div>
+	<img src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEjOAoVavw0VAhU7HXb4JKsBv1FHOh41r7yQqPn935m0hmmoIMYMtmVC7fxAyCyFpkojbkOvgVRDADIE1cwKhpxQzIDomDu-Kb7Piiga2buQu-3i3Dk23qw4xF4LlFBxIgYv1a5hLHIhWcAODGm57gPTsK0slKUMyXnwojOo8ATC4JEnOXaCTAwSWFlBbySC/s1000/toster-preklopni-vox-sm-217.jpg" class="card-img-top" alt="...">
+    <div class="card-body sympa-card-body">
+      <h5 class="card-title">Daljinski upravljač za klimu univerzalni</h5>
+      <p class="card-text"><i class="bi bi-check-circle"></i> Na zalihi</p>
+      <div class="d-grid gap-2">
+		<div class="btn btn-outline-primary">Dodaj u košaricu</div>		
+      </div> 
+    </div>    
+    
+    <div class="card-footer">
+      <small class="text-body-secondary">Šifra: 51706</small>
+    </div>		 
+  </div>
+  
+  
+  
+  
+  
+    
+    
+    </div>
+    
+
+
+  -->
+    
+    </div>
+    
+    
+    <br>
+    
+        <nav aria-label="...">
+  <ul class="pagination">
+    <li class="page-item disabled">
+      <span class="page-link">Previous</span>
+    </li>
+    <li class="page-item"><a class="page-link" href="#">1</a></li>
+    <li class="page-item active" aria-current="page">
+      <span class="page-link">2</span>
+    </li>
+    <li class="page-item"><a class="page-link" href="#">3</a></li>
+    <li class="page-item">
+      <a class="page-link" href="#">Next</a>
+    </li>
+  </ul>
+</nav>
+  
+    
+  </div>   
+</div>  
+</div>  
+  
+    
+  
+
+
+  
+  
+  
+  
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</div>
+
+
+
+
+
+
+
+
+<!-- components -->
+{{components|raw}}
+    
+<script>
+    window.addEventListener("load", function(){			
+        initDsCart();
+    });
+</script>
+
+
+
+
+
+<script src="{{rootUrl}}/assets/vendor/noUiSlider-15.8.1/nouislider.min.js"></script>
+
+<script>
+
+var valuesSlider = document.getElementById('values-slider');
+
+/*
+noUiSlider.create(valuesSlider, {
+    start: [8, 24],
+    // A linear range from 0 to 15 (16 values)
+    range: { min: 0, max: valuesForSlider.length - 1 },
+    // steps of 1
+    step: 1,
+    tooltips: true,
+    format: format,
+});
+*/
+
+noUiSlider.create(valuesSlider, {
+    start: [10, 10000],  // Start positions
+    connect: true,       // Connect the range
+    range: {
+      'min': 10,
+      'max': 10000
+    },
+    step: 0.01,  // Allows float values
+    tooltips: false,
+    format: {
+      to: function (value) {
+        return parseInt(value);  // Format the value to 2 decimal places with a euro sign
+      },
+      from: function (value) {
+        return Number(value);  // Parse the value back to a number
+      }
+    }
+});
+
+valuesSlider.noUiSlider.on('update', function (values, handle) {
+    if (handle === 0) {
+        document.getElementById('range-slider-start').innerHTML = parseInt(values[0]);
+    } else {
+        document.getElementById('range-slider-end').innerHTML = parseInt(values[1]);
+    }
+});
+
+
+function updateSliderRange(minValue, maxValue) {
+    valuesSlider.noUiSlider.updateOptions({
+        range: {
+            'min': minValue,
+            'max': maxValue
+        }
+    });
+}
+
+// Example of updating the range dynamically
+// Update the range to 20 - 5000
+//updateSliderRange(20, 5000);
+
+
+function sympa_drawList(data)
+{      
+    const _formatEuroPrice = function(amount) {
+        return amount.toFixed(2).replace('.', ',');
+    }
+    
+    const _createItem = function(x){
+       
+        let id = x.id;
+        let title = x.title;
+        let excerpt = x.excerpt;
+        let image = x.image;
+        let sku = x.sku;
+        let uuid = x.uuid;
+        let groupUuid = x.groupUuid;
+        let quantity = x.quantity;
+        let price = x.price;
+        let priceMoney = _formatEuroPrice(x.price);
+        
+        let createdAt = x.created_at;
+        let modifiedAt = x.modified_at;
+        
+        let quantityElement = null;
+        if (quantity > 0) {
+            quantityElement = `<div style="color: #666;"><i class="bi bi-check-circle"></i> <small>Avaliable</small></div>`;
+        }
+        else{
+            quantityElement = `<div style="color: #999;"><i class="bi bi-x-circle"></i> <small>Not available</small></div>`;
+        }
+           
+        // sympa_addToCart(id, title, image, price){   
+           
+        return `
+		<div class="card">
+           <div class="sympa-products-card-container">
+              <div class="sympa-products-inside-right"><i class="bi bi-heart"></i> <i class="bi bi-shuffle"></i></div>
+           </div>
+           <img style="cursor:pointer" onclick="window.open('/product-id/${id}', '_blank')" src="${image}" class="card-img-top" alt="...">
+           <div class="card-body sympa-card-body">
+              <h5 class="card-title">${title}</h5>
+              <p class="card-text">${quantityElement}</p>
+              <div data-price="${price}"><b>${priceMoney} €</b></div>
+              <div class="d-grid gap-2">
+                 <div class="btn btn-outline-primary" onclick="sympa_addToCart(${id},'${title}','${image}',${price})">Add to cart</div>
+              </div>
+           </div>
+           <div class="card-footer">
+              <small class="text-body-secondary" title="ID: ${id} \nUUID: ${uuid}\nGroup Uuid: ${groupUuid}">SKU: ${sku}</small>
+           </div>
+        </div>
+        `;        
+    }
+    
+    let _createEmptyItem = function(){
+        
+        return `
+        <div class="card" style="background: #eee;">
+        </div>
+        `;        
+    }
+    
+    //<div class="card-group"> </div>
+
+    
+    let htmlData = ``;    
+    let listElement = document.getElementById("sympa-product-list");    
+    
+    let counter = 0;
+    for (const key in data.products) {
+        
+        //htmlData += _createItem(data.products[key]);
+        //htmlData += ""
+        if (counter == 0) htmlData += `<div class="card-group">`;         
+        // htmlData += counter + "<br> ";
+        htmlData += _createItem(data.products[key]);
+        if (counter == 3) htmlData += "</div>";
+                
+        counter++;
+        if (counter == 4) counter = 0;
+    }
+    
+    counter--;
+    
+    if (counter < 3){
+        let i = counter+1;
+        for (; i<4; i++){
+            // htmlData += `fill empty = ` + i + "<br>";
+            htmlData += _createEmptyItem();
+        }
+        
+        counter = i-1;
+    }
+    
+    if (counter == 3){
+        htmlData += "</div>";
+    }    
+    
+    htmlData += ``;
+    
+    listElement.innerHTML = htmlData;
+    
+    // let totalArticlesElement = document.getElementById("sympa-total-articles");
+   // totalArticlesElement.innerHTML = data.total + ' items(s)';   
+}
+
+
+
+function sympa_addToCart(id, title, image, price){
+
+    dsCart.show();
+    
+    dsCart.addItem({
+        'image':  image, 
+        'title': title, 
+        'price': price, 
+        'quantity': 1, 
+        'sku': id,
+    });   
+
+}
+
+
+async function sympa_getProductsByUrl(url)
+{          
+    const response = await fetch('/product-get-all?'+url); 
+	const jsonData = await response.json();
+	if (response.status != 200){
+		console.log('ERROR!');
+		return null;
+	}
+    
+    if (!jsonData.products){
+        throw new Error("Missing 'products' object. Bad json format!");
+    }
+    
+    return jsonData;
+}
+
+
+
+async function sympa_initList(){
+    const currentUrl = window.location.href;
+    const url = new URL(currentUrl);
+    const queryParams = url.search;
+    
+    const data = await sympa_getProductsByUrl(queryParams);
+    sympa_drawList(data);    
+    //console.log(url.search, "----"); 
+}
+
+
+
+//INIT
+window.addEventListener("load", async function(){       
+    sympa_initList();
+    console.log("LOADED!");   
+});
+
+
+
+
+</script>
+	  
+
+

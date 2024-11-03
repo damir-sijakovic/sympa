@@ -2,11 +2,13 @@
 
 namespace App\Entity;
 
+use App\Repository\ShopOrdersRepository;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
 
-#[ORM\Entity]
-class Order
+#[ORM\Entity(repositoryClass: ShopOrdersRepository::class)]
+#[ORM\Table(name: "shop_orders")]
+class ShopOrders
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
@@ -52,146 +54,163 @@ class Order
     #[ORM\Column(type: 'text', nullable: true)]
     private ?string $deliveryNote = null;
 
+    #[ORM\Column]
+    private ?\DateTimeImmutable $createdAt = null;
+
     #[ORM\Column(type: 'json')]
     #[Assert\NotNull]
     private array $productList = [];
 
-    // Getters and Setters
+    #[ORM\Column(type: 'string', length: 50)]
+    private ?string $status = null;
 
+    // Getters and Setters
     public function getId(): ?int
     {
-        return $id;
+        return $this->id;
     }
 
     public function getFirstName(): ?string
     {
-        return $firstName;
+        return $this->firstName;
     }
 
     public function setFirstName(string $firstName): self
     {
         $this->firstName = $firstName;
-
         return $this;
     }
 
     public function getLastName(): ?string
     {
-        return $lastName;
+        return $this->lastName;
     }
 
     public function setLastName(string $lastName): self
     {
         $this->lastName = $lastName;
-
         return $this;
     }
 
     public function getEmail(): ?string
     {
-        return $email;
+        return $this->email;
     }
 
     public function setEmail(string $email): self
     {
         $this->email = $email;
-
         return $this;
     }
 
     public function getAddress(): ?string
     {
-        return $address;
+        return $this->address;
     }
 
     public function setAddress(string $address): self
     {
         $this->address = $address;
-
         return $this;
     }
 
     public function getAddress2(): ?string
     {
-        return $address2;
+        return $this->address2;
     }
 
     public function setAddress2(?string $address2): self
     {
         $this->address2 = $address2;
-
         return $this;
     }
 
     public function getPhone(): ?string
     {
-        return $phone;
+        return $this->phone;
     }
 
     public function setPhone(string $phone): self
     {
         $this->phone = $phone;
-
         return $this;
     }
 
     public function getCountry(): ?string
     {
-        return $country;
+        return $this->country;
     }
 
     public function setCountry(string $country): self
     {
         $this->country = $country;
-
         return $this;
     }
 
     public function getState(): ?string
     {
-        return $state;
+        return $this->state;
     }
 
     public function setState(string $state): self
     {
         $this->state = $state;
-
         return $this;
     }
 
     public function getZip(): ?string
     {
-        return $zip;
+        return $this->zip;
     }
 
     public function setZip(string $zip): self
     {
         $this->zip = $zip;
-
         return $this;
     }
 
     public function getDeliveryNote(): ?string
     {
-        return $deliveryNote;
+        return $this->deliveryNote;
     }
 
     public function setDeliveryNote(?string $deliveryNote): self
     {
         $this->deliveryNote = $deliveryNote;
+        return $this;
+    }
 
+    public function getCreatedAt(): ?\DateTimeImmutable
+    {
+        return $this->createdAt;
+    }
+
+    public function setCreatedAt(\DateTimeImmutable $createdAt): self
+    {
+        $this->createdAt = $createdAt;
         return $this;
     }
 
     public function getProductList(): array
     {
-        return $productList;
+        return $this->productList;
     }
 
     public function setProductList(array $productList): self
     {
         $this->productList = $productList;
+        return $this;
+    }
 
+    public function getStatus(): ?string
+    {
+        return $this->status;
+    }
+
+    public function setStatus(string $status): self
+    {
+        $this->status = $status;
         return $this;
     }
 }
+

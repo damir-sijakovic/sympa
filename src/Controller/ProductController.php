@@ -285,7 +285,7 @@ class ProductController extends AbstractController
     
     
 
-public function getProductsPost(Request $request): Response
+public function getProductsOld(Request $request): Response
 {
     try {
         $perPage = $request->query->getInt('per-page', 10);
@@ -343,11 +343,6 @@ public function getProductsPost(Request $request): Response
         $totalQueryBuilder = clone $queryBuilder;
         $totalArticles = (int) $totalQueryBuilder->select('COUNT(a.id)')->getQuery()->getSingleScalarResult();
 
-        // Log the pagination values for debugging
-        //error_log("Page: " . $page);
-        //error_log("PerPage: " . $perPage);
-        //error_log("Offset: " . $offset);
-        //error_log("Total Articles: " . $totalArticles);
 
         // Ensure offset doesn't exceed total articles
         if ($offset >= $totalArticles) {
@@ -380,6 +375,9 @@ public function getProductsPost(Request $request): Response
                 'excerpt' => $article->getExcerpt(),
                 'content' => $article->getContent(),
                 'slug' => $article->getSlug(),
+                'sku' => $article->getSku(),
+                'uuid' => $article->getUuid(),
+                'groupUuid' => $article->getGroupUuid(),
                 'image' => $article->getImage(),
                 'created_at' => $article->getCreatedAt()->format('Y-m-d H:i:s'),
                 'modified_at' => $article->getModifiedAt() ? $article->getModifiedAt()->format('Y-m-d H:i:s') : null,
@@ -398,7 +396,7 @@ public function getProductsPost(Request $request): Response
 }
 
 
-    public function getArticlesPostOLD(Request $request): Response
+    public function getProducts(Request $request): Response
     {
         try {
             $perPage = $request->query->getInt('per-page', 10);
@@ -407,6 +405,8 @@ public function getProductsPost(Request $request): Response
             $active = $request->query->get('active'); // Get the active parameter
             $search = $request->query->get('search'); // Get the search parameter
             $category = $request->query->get('category'); // Get the category parameter
+            $tag = $request->query->get('tag'); // Get the tag parameter
+            $products = $request->query->get('products'); // Get the products parameter (list of IDs)
             $offset = ($page - 1) * $perPage;
 
             // Determine the sorting order based on the "sort" parameter
@@ -415,54 +415,75 @@ public function getProductsPost(Request $request): Response
             } elseif ($sort === 'id-desc') {
                 $order = ['id' => 'DESC'];
             } else {
-                // Default to sorting by createdAt
                 $order = ($sort === 'asc') ? ['createdAt' => 'ASC'] : ['createdAt' => 'DESC'];
             }
 
             $articleRepository = $this->entityManager->getRepository(Article::class);
 
-            // Create criteria for the query, including active filter and type "article"
-            $criteria = ['type' => 'article'];
-            if ($active === '1') {
-                $criteria['active'] = true;
-            } elseif ($active === '0') {
-                $criteria['active'] = false;
-            }
-
-            // Build the query with optional category filter
+            // Create criteria for the query
             $queryBuilder = $articleRepository->createQueryBuilder('a')
                 ->where('a.type = :type')
                 ->setParameter('type', 'product');
 
+            // Filter by active status if provided
             if ($active === '1') {
                 $queryBuilder->andWhere('a.active = :active')->setParameter('active', true);
             } elseif ($active === '0') {
                 $queryBuilder->andWhere('a.active = :active')->setParameter('active', false);
             }
 
-            if (!empty($search)) {
-                $queryBuilder->andWhere('a.title LIKE :search OR a.excerpt LIKE :search')
-                             ->setParameter('search', '%' . $search . '%');
+            // Check if the 'products' query parameter exists
+            if (!empty($products)) {
+                // Convert the products parameter to an array of IDs
+                $productIds = array_map('intval', explode(',', $products));
+
+                // Filter by the given product IDs
+                $queryBuilder->andWhere('a.id IN (:productIds)')
+                             ->setParameter('productIds', $productIds);
+
+                // Ignore the search query parameter when products are provided
+            } else {
+                // Apply search filter if products filter is not present
+                if (!empty($search)) {
+                    $queryBuilder->andWhere('a.title LIKE :search OR a.excerpt LIKE :search')
+                                 ->setParameter('search', '%' . $search . '%');
+                }
             }
 
+            // Filter by category if provided
             if (!empty($category)) {
-                // Join with ArticleCategory entity to filter by category
                 $queryBuilder->join('App\Entity\ArticleCategory', 'ac', 'WITH', 'ac.article = a')
                              ->andWhere('ac.category = :category')
                              ->setParameter('category', $category);
             }
 
-            // First count all results that match the criteria
-            $totalQuery = clone $queryBuilder;
-            $totalArticles = count($totalQuery->getQuery()->getResult());
+            // Filter by tag if provided
+            if (!empty($tag)) {
+                $queryBuilder->join('App\Entity\ArticleTag', 'at', 'WITH', 'at.article = a')
+                             ->andWhere('at.tag = :tag')
+                             ->setParameter('tag', $tag);
+            }
+
+            // Clone the query builder for counting total results
+            $totalQueryBuilder = clone $queryBuilder;
+            $totalArticles = (int) $totalQueryBuilder->select('COUNT(a.id)')->getQuery()->getSingleScalarResult();
+
+            // Ensure offset doesn't exceed total articles
+            if ($offset >= $totalArticles) {
+                $offset = max(0, $totalArticles - $perPage);  // Adjust offset if it exceeds total
+            }
 
             // Apply pagination and sorting
-            $queryBuilder->orderBy('a.' . key($order), current($order))
-                         ->setFirstResult($offset)
-                         ->setMaxResults($perPage);
+            if (!empty($order)) {
+                $queryBuilder->orderBy('a.' . key($order), current($order));
+            }
 
+            $queryBuilder->setFirstResult($offset)->setMaxResults($perPage);
+
+            // Fetch the products
             $articles = $queryBuilder->getQuery()->getResult();
 
+            // Prepare article data for response
             $articleData = [];
             foreach ($articles as $article) {
                 $articleData[] = [
@@ -470,7 +491,12 @@ public function getProductsPost(Request $request): Response
                     'title' => $article->getTitle(),
                     'excerpt' => $article->getExcerpt(),
                     'content' => $article->getContent(),
+                    'quantity' => $article->getQuantity(),
+                    'price' => $article->getPrice(),
                     'slug' => $article->getSlug(),
+                    'sku' => $article->getSku(),
+                    'uuid' => $article->getUuid(),
+                    'groupUuid' => $article->getGroupUuid(),
                     'image' => $article->getImage(),
                     'created_at' => $article->getCreatedAt()->format('Y-m-d H:i:s'),
                     'modified_at' => $article->getModifiedAt() ? $article->getModifiedAt()->format('Y-m-d H:i:s') : null,
@@ -478,15 +504,132 @@ public function getProductsPost(Request $request): Response
                 ];
             }
 
+            // Pagination data
             $paginateData = $this->utilityHelper->paginate($totalArticles, $perPage, $page, 3); // 3 = visible pages
 
-            return $this->json(['total' => $totalArticles, 'articles' => $articleData, 'paginateData' => $paginateData]);
-        } catch (\Exception $e) {
+            return $this->json(['total' => $totalArticles, 'products' => $articleData, 'paginateData' => $paginateData]);
+        } 
+        catch (\Exception $e) 
+        {
             return $this->json(['error' => $e->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
 
-    
+
+
+/*
+public function getProductsOld(Request $request): Response
+{
+    try {
+        $perPage = $request->query->getInt('per-page', 10);
+        $page = $request->query->getInt('page', 1);
+        $sort = $request->query->get('sort', 'desc'); // Default sort order is descending
+        $active = $request->query->get('active'); // Get the active parameter
+        $search = $request->query->get('search'); // Get the search parameter
+        $category = $request->query->get('category'); // Get the category parameter
+        $tag = $request->query->get('tag'); // Get the tag parameter
+        $offset = ($page - 1) * $perPage;
+
+        // Determine the sorting order based on the "sort" parameter
+        if ($sort === 'id-asc') {
+            $order = ['id' => 'ASC'];
+        } elseif ($sort === 'id-desc') {
+            $order = ['id' => 'DESC'];
+        } else {
+            // Default to sorting by createdAt
+            $order = ($sort === 'asc') ? ['createdAt' => 'ASC'] : ['createdAt' => 'DESC'];
+        }
+
+        $articleRepository = $this->entityManager->getRepository(Article::class);
+
+        // Create criteria for the query, including active filter and type "article"
+        $queryBuilder = $articleRepository->createQueryBuilder('a')
+            ->where('a.type = :type')
+            ->setParameter('type', 'product');
+
+        if ($active === '1') {
+            $queryBuilder->andWhere('a.active = :active')->setParameter('active', true);
+        } elseif ($active === '0') {
+            $queryBuilder->andWhere('a.active = :active')->setParameter('active', false);
+        }
+
+        if (!empty($search)) {
+            $queryBuilder->andWhere('a.title LIKE :search OR a.excerpt LIKE :search')
+                         ->setParameter('search', '%' . $search . '%');
+        }
+
+        if (!empty($category)) {
+            // Join with ArticleCategory entity to filter by category
+            $queryBuilder->join('App\Entity\ArticleCategory', 'ac', 'WITH', 'ac.article = a')
+                         ->andWhere('ac.category = :category')
+                         ->setParameter('category', $category);
+        }
+
+        if (!empty($tag)) {
+            // Join with ArticleTag entity to filter by tag
+            $queryBuilder->join('App\Entity\ArticleTag', 'at', 'WITH', 'at.article = a')
+                         ->andWhere('at.tag = :tag')
+                         ->setParameter('tag', $tag);
+        }
+
+        // Clone the query builder for counting results to avoid affecting the main query
+        $totalQueryBuilder = clone $queryBuilder;
+        $totalArticles = (int) $totalQueryBuilder->select('COUNT(a.id)')->getQuery()->getSingleScalarResult();
+
+
+        // Ensure offset doesn't exceed total articles
+        if ($offset >= $totalArticles) {
+            $offset = max(0, $totalArticles - $perPage);  // Adjust offset if it exceeds total
+            //error_log("Adjusted Offset: " . $offset);  // Log the adjusted offset
+        }
+
+        // Apply pagination and sorting
+        if (!empty($order)) {
+            $queryBuilder->orderBy('a.' . key($order), current($order));
+        }
+
+        $queryBuilder->setFirstResult($offset)->setMaxResults($perPage);
+
+        // Fetch articles after count, this should return Article entities
+        $articles = $queryBuilder->getQuery()->getResult();
+
+        //if (empty($articles)) {
+        //    error_log("No articles found for the current page and offset.");
+        //} else {
+        //    error_log("Found " . count($articles) . " articles.");
+        //}
+
+        // Prepare article data for response
+        $articleData = [];
+        foreach ($articles as $article) {
+            $articleData[] = [
+                'id' => $article->getId(),
+                'title' => $article->getTitle(),
+                'excerpt' => $article->getExcerpt(),
+                'content' => $article->getContent(),
+                'slug' => $article->getSlug(),
+                'sku' => $article->getSku(),
+                'uuid' => $article->getUuid(),
+                'groupUuid' => $article->getGroupUuid(),
+                'image' => $article->getImage(),
+                'created_at' => $article->getCreatedAt()->format('Y-m-d H:i:s'),
+                'modified_at' => $article->getModifiedAt() ? $article->getModifiedAt()->format('Y-m-d H:i:s') : null,
+                'active' => $article->isActive(),
+            ];
+        }
+
+        $paginateData = $this->utilityHelper->paginate($totalArticles, $perPage, $page, 3); // 3 = visible pages
+
+        return $this->json(['total' => $totalArticles, 'products' => $articleData, 'paginateData' => $paginateData]);
+    } 
+    catch (\Exception $e) 
+    {
+        return $this->json(['error' => $e->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR);
+    }
+}
+*/
+
+
 
  public function deleteByIdsPostNew(Request $request): Response
     {
@@ -729,6 +872,8 @@ public function getProductsPost(Request $request): Response
                  $attribute = new Attribute();
                  $attribute->setArticleId($article->getId())
                            ->setKey($key)
+                           ->setSlug($key)
+                           ->setSlug( strtolower($this->slugger->slug($key)->toString()) )
                            ->setValue($value);
                  $this->entityManager->persist($attribute);
              }
@@ -772,10 +917,13 @@ public function getProductsPost(Request $request): Response
         $ogTitle = $request->request->get('ogTitle');
         $ogDescription = $request->request->get('ogDescription');
         $ogUrl = $request->request->get('ogUrl');
-        $uuid = $request->request->get('uuid');
+       // $uuid = $request->request->get('uuid');
         $groupUuid = $request->request->get('groupUuid');
         $metaJson = $request->request->get('metaJson');  
         $metaJsonData = [];      
+
+        if ($groupUuid === "") $groupUuid = null;
+
 
         if ($metaJson){
             $metaJsonData = json_decode($metaJson, true);
@@ -803,7 +951,7 @@ public function getProductsPost(Request $request): Response
                 ->setOgTitle($ogTitle)
                 ->setOgDescription($ogDescription)
                 ->setOgUrl($ogUrl)
-                ->setUuid($uuid)
+               // ->setUuid($uuid)
                 ->setGroupUuid($groupUuid)
                 ->setModifiedAt(new \DateTimeImmutable());
 
@@ -851,7 +999,8 @@ public function getProductsPost(Request $request): Response
                 $attribute = new Attribute();
                 $attribute->setArticleId($article->getId())
                           ->setKey($key)
-                          ->setValue($value);
+                          ->setValue($value)
+                          ->setSlug( strtolower($this->slugger->slug($key)->toString()) );
                 $this->entityManager->persist($attribute);
             }
         }

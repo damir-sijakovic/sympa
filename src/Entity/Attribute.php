@@ -1,13 +1,14 @@
 <?php
 
-// src/Entity/Attribute.php
 namespace App\Entity;
 
 use App\Repository\AttributeRepository;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: AttributeRepository::class)]
-#[ORM\Table(name: 'attribute')]
+#[ORM\Table(name: 'attribute', uniqueConstraints: [
+    new ORM\UniqueConstraint(name: 'unique_article_key', columns: ['articleId', '`key`'])
+])]
 class Attribute
 {
     #[ORM\Id]
@@ -18,6 +19,9 @@ class Attribute
     #[ORM\Column(type: 'integer')]
     private int $articleId;
 
+    #[ORM\Column(type: "text")]
+    private ?string $slug;
+
     #[ORM\Column(name: '`key`', type: 'string', length: 256)]
     private string $key;
 
@@ -25,6 +29,7 @@ class Attribute
     private string $value;
 
     // Getters and Setters
+
     public function getId(): ?int
     {
         return $this->id;
@@ -62,4 +67,17 @@ class Attribute
         $this->value = $value;
         return $this;
     }
+    
+    public function getSlug(): ?string
+    {
+        return $this->slug;
+    }
+
+    public function setSlug(string $slug): static
+    {
+        $this->slug = $slug;
+
+        return $this;
+    }
+    
 }

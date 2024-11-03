@@ -506,7 +506,7 @@ async function sympa_getCategoriesNew()
 
 async function sympa_getCategorysByUrl(url)
 {          
-    const response = await fetch('/Category-get-all?'+url); 
+    const response = await fetch('/category-get-all?'+url); 
 	const jsonData = await response.json();
 	if (response.status != 200){
 		console.log('ERROR!');
@@ -514,7 +514,7 @@ async function sympa_getCategorysByUrl(url)
 	}
     
     if (!jsonData.Categorys){
-        throw new Error("Missing 'Categorys' object. Bad json format!");
+        throw new Error("Missing 'category' object. Bad json format!");
     }
     
     return jsonData;
